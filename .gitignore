@@ -7,7 +7,6 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
 
 # Compiled Static libraries
 *.lai
@@ -19,3 +18,27 @@
 *.exe
 *.out
 *.app
+
+# Visual Studio project files
+*.sln
+*.suo
+*.sdf
+*.opensdf
+*.vcxproj.user
+
+# Xcode project files
+*.xcodeproj
+
+# Unreal Directories
+/Binaries
+/DerivedDataCache
+/Intermediate
+/Saved
+/Build
+
+
+*.hmap
+
+*.dat
+
+*.dep
