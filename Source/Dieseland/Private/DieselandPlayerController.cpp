@@ -3,6 +3,7 @@
 #include "Dieseland.h"
 #include "DieselandPlayerController.h"
 #include "AI/Navigation/NavigationSystem.h"
+#include "DieselandCharacter.h"
 
 ADieselandPlayerController::ADieselandPlayerController(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
@@ -39,9 +40,13 @@ void ADieselandPlayerController::MoveToMouseCursor()
 {
 	// Trace to see what is under the mouse cursor
 	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-
-	if (Hit.bBlockingHit)
+	GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, Hit);
+	//GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+	if (Hit.Component->GetOwner() != nullptr && Hit.Component->GetOwner()->ActorHasTag("Player") && Hit.Component->GetOwner() != Cast<AActor>(this->GetControlledPawn()))
+	{
+		Cast<ADieselandCharacter>(this->GetControlledPawn())->BasicAttack();
+	}
+	else if(Hit.bBlockingHit)
 	{
 		// We hit something, move there
 		SetNewMoveDestination(Hit.ImpactPoint);

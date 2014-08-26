@@ -3,7 +3,7 @@
 #ifndef __DIESELAND_H__
 #define __DIESELAND_H__
 
-#include "EngineMinimal.h"
+#include "Engine.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogDieseland, Log, All);
 

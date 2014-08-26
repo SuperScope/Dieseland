@@ -8,6 +8,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 {
 	// Set size for player capsule
 	CapsuleComponent->InitCapsuleSize(42.f, 96.0f);
+	CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 
 	// Don't rotate character to camera direction
 	bUseControllerRotationPitch = false;
@@ -33,4 +34,10 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUseControllerViewRotation = false; // Camera does not rotate relative to arm
 
+	Tags.Add(FName("Player"));
+}
+
+void ADieselandCharacter::BasicAttack()
+{
+	GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor::Red, FString("Clicked an opponent"));
 }

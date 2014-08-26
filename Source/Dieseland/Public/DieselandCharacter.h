@@ -16,5 +16,7 @@ class ADieselandCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+	void BasicAttack();
 };
 
