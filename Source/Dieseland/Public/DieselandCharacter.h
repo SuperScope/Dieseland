@@ -7,6 +7,7 @@ UCLASS(Blueprintable)
 class ADieselandCharacter : public ACharacter
 {
 	GENERATED_UCLASS_BODY()
+public:
 
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
@@ -16,7 +17,22 @@ class ADieselandCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
+	TSubobjectPtr<UTextRenderComponent> PlayerLabel;
+
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
-	void BasicAttack();
+	void BasicAttack(AActor* Target);
+
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+	void EditHealth(int32 Amt);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerEditHealth(int32 Amt);
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 Health;
+
+protected:
+	virtual void Tick(float DeltaSeconds) override;
 };
 

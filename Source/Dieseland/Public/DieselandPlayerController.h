@@ -24,6 +24,7 @@ protected:
 	void MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location);
 	
 	/** Navigate player to the given world location. */
+	UFUNCTION(Reliable, Server, WithValidation)
 	void SetNewMoveDestination(const FVector DestLocation);
 
 	/** Input handlers for SetDestination action. */

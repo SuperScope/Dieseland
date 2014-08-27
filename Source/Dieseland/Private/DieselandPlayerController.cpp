@@ -41,12 +41,8 @@ void ADieselandPlayerController::MoveToMouseCursor()
 	// Trace to see what is under the mouse cursor
 	FHitResult Hit;
 	GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, Hit);
-	//GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-	if (Hit.Component->GetOwner() != nullptr && Hit.Component->GetOwner()->ActorHasTag("Player") && Hit.Component->GetOwner() != Cast<AActor>(this->GetControlledPawn()))
-	{
-		Cast<ADieselandCharacter>(this->GetControlledPawn())->BasicAttack();
-	}
-	else if(Hit.bBlockingHit)
+
+	if(Hit.bBlockingHit)
 	{
 		// We hit something, move there
 		SetNewMoveDestination(Hit.ImpactPoint);
@@ -67,12 +63,13 @@ void ADieselandPlayerController::MoveToTouchLocation(const ETouchIndex::Type Fin
 	}
 }
 
-void ADieselandPlayerController::SetNewMoveDestination(const FVector DestLocation)
+void ADieselandPlayerController::SetNewMoveDestination_Implementation(const FVector DestLocation)
 {
 	APawn* const Pawn = GetPawn();
 	if (Pawn)
 	{
-		UNavigationSystem* const NavSys = GetWorld()->GetNavigationSystem();
+		//UNavigationSystem* const NavSys = GetWorld()->GetNavigationSystem();
+		UNavigationSystem* const NavSys = UNavigationSystem::GetCurrent(this);
 		float const Distance = FVector::Dist(DestLocation, Pawn->GetActorLocation());
 
 		// We need to issue move command only if far enough in order for walk animation to play correctly
@@ -82,11 +79,27 @@ void ADieselandPlayerController::SetNewMoveDestination(const FVector DestLocatio
 		}
 	}
 }
+bool ADieselandPlayerController::SetNewMoveDestination_Validate(const FVector DestLocation)
+{
+	return true;
+}
 
 void ADieselandPlayerController::OnSetDestinationPressed()
 {
-	// set flag to keep updating destination until released
-	bMoveToMouseCursor = true;
+	// Trace to see what is under the mouse cursor
+	FHitResult Hit;
+	GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, Hit);
+
+	if (Hit.Component->GetOwner() != nullptr && Hit.Component->GetOwner()->ActorHasTag("Player") && Hit.Component->GetOwner() != Cast<AActor>(this->GetControlledPawn()))
+	{
+		Cast<ADieselandCharacter>(this->GetControlledPawn())->BasicAttack(Hit.Component->GetOwner());
+	}
+
+	else
+	{
+		// set flag to keep updating destination until released
+		bMoveToMouseCursor = true;
+	}
 }
 
 void ADieselandPlayerController::OnSetDestinationReleased()
