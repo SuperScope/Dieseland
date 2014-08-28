@@ -17,22 +17,20 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
 	TSubobjectPtr<UTextRenderComponent> PlayerLabel;
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void BasicAttack(AActor* Target);
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
-	void EditHealth(int32 Amt);
-
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerEditHealth(int32 Amt);
+	void EditHealth(int32 Amt, AActor* Target);
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;
+
 };
 

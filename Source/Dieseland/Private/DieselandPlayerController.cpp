@@ -4,12 +4,14 @@
 #include "DieselandPlayerController.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "DieselandCharacter.h"
+#include "UnrealNetwork.h"
 
 ADieselandPlayerController::ADieselandPlayerController(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
+
 }
 
 void ADieselandPlayerController::PlayerTick(float DeltaTime)
@@ -63,7 +65,17 @@ void ADieselandPlayerController::MoveToTouchLocation(const ETouchIndex::Type Fin
 	}
 }
 
-void ADieselandPlayerController::SetNewMoveDestination_Implementation(const FVector DestLocation)
+bool ADieselandPlayerController::ServerEditHealth_Validate(int32 Amt, AActor* Target)
+{
+	return true;
+}
+
+void ADieselandPlayerController::ServerEditHealth_Implementation(int32 Amt, AActor* Target)
+{
+	Cast<ADieselandCharacter>(this->GetControlledPawn())->EditHealth(Amt, Target);
+}
+
+void ADieselandPlayerController::SetNewMoveDestination(const FVector DestLocation)
 {
 	APawn* const Pawn = GetPawn();
 	if (Pawn)
@@ -76,10 +88,26 @@ void ADieselandPlayerController::SetNewMoveDestination_Implementation(const FVec
 		if (NavSys && (Distance > 120.0f))
 		{
 			NavSys->SimpleMoveToLocation(this, DestLocation);
+			
 		}
 	}
+	if (Role < ROLE_Authority)
+	{
+		ServerSetNewMoveDestination(DestLocation);
+	}
+
 }
-bool ADieselandPlayerController::SetNewMoveDestination_Validate(const FVector DestLocation)
+void ADieselandPlayerController::OnRep_PawnRotation()
+{
+	ControlRotation = PawnRotation;
+}
+void ADieselandPlayerController::ServerSetNewMoveDestination_Implementation(const FVector DestLocation)
+{
+	SetNewMoveDestination(DestLocation);
+	PawnRotation = ControlRotation;
+	
+}
+bool ADieselandPlayerController::ServerSetNewMoveDestination_Validate(const FVector DestLocation)
 {
 	return true;
 }
@@ -93,6 +121,10 @@ void ADieselandPlayerController::OnSetDestinationPressed()
 	if (Hit.Component->GetOwner() != nullptr && Hit.Component->GetOwner()->ActorHasTag("Player") && Hit.Component->GetOwner() != Cast<AActor>(this->GetControlledPawn()))
 	{
 		Cast<ADieselandCharacter>(this->GetControlledPawn())->BasicAttack(Hit.Component->GetOwner());
+		if (Role < ROLE_Authority)
+		{
+			ServerEditHealth(-1, Hit.Component->GetOwner());
+		}
 	}
 
 	else
@@ -106,4 +138,12 @@ void ADieselandPlayerController::OnSetDestinationReleased()
 {
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
+}
+
+void ADieselandPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Replicate to everyone
+	DOREPLIFETIME(ADieselandPlayerController, PawnRotation);
 }

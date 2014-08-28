@@ -8,6 +8,13 @@ class ADieselandPlayerController : public APlayerController
 {
 	GENERATED_UCLASS_BODY()
 
+public:
+		UFUNCTION(reliable, Server, WithValidation)
+		void ServerEditHealth(int32 Amt, AActor* Target);
+
+		UPROPERTY(Replicated, ReplicatedUsing=OnRep_PawnRotation, EditAnywhere, BlueprintReadWrite, Category = Network)
+		FRotator PawnRotation;
+
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -25,11 +32,17 @@ protected:
 	
 	/** Navigate player to the given world location. */
 	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerSetNewMoveDestination(const FVector DestLocation);
+
+	/** Navigate player to the given world location. */
 	void SetNewMoveDestination(const FVector DestLocation);
 
 	/** Input handlers for SetDestination action. */
 	void OnSetDestinationPressed();
 	void OnSetDestinationReleased();
+
+	UFUNCTION()
+	void OnRep_PawnRotation();
 };
 
 

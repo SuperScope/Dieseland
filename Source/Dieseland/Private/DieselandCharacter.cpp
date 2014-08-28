@@ -2,6 +2,7 @@
 
 #include "Dieseland.h"
 #include "DieselandCharacter.h"
+#include "DieselandPlayerController.h"
 #include "UnrealNetwork.h"
 
 ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializeProperties& PCIP)
@@ -50,34 +51,21 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 void ADieselandCharacter::Tick(float DeltaSeconds)
 {
 	PlayerLabel->SetText(FString::FromInt(Health));
-
+	
 	Super::Tick(DeltaSeconds);
 }
 
-void ADieselandCharacter::EditHealth(int32 Amt)
+void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 {
-	Health += Amt;
-	//PlayerLabel->SetText(FString::FromInt(Health));
+	Cast<ADieselandCharacter>(Target)->Health += Amt;
 
-	if (Role < ROLE_Authority)
-	{
-		ServerEditHealth(Amt);
-	}
-}
-bool ADieselandCharacter::ServerEditHealth_Validate(int32 Amt)
-{
-	return true;
+	PlayerLabel->SetText(FString::FromInt(Health));
 }
 
-void ADieselandCharacter::ServerEditHealth_Implementation(int32 Amt)
-{
-	EditHealth(Amt);
-}
 
 void ADieselandCharacter::BasicAttack(AActor* Target)
 {
-	//GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor::Red, FString("Clicked an opponent"));
-	Cast<ADieselandCharacter>(Target)->EditHealth(-1);
+	Cast<ADieselandCharacter>(Target)->EditHealth(-1, Target);
 }
 
 void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -86,5 +74,4 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandCharacter, Health);
-	DOREPLIFETIME(ADieselandCharacter, PlayerLabel);
 }
