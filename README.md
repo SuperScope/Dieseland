@@ -17,7 +17,7 @@ Getting Started
 1. Install the GitHub client for [Windows] (https://windows.github.com/) or [Mac] (https://mac.github.com/)
 2. Install Unreal 4
 3. Open the GitHub client
-4. Clone this repository from "MetalMuffinStudios" (Right click to "Clone to..." a different directory)
+4. Clone this repository from "SuperScope" (Right click to "Clone to..." a different directory)
 5. Navigate to the directory on your computer where it was cloned
 6. Proceed to the correct Compiling and Building section
 
