@@ -72,23 +72,25 @@ bool ADieselandPlayerController::ServerEditHealth_Validate(int32 Amt, AActor* Ta
 
 void ADieselandPlayerController::ServerEditHealth_Implementation(int32 Amt, AActor* Target)
 {
-	Cast<ADieselandCharacter>(this->GetControlledPawn())->EditHealth(Amt, Target);
+	Cast<ADieselandCharacter>(this->GetPawn())->EditHealth(Amt, Target);
 }
 
 void ADieselandPlayerController::SetNewMoveDestination(const FVector DestLocation)
 {
-	APawn* const Pawn = GetPawn();
-	if (Pawn)
+	if (Role == ROLE_Authority)
 	{
-		//UNavigationSystem* const NavSys = GetWorld()->GetNavigationSystem();
-		UNavigationSystem* const NavSys = UNavigationSystem::GetCurrent(this);
-		float const Distance = FVector::Dist(DestLocation, Pawn->GetActorLocation());
-
-		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if (NavSys && (Distance > 120.0f))
+		APawn* const Pawn = GetPawn();
+		if (Pawn)
 		{
-			NavSys->SimpleMoveToLocation(this, DestLocation);
-			
+			//UNavigationSystem* const NavSys = GetWorld()->GetNavigationSystem();
+			UNavigationSystem* const NavSys = UNavigationSystem::GetCurrent(this);
+			float const Distance = FVector::Dist(DestLocation, Pawn->GetActorLocation());
+
+			// We need to issue move command only if far enough in order for walk animation to play correctly
+			if (NavSys && (Distance > 120.0f))
+			{
+				NavSys->SimpleMoveToLocation(this, DestLocation);
+			}
 		}
 	}
 	if (Role < ROLE_Authority)
@@ -104,8 +106,7 @@ void ADieselandPlayerController::OnRep_PawnRotation()
 void ADieselandPlayerController::ServerSetNewMoveDestination_Implementation(const FVector DestLocation)
 {
 	SetNewMoveDestination(DestLocation);
-	PawnRotation = ControlRotation;
-	
+	//PawnRotation = ControlRotation;
 }
 bool ADieselandPlayerController::ServerSetNewMoveDestination_Validate(const FVector DestLocation)
 {
@@ -118,9 +119,9 @@ void ADieselandPlayerController::OnSetDestinationPressed()
 	FHitResult Hit;
 	GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, Hit);
 
-	if (Hit.Component->GetOwner() != nullptr && Hit.Component->GetOwner()->ActorHasTag("Player") && Hit.Component->GetOwner() != Cast<AActor>(this->GetControlledPawn()))
+	if (Hit.Component->GetOwner() != nullptr && Hit.Component->GetOwner()->ActorHasTag("Player") && Hit.Component->GetOwner() != Cast<AActor>(this->GetPawn()))
 	{
-		Cast<ADieselandCharacter>(this->GetControlledPawn())->BasicAttack(Hit.Component->GetOwner());
+		Cast<ADieselandCharacter>(this->GetPawn())->BasicAttack(Hit.Component->GetOwner());
 		if (Role < ROLE_Authority)
 		{
 			ServerEditHealth(-1, Hit.Component->GetOwner());
