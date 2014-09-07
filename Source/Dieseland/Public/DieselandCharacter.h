@@ -17,20 +17,36 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
+	// Temporary display of health value
+	// TODO: Remove when UI is ready
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
 	TSubobjectPtr<class UTextRenderComponent> PlayerLabel;
 
+	// Mesh attached to the torso socket which is used to show attack direction - invisible by default
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UStaticMeshComponent> AimMesh;
 
+	// Called to subtract and/or add health to the player
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void EditHealth(int32 Amt, AActor* Target);
 
+	// Public health value of this character
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
 
+	// Replicated Rotation of the torso for aiming purposess
+	UPROPERTY(Replicated, ReplicatedUsing = OnRep_AimRotation, EditAnywhere, BlueprintReadWrite, Category = Network)
+	FRotator AimRotation;
+
+	// Combat functions
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void Attack();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void RangedAttack();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void MeleeAttack();
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void SkillOne();
@@ -40,6 +56,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void SkillThree();
+
+	// Called when AimRotation is replicated
+	UFUNCTION()
+	void OnRep_AimRotation();
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;

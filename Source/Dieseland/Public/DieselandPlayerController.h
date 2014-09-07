@@ -9,14 +9,16 @@ class ADieselandPlayerController : public APlayerController
 	GENERATED_UCLASS_BODY()
 
 public:
-		UFUNCTION(reliable, Server, WithValidation)
-		void ServerEditHealth(int32 Amt, AActor* Target);
+	// Called by the server to edit client's health
+	UFUNCTION(reliable, Server, WithValidation)
+	void ServerEditHealth(int32 Amt, AActor* Target);
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Network)
-		FRotator AimRotation;
+	// Calculated rotation of torso
+	FRotator FacingRotation;
 
-		UFUNCTION(Reliable, Server, WithValidation)
-		void ServerOnAim(FRotator Rotation);
+	// Called when aim input is recieved
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerOnAim(FRotator Rotation);
 
 protected:
 
@@ -25,15 +27,15 @@ protected:
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
+	// Input events
 	void OnAttack();
-
 	void OnSkillOne();
 	void OnSkillTwo();
 	void OnSkillThree();
 
+	// Movment input events
 	void OnMoveForward(float Val);
 	void OnMoveRight(float Val);
-
 	void OnFaceNorth(float Val);
 	void OnFaceEast(float Val);
 	

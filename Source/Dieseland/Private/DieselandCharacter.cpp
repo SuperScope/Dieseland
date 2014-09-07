@@ -36,6 +36,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUseControllerViewRotation = false; // Camera does not rotate relative to arm
 
+	// Set the starting health value
 	Health = 100;
 
 	// Create the text component
@@ -45,21 +46,30 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	PlayerLabel->AddLocalRotation(FRotator(90.0f, 0.0f, -180.0f));
 	PlayerLabel->Text = FString::FromInt(Health);
 
+	// Find the mesh to use for AimMesh component
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticAimMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube.Shape_Cube'"));
 
+	// Setup the AimMesh component
 	AimMesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("AimMesh"));
-	AimMesh->AttachParent = RootComponent;
+	AimMesh->AttachParent = (Mesh);
+	AimMesh->AttachSocketName = FName(TEXT("AimSocket"));
 	AimMesh->SetStaticMesh(StaticAimMesh.Object);
-	AimMesh->SetRelativeScale3D(FVector(1.0f, 0.25f, 0.25f));
-
+	AimMesh->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+	AimMesh->SetHiddenInGame(false);
+	
+	// Tag this character as a player
 	Tags.Add(FName("Player"));
 
+	// Ensure replication
 	bReplicates = true;
 	AimMesh->SetIsReplicated(true);
+	Mesh->SetIsReplicated(true);
 }
 
 void ADieselandCharacter::Tick(float DeltaSeconds)
 {
+	// Every frame set the health display
+	// TODO: Remove when UI is completed
 	PlayerLabel->SetText(FString::FromInt(Health));
 	
 	Super::Tick(DeltaSeconds);
@@ -78,6 +88,16 @@ void ADieselandCharacter::Attack()
 
 }
 
+void ADieselandCharacter::RangedAttack()
+{
+
+}
+
+void ADieselandCharacter::MeleeAttack()
+{
+
+}
+
 void ADieselandCharacter::SkillOne()
 {
 
@@ -92,6 +112,10 @@ void ADieselandCharacter::SkillThree()
 {
 
 }
+void ADieselandCharacter::OnRep_AimRotation()
+{
+
+}
 
 void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
@@ -100,4 +124,5 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandCharacter, Health);
 	DOREPLIFETIME(ADieselandCharacter, AimMesh);
+	DOREPLIFETIME(ADieselandCharacter, AimRotation);
 }

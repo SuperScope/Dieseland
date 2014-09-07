@@ -12,7 +12,9 @@ ADieselandPlayerController::ADieselandPlayerController(const class FPostConstruc
 	// Used for showing mouse cursor
 	//bShowMouseCursor = true;
 	//DefaultMouseCursor = EMouseCursor::Crosshairs;
+
 	bReplicates = true;
+	
 }
 
 void ADieselandPlayerController::PlayerTick(float DeltaTime)
@@ -46,6 +48,7 @@ bool ADieselandPlayerController::ServerEditHealth_Validate(int32 Amt, AActor* Ta
 
 void ADieselandPlayerController::ServerEditHealth_Implementation(int32 Amt, AActor* Target)
 {
+	// Edit the health of the specific pawn
 	Cast<ADieselandCharacter>(this->GetPawn())->EditHealth(Amt, Target);
 }
 
@@ -68,13 +71,17 @@ void ADieselandPlayerController::OnFaceNorth(float Val)
 	if (GetPawn() != nullptr && Val != 0.0f){
 		ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 
+		// Convert the joystick axis to a rotator
 		FVector TempAxisVector = FVector(Val, (GetInputAxisValue("LookEast") * 1.0f), 0.0f);
-		AimRotation = FRotationMatrix::MakeFromX(TempAxisVector).Rotator();
+		FacingRotation = FRotationMatrix::MakeFromX(TempAxisVector).Rotator();
 		
-		if (DieselandPawn->AimMesh->GetComponentRotation() != AimRotation){
-			DieselandPawn->AimMesh->SetWorldRotation(AimRotation);
+		// If the rotation value is different from previous, change the rotation
+		if (DieselandPawn->AimRotation != FacingRotation){
+			// Edit the pawn's spine rotation
+			DieselandPawn->AimRotation = FacingRotation;
+			// If this is the client, send the the rotator to the server
 			if (Role < ROLE_Authority){
-				ServerOnAim(AimRotation);
+				ServerOnAim(FacingRotation);
 			}
 		}
 	}
@@ -84,13 +91,17 @@ void ADieselandPlayerController::OnFaceEast(float Val)
 	if (GetPawn() != nullptr && Val != 0.0f){
 		ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 		
+		// Convert the joystick axis to a rotator
 		FVector TempAxisVector = FVector(GetInputAxisValue("LookNorth"), Val * 1.0f, 0.0f);
-		AimRotation = FRotationMatrix::MakeFromX(TempAxisVector).Rotator();
+		FacingRotation = FRotationMatrix::MakeFromX(TempAxisVector).Rotator();
 
-		if (DieselandPawn->AimMesh->GetComponentRotation() != AimRotation){
-			DieselandPawn->AimMesh->SetWorldRotation(AimRotation);
+		// If the rotation value is different from previous, change the rotation
+		if (DieselandPawn->AimRotation != FacingRotation){
+			// Edit the pawn's spine rotation
+			DieselandPawn->AimRotation = FacingRotation;
+			// If this is the client, send the the rotator to the server
 			if (Role < ROLE_Authority){
-				ServerOnAim(AimRotation);
+				ServerOnAim(FacingRotation);
 			}
 		}
 	}
@@ -124,6 +135,6 @@ bool ADieselandPlayerController::ServerOnAim_Validate(FRotator Rotation)
 void ADieselandPlayerController::ServerOnAim_Implementation(FRotator Rotation)
 {
 	if (GetPawn() != nullptr){
-		Cast<ADieselandCharacter>(GetPawn())->AimMesh->SetWorldRotation(Rotation);
+		Cast<ADieselandCharacter>(GetPawn())->AimRotation = Rotation;
 	}
 }
