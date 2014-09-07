@@ -17,11 +17,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
-	TSubobjectPtr<UTextRenderComponent> PlayerLabel;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
+	TSubobjectPtr<class UTextRenderComponent> PlayerLabel;
 
-	UFUNCTION(BlueprintCallable, Category = Gameplay)
-	void BasicAttack(AActor* Target);
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	TSubobjectPtr<class UStaticMeshComponent> AimMesh;
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void EditHealth(int32 Amt, AActor* Target);

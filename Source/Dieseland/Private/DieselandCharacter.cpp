@@ -45,7 +45,17 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	PlayerLabel->AddLocalRotation(FRotator(90.0f, 0.0f, -180.0f));
 	PlayerLabel->Text = FString::FromInt(Health);
 
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticAimMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube.Shape_Cube'"));
+
+	AimMesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("AimMesh"));
+	AimMesh->AttachParent = RootComponent;
+	AimMesh->SetStaticMesh(StaticAimMesh.Object);
+	AimMesh->SetRelativeScale3D(FVector(1.0f, 0.25f, 0.25f));
+
 	Tags.Add(FName("Player"));
+
+	bReplicates = true;
+	AimMesh->SetIsReplicated(true);
 }
 
 void ADieselandCharacter::Tick(float DeltaSeconds)
@@ -62,16 +72,11 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 	PlayerLabel->SetText(FString::FromInt(Health));
 }
 
-
-void ADieselandCharacter::BasicAttack(AActor* Target)
-{
-	Cast<ADieselandCharacter>(Target)->EditHealth(-1, Target);
-}
-
 void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandCharacter, Health);
+	DOREPLIFETIME(ADieselandCharacter, AimMesh);
 }
