@@ -42,11 +42,32 @@ void ADieselandEnemyController::SearchForEnemy()
 	}
 	const FVector MyLoc = MyEnemy->GetActorLocation();
 	float BestDistsq = MAX_FLT;
-	
+	APawn* BestPawn = NULL;
+
+	for (FConstPawnIterator It = GetWorld()->GetPawnIterator(); It; ++It)
+	{
+
+		APawn* TestPawn = Cast<APawn>(*It);
+		if (TestPawn)
+		{
+			const float DistSq = FVector::Dist(TestPawn->GetActorLocation, MyLoc);
+			if (DistSq < BestDistsq)
+			{
+				BestDistsq = DistSq;
+				BestPawn = TestPawn;
+			}
+		}
+	}
+	if (BestPawn)
+	{
+		SetEnemy(BestPawn);
+	}
 }
 
 void ADieselandEnemyController::SetEnemy(class APawn *InPawn)
 {
+	BlackboardComp->SetValueAsObject(EnemyKeyID, InPawn);
+	BlackboardComp->SetValueAsVector(EnemyLocationID, InPawn->GetActorLocation());
 
 }
 
