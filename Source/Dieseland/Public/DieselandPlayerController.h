@@ -25,6 +25,11 @@ protected:
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
+	void OnAttack();
+
+	void OnSkillOne();
+	void OnSkillTwo();
+	void OnSkillThree();
 
 	void OnMoveForward(float Val);
 	void OnMoveRight(float Val);

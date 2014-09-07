@@ -72,6 +72,27 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 	PlayerLabel->SetText(FString::FromInt(Health));
 }
 
+
+void ADieselandCharacter::Attack()
+{
+
+}
+
+void ADieselandCharacter::SkillOne()
+{
+
+}
+
+void ADieselandCharacter::SkillTwo()
+{
+
+}
+
+void ADieselandCharacter::SkillThree()
+{
+
+}
+
 void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

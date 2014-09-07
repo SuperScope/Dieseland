@@ -29,6 +29,18 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
 
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void Attack();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void SkillOne();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void SkillTwo();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void SkillThree();
+
 protected:
 	virtual void Tick(float DeltaSeconds) override;
 

@@ -31,6 +31,12 @@ void ADieselandPlayerController::SetupInputComponent()
 
 	InputComponent->BindAxis("LookNorth", this, &ADieselandPlayerController::OnFaceNorth);
 	InputComponent->BindAxis("LookEast", this, &ADieselandPlayerController::OnFaceEast);
+
+	InputComponent->BindAction("Attack", IE_Released, this, &ADieselandPlayerController::OnAttack);
+
+	InputComponent->BindAction("Skill_1", IE_Released, this, &ADieselandPlayerController::OnSkillOne);
+	InputComponent->BindAction("Skill_2", IE_Released, this, &ADieselandPlayerController::OnSkillTwo);
+	InputComponent->BindAction("Skill_3", IE_Released, this, &ADieselandPlayerController::OnSkillThree);
 }
 
 bool ADieselandPlayerController::ServerEditHealth_Validate(int32 Amt, AActor* Target)
@@ -88,6 +94,26 @@ void ADieselandPlayerController::OnFaceEast(float Val)
 			}
 		}
 	}
+}
+
+void ADieselandPlayerController::OnAttack()
+{
+
+}
+
+void ADieselandPlayerController::OnSkillOne()
+{
+
+}
+
+void ADieselandPlayerController::OnSkillTwo()
+{
+
+}
+
+void ADieselandPlayerController::OnSkillThree()
+{
+
 }
 
 bool ADieselandPlayerController::ServerOnAim_Validate(FRotator Rotation)
