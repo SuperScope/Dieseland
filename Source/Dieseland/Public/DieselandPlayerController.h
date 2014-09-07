@@ -20,6 +20,21 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerOnAim(FRotator Rotation);
 
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerMeleeAttack();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerRangedAttack();
+
+	/*UFUNCTION(Reliable, Server, WithValidation)
+	void ServerSkillOne();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerSkillTwo();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerSkillThree();*/
+
 protected:
 
 	// Begin PlayerController interface
@@ -32,6 +47,8 @@ protected:
 	void OnSkillOne();
 	void OnSkillTwo();
 	void OnSkillThree();
+
+	void SwapMelee();
 
 	// Movment input events
 	void OnMoveForward(float Val);

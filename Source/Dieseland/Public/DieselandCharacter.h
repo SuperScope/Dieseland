@@ -26,7 +26,11 @@ public:
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UStaticMeshComponent> AimMesh;
 
-	// Called to subtract and/or add health to the player
+	// Collider used to detect melee range
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	TSubobjectPtr<class UCapsuleComponent> MeleeCollision;
+
+	// Called to subtract and/or add health to the target player
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void EditHealth(int32 Amt, AActor* Target);
 
@@ -34,14 +38,26 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
 
+	// Does this character use melee for it's basic attack
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	bool IsMelee;
+
+	// The range of this character's melee attack
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float MeleeRange;
+
+	// The range of this character's ranged attack
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float RangedRange;
+
 	// Replicated Rotation of the torso for aiming purposess
 	UPROPERTY(Replicated, ReplicatedUsing = OnRep_AimRotation, EditAnywhere, BlueprintReadWrite, Category = Network)
 	FRotator AimRotation;
 
-	// Combat functions
-	UFUNCTION(BlueprintCallable, Category = Combat)
-	void Attack();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	TArray<AActor*> ActorsInMeleeRange;
 
+	// Combat functions
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void RangedAttack();
 

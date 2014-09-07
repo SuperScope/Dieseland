@@ -39,6 +39,8 @@ void ADieselandPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Skill_1", IE_Released, this, &ADieselandPlayerController::OnSkillOne);
 	InputComponent->BindAction("Skill_2", IE_Released, this, &ADieselandPlayerController::OnSkillTwo);
 	InputComponent->BindAction("Skill_3", IE_Released, this, &ADieselandPlayerController::OnSkillThree);
+
+	InputComponent->BindAction("Debug_MeleeSwap", IE_Released, this, &ADieselandPlayerController::SwapMelee);
 }
 
 bool ADieselandPlayerController::ServerEditHealth_Validate(int32 Amt, AActor* Target)
@@ -49,7 +51,10 @@ bool ADieselandPlayerController::ServerEditHealth_Validate(int32 Amt, AActor* Ta
 void ADieselandPlayerController::ServerEditHealth_Implementation(int32 Amt, AActor* Target)
 {
 	// Edit the health of the specific pawn
-	Cast<ADieselandCharacter>(this->GetPawn())->EditHealth(Amt, Target);
+	if (GetPawn() != nullptr)
+	{
+		Cast<ADieselandCharacter>(GetPawn())->EditHealth(Amt, Target);
+	}
 }
 
 void ADieselandPlayerController::OnMoveForward(float Val)
@@ -110,6 +115,15 @@ void ADieselandPlayerController::OnFaceEast(float Val)
 void ADieselandPlayerController::OnAttack()
 {
 
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn->IsMelee)
+	{
+		ServerMeleeAttack();
+	}
+	else
+	{
+		ServerRangedAttack();
+	}
 }
 
 void ADieselandPlayerController::OnSkillOne()
@@ -125,6 +139,42 @@ void ADieselandPlayerController::OnSkillTwo()
 void ADieselandPlayerController::OnSkillThree()
 {
 
+}
+
+void ADieselandPlayerController::SwapMelee()
+{
+	if (Cast<ADieselandCharacter>(GetPawn())->IsMelee)
+	{
+		Cast<ADieselandCharacter>(GetPawn())->IsMelee = false;
+	}
+	else
+	{
+		Cast<ADieselandCharacter>(GetPawn())->IsMelee = true;
+	}
+	
+}
+
+bool ADieselandPlayerController::ServerMeleeAttack_Validate()
+{
+	return true;
+}
+
+void ADieselandPlayerController::ServerMeleeAttack_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	DieselandPawn->MeleeAttack();
+}
+
+bool ADieselandPlayerController::ServerRangedAttack_Validate()
+{
+	return true;
+}
+
+void ADieselandPlayerController::ServerRangedAttack_Implementation()
+{
+	if (GetPawn() != nullptr){
+		Cast<ADieselandCharacter>(GetPawn())->RangedAttack();
+	}
 }
 
 bool ADieselandPlayerController::ServerOnAim_Validate(FRotator Rotation)
