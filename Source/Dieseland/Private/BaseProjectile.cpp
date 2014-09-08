@@ -28,6 +28,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	ProjectileMovement->InitialSpeed = 800.0f;
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 
+	InitialLifeSpan = 10.0f;
 
 	bReplicates = true;
 }

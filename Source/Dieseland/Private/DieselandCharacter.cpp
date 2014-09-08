@@ -91,13 +91,16 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 
 void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 {
-	Cast<ADieselandCharacter>(Target)->Health += Amt;
-
-	PlayerLabel->SetText(FString::FromInt(Health));
-
-	if (Role < ROLE_Authority)
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
 	{
-		Cast<ADieselandPlayerController>(Controller)->ServerEditHealth(Amt, Target);
+		Cast<ADieselandCharacter>(Target)->Health += Amt;
+
+		PlayerLabel->SetText(FString::FromInt(Health));
+
+		if (Role < ROLE_Authority)
+		{
+			Cast<ADieselandPlayerController>(Controller)->ServerEditHealth(Amt, Target);
+		}
 	}
 }
 
@@ -131,7 +134,7 @@ void ADieselandCharacter::MeleeAttack()
 	for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)
 	{
 		CurActor = ActorsInMeleeRange[b];
-		if (!CurActor) continue;
+		if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Player")))) continue;
 		if (!CurActor->IsValidLowLevel()) continue;
 		
 		if (Role == ROLE_Authority){
