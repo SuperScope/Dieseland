@@ -62,9 +62,13 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 	IsMelee = true;
 
+	BasicAttackDamage = 10;
+
 	// Set default ranges
 	MeleeRange = 144.0f;
 	RangedRange = 1200.0f;
+
+	// Damage values
 
 	// Cooldown values
 	BasicAttackCooldown = 0.2f;
@@ -133,6 +137,7 @@ void ADieselandCharacter::RangedAttack()
 		ABaseProjectile* const Projectile = World->SpawnActor<ABaseProjectile>(ABaseProjectile::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 		if (Projectile)
 		{
+			Projectile->ProjectileDamage = BasicAttackDamage;
 			//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
 		}
 	}
@@ -150,7 +155,7 @@ void ADieselandCharacter::MeleeAttack()
 		if (!CurActor->IsValidLowLevel()) continue;
 		
 		if (Role == ROLE_Authority){
-			EditHealth(-25, CurActor);
+			EditHealth(-1 * BasicAttackDamage, CurActor);
 		}
 	}
 }
@@ -189,4 +194,5 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, SkillThreeTimer);
 
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackActive);
+	DOREPLIFETIME(ADieselandCharacter, BasicAttackDamage);
 }
