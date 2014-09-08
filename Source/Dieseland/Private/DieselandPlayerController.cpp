@@ -21,6 +21,67 @@ void ADieselandPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
+	UpdateCooldownTimers(DeltaTime);
+
+}
+
+void ADieselandPlayerController::UpdateCooldownTimers(float DeltaSeconds)
+{
+	if (Cast<ADieselandCharacter>(GetPawn()) != nullptr){
+		ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+
+		// Update all of the timers
+		if (DieselandPawn->BasicAttackTimer > 0.0f)
+		{
+			DieselandPawn->BasicAttackTimer -= DeltaSeconds;
+			if (DieselandPawn->BasicAttackTimer < 0.0f)
+			{
+				DieselandPawn->BasicAttackTimer = 0.0f;
+			}
+		}
+		if (DieselandPawn->SkillOneTimer > 0.0f)
+		{
+			DieselandPawn->SkillOneTimer -= DeltaSeconds;
+			if (DieselandPawn->SkillOneTimer < 0.0f)
+			{
+				DieselandPawn->SkillOneTimer = 0.0f;
+			}
+		}
+
+		if (DieselandPawn->SkillTwoTimer > 0.0f)
+		{
+			DieselandPawn->SkillTwoTimer -= DeltaSeconds;
+			if (DieselandPawn->SkillTwoTimer < 0.0f)
+			{
+				DieselandPawn->SkillTwoTimer = 0.0f;
+			}
+		}
+
+		if (DieselandPawn->SkillThreeTimer > 0.0f)
+		{
+			DieselandPawn->SkillThreeTimer -= DeltaSeconds;
+			if (DieselandPawn->SkillThreeTimer < 0.0f)
+			{
+				DieselandPawn->SkillThreeTimer = 0.0f;
+			}
+		}
+
+		// Basic Attack actions
+		if (DieselandPawn->BasicAttackTimer <= 0.0f && DieselandPawn->BasicAttackActive)
+		{
+			ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+			if (DieselandPawn->IsMelee)
+			{
+				ServerMeleeAttack();
+				DieselandPawn->BasicAttackTimer = DieselandPawn->BasicAttackCooldown;
+			}
+			else
+			{
+				ServerRangedAttack();
+				DieselandPawn->BasicAttackTimer = DieselandPawn->BasicAttackCooldown;
+			}
+		}
+	}
 }
 
 void ADieselandPlayerController::SetupInputComponent()
@@ -34,11 +95,12 @@ void ADieselandPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("LookNorth", this, &ADieselandPlayerController::OnFaceNorth);
 	InputComponent->BindAxis("LookEast", this, &ADieselandPlayerController::OnFaceEast);
 
-	InputComponent->BindAction("Attack", IE_Released, this, &ADieselandPlayerController::OnAttack);
+	InputComponent->BindAction("Attack", IE_Pressed, this, &ADieselandPlayerController::OnAttackPress);
+	InputComponent->BindAction("Attack", IE_Released, this, &ADieselandPlayerController::OnAttackRelease);
 
-	InputComponent->BindAction("Skill_1", IE_Released, this, &ADieselandPlayerController::OnSkillOne);
-	InputComponent->BindAction("Skill_2", IE_Released, this, &ADieselandPlayerController::OnSkillTwo);
-	InputComponent->BindAction("Skill_3", IE_Released, this, &ADieselandPlayerController::OnSkillThree);
+	InputComponent->BindAction("Skill_1", IE_Pressed, this, &ADieselandPlayerController::OnSkillOne);
+	InputComponent->BindAction("Skill_2", IE_Pressed, this, &ADieselandPlayerController::OnSkillTwo);
+	InputComponent->BindAction("Skill_3", IE_Pressed, this, &ADieselandPlayerController::OnSkillThree);
 
 	InputComponent->BindAction("Debug_MeleeSwap", IE_Released, this, &ADieselandPlayerController::SwapMelee);
 }
@@ -112,18 +174,14 @@ void ADieselandPlayerController::OnFaceEast(float Val)
 	}
 }
 
-void ADieselandPlayerController::OnAttack()
+void ADieselandPlayerController::OnAttackPress()
 {
+	Cast<ADieselandCharacter>(GetPawn())->BasicAttackActive = true;
+}
 
-	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn->IsMelee)
-	{
-		ServerMeleeAttack();
-	}
-	else
-	{
-		ServerRangedAttack();
-	}
+void ADieselandPlayerController::OnAttackRelease()
+{
+	Cast<ADieselandCharacter>(GetPawn())->BasicAttackActive = false;
 }
 
 void ADieselandPlayerController::OnSkillOne()
@@ -138,7 +196,7 @@ void ADieselandPlayerController::OnSkillTwo()
 
 void ADieselandPlayerController::OnSkillThree()
 {
-
+	
 }
 
 void ADieselandPlayerController::SwapMelee()

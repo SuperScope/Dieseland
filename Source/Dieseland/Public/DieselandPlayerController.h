@@ -35,6 +35,8 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerSkillThree();*/
 
+	void UpdateCooldownTimers(float DeltaSeconds);
+
 protected:
 
 	// Begin PlayerController interface
@@ -43,7 +45,8 @@ protected:
 	// End PlayerController interface
 
 	// Input events
-	void OnAttack();
+	void OnAttackPress();
+	void OnAttackRelease();
 	void OnSkillOne();
 	void OnSkillTwo();
 	void OnSkillThree();

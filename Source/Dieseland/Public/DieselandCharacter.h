@@ -50,6 +50,22 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float RangedRange;
 
+	// The Cooldown for the basic attack
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float BasicAttackCooldown;
+
+	// The Cooldown for skill 1
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float SkillOneCooldown;
+
+	// The Cooldown for skill 2
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float SkillTwoCooldown;
+
+	// The Cooldown for skill 3
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float SkillThreeCooldown;
+
 	// Replicated Rotation of the torso for aiming purposess
 	UPROPERTY(Replicated, ReplicatedUsing = OnRep_AimRotation, EditAnywhere, BlueprintReadWrite, Category = Network)
 	FRotator AimRotation;
@@ -76,6 +92,18 @@ public:
 	// Called when AimRotation is replicated
 	UFUNCTION()
 	void OnRep_AimRotation();
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	float BasicAttackTimer;
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	float SkillOneTimer;
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	float SkillTwoTimer;
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	float SkillThreeTimer;
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	bool BasicAttackActive;
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;

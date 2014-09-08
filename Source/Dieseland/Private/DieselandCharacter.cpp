@@ -66,6 +66,18 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	MeleeRange = 144.0f;
 	RangedRange = 1200.0f;
 
+	// Cooldown values
+	BasicAttackCooldown = 0.2f;
+	SkillOneCooldown = 2.0f;
+	SkillTwoCooldown = 3.5f;
+	SkillThreeCooldown = 4.0f;
+
+	// Timer values
+	BasicAttackTimer = 0.0f;
+	SkillOneTimer = 0.0f;
+	SkillTwoTimer = 0.0f;
+	SkillThreeTimer = 0.0f;
+
 	MeleeCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("MeleeCollision"));
 	MeleeCollision->AttachParent = (Mesh);
 	MeleeCollision->AttachSocketName = FName(TEXT("AimSocket"));
@@ -85,7 +97,7 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	// Every frame set the health display
 	// TODO: Remove when UI is completed
 	PlayerLabel->SetText(FString::FromInt(Health));
-	
+
 	Super::Tick(DeltaSeconds);
 }
 
@@ -121,7 +133,7 @@ void ADieselandCharacter::RangedAttack()
 		ABaseProjectile* const Projectile = World->SpawnActor<ABaseProjectile>(ABaseProjectile::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 		if (Projectile)
 		{
-			// Projectile actions if needed here
+			//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
 		}
 	}
 }
@@ -170,4 +182,11 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, Health);
 	DOREPLIFETIME(ADieselandCharacter, AimMesh);
 	DOREPLIFETIME(ADieselandCharacter, AimRotation);
+
+	DOREPLIFETIME(ADieselandCharacter, BasicAttackTimer);
+	DOREPLIFETIME(ADieselandCharacter, SkillOneTimer);
+	DOREPLIFETIME(ADieselandCharacter, SkillTwoTimer);
+	DOREPLIFETIME(ADieselandCharacter, SkillThreeTimer);
+
+	DOREPLIFETIME(ADieselandCharacter, BasicAttackActive);
 }
