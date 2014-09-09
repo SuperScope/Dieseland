@@ -4,6 +4,9 @@
 #include "BaseProjectile.h"
 #include "UnrealNetwork.h"
 #include "DieselandCharacter.h"
+#include "ParticleDefinitions.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 
 
 ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties& PCIP)
@@ -28,14 +31,19 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	ProjectileMovement->InitialSpeed = 800.0f;
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'"));
 	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
-
+	Particle->Template = ParticleSystemAsset.Object;
+	Particle->AttachTo(Mesh);
+	Particle->bAutoActivate = false;
+	Particle->SetHiddenInGame(false);
 
 	ProjectileDamage = 10;
 
 	InitialLifeSpan = 10.0f;
 
 	bReplicates = true;
+	Particle->SetIsReplicated(true);
 }
 
 void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
@@ -49,6 +57,7 @@ void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 		}
 		this->Destroy();
 	}
+	
 }
 
 void ABaseProjectile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -57,4 +66,5 @@ void ABaseProjectile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 
 	// Replicate to everyone
 	DOREPLIFETIME(ABaseProjectile, ProjectileMovement);
+	DOREPLIFETIME(ABaseProjectile, Particle);
 }

@@ -5,6 +5,9 @@
 #include "DieselandPlayerController.h"
 #include "UnrealNetwork.h"
 #include "BaseProjectile.h"
+#include "ParticleDefinitions.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 
 ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
@@ -126,7 +129,7 @@ void ADieselandCharacter::RangedAttack()
 	if (World)
 	{
 		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = this;
+		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
 		SpawnParams.Instigator = Instigator;
 
 		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
@@ -138,6 +141,7 @@ void ADieselandCharacter::RangedAttack()
 		if (Projectile)
 		{
 			Projectile->ProjectileDamage = BasicAttackDamage;
+			Projectile->Particle->ActivateSystem();
 			//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
 		}
 	}

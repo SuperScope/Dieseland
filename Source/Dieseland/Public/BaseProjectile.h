@@ -26,10 +26,14 @@ public:
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UProjectileMovementComponent> ProjectileMovement;
 
+	UPROPERTY(Replicated, Category = Visual, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UParticleSystemComponent> Particle;
-	
+
 	int32 ProjectileDamage;
 
-	virtual void ReceiveActorBeginOverlap(AActor* OtherActor) override;
+	UFUNCTION(Reliable, NetMulticast, WithValidation)
+	void ServerActivateProjectile();
 
+	virtual void ReceiveActorBeginOverlap(AActor* OtherActor) override;
+	
 };
