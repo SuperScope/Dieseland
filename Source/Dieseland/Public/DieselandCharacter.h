@@ -38,6 +38,26 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
 
+	//*** Core Attributes Stats Begins ***\\
+
+	// Public strength value of this character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 Strength;
+
+	// Public dexterity value of this character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 Dexterity;
+
+	// Public constitution value of this character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 Constitution;
+
+	// Public intelligence value of this character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 Intelligence;
+
+	//*** Core Attributes Stats Ends ***\\
+
 	// Does this character use melee for it's basic attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	bool IsMelee;

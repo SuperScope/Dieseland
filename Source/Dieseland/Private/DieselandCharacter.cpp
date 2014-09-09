@@ -170,4 +170,9 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, Health);
 	DOREPLIFETIME(ADieselandCharacter, AimMesh);
 	DOREPLIFETIME(ADieselandCharacter, AimRotation);
+	//Replicate Core Attributes
+	DOREPLIFETIME(ADieselandCharacter, Strength);
+	DOREPLIFETIME(ADieselandCharacter, Dexterity);
+	DOREPLIFETIME(ADieselandCharacter, Constitution);
+	DOREPLIFETIME(ADieselandCharacter, Intelligence);
 }
