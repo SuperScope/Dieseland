@@ -14,14 +14,6 @@ ADieselandEnemyAI::ADieselandEnemyAI(const class FPostConstructInitializePropert
 	BlackboardComp = PCIP.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("BlackboardComp"));
 	BehaviorComp = PCIP.CreateDefaultSubobject<UBehaviorTreeComponent>(this, TEXT("BehaviorComp"));
 
-	//here I initiliaze the box component and light component for the AI
-	Box = PCIP.CreateDefaultSubobject<UBoxComponent>(this, TEXT("Box"));
-	Light = PCIP.CreateDefaultSubobject<UPointLightComponent>(this, TEXT("Light"));
-	//here I establish the settings for the light and box, such as size
-	Box->bGenerateOverlapEvents = true;
-	Box->SetRelativeScale3D(FVector(2, 2, 5));
-	RootComponent = Box;
-
 }
 
 //in this function the AI sets its enemy id and detection id, from there
@@ -80,25 +72,3 @@ void ADieselandEnemyAI::SetEnemy(class APawn *InPawn)
 	BlackboardComp->SetValueAsVector(EnemyKeyLocationID, InPawn->GetActorLocation());
 }
 
-//for aggressive enemy types, if a player enters the trigger radius of this enemy type they then become aggressive towards the offending player
-void ADieselandEnemyAI::OnTriggerEnter(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-
-}
-
-//for both aggressive and non aggressive enemy types, if a currently attacking enemy has a player leave
-// it's trigger radius it is non longer attacking and begeins healing.
-void ADieselandEnemyAI::OnTriggerExit(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-
-}
-
-//here is a test message used to ensure that the trigger is working properly
-void ADieselandEnemyAI :: Debug(FString Msg)
-{
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Msg);
-	}
-
-}
