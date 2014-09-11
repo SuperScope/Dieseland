@@ -190,7 +190,7 @@ void ADieselandCharacter::SkillOne()
 			Projectile->ProjectileDamage = BasicAttackDamage;
 			Projectile->ServerActivateProjectile();
 
-			Projectile->SetLifeSpan(4.0f);
+			Projectile->SetLifeSpan(1.0f);
 			Projectile->Piercing = true;
 
 			//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
