@@ -17,17 +17,97 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
-	TSubobjectPtr<UTextRenderComponent> PlayerLabel;
+	// Temporary display of health value
+	// TODO: Remove when UI is ready
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
+	TSubobjectPtr<class UTextRenderComponent> PlayerLabel;
 
-	UFUNCTION(BlueprintCallable, Category = Gameplay)
-	void BasicAttack(AActor* Target);
+	// Mesh attached to the torso socket which is used to show attack direction - invisible by default
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	TSubobjectPtr<class UStaticMeshComponent> AimMesh;
 
+	// Collider used to detect melee range
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	TSubobjectPtr<class UCapsuleComponent> MeleeCollision;
+
+	// Called to subtract and/or add health to the target player
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void EditHealth(int32 Amt, AActor* Target);
 
+	// Public health value of this character
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
+
+	// Damage amount for the basic attack
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	int32 BasicAttackDamage;
+
+	// Does this character use melee for it's basic attack
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	bool IsMelee;
+
+	// The range of this character's melee attack
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float MeleeRange;
+
+	// The range of this character's ranged attack
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float RangedRange;
+
+	// The Cooldown for the basic attack
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float BasicAttackCooldown;
+
+	// The Cooldown for skill 1
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float SkillOneCooldown;
+
+	// The Cooldown for skill 2
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float SkillTwoCooldown;
+
+	// The Cooldown for skill 3
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float SkillThreeCooldown;
+
+	// Replicated Rotation of the torso for aiming purposess
+	UPROPERTY(Replicated, ReplicatedUsing = OnRep_AimRotation, EditAnywhere, BlueprintReadWrite, Category = Network)
+	FRotator AimRotation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	TArray<AActor*> ActorsInMeleeRange;
+
+	// Combat functions
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void RangedAttack();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void MeleeAttack();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void SkillOne();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void SkillTwo();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void SkillThree();
+
+	// Called when AimRotation is replicated
+	UFUNCTION()
+	void OnRep_AimRotation();
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	float BasicAttackTimer;
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	float SkillOneTimer;
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	float SkillTwoTimer;
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	float SkillThreeTimer;
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	bool BasicAttackActive;
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;
