@@ -9,19 +9,78 @@
 ADieselandPlayerController::ADieselandPlayerController(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	bShowMouseCursor = true;
-	DefaultMouseCursor = EMouseCursor::Crosshairs;
+	// Used for showing mouse cursor
+	//bShowMouseCursor = true;
+	//DefaultMouseCursor = EMouseCursor::Crosshairs;
 
+	bReplicates = true;
+	
 }
 
 void ADieselandPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	// keep updating the destination every tick while desired
-	if (bMoveToMouseCursor)
-	{
-		MoveToMouseCursor();
+	UpdateCooldownTimers(DeltaTime);
+
+}
+
+void ADieselandPlayerController::UpdateCooldownTimers(float DeltaSeconds)
+{
+	if (Cast<ADieselandCharacter>(GetPawn()) != nullptr){
+		ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+
+		// Update all of the timers
+		if (DieselandPawn->BasicAttackTimer > 0.0f)
+		{
+			DieselandPawn->BasicAttackTimer -= DeltaSeconds;
+			if (DieselandPawn->BasicAttackTimer < 0.0f)
+			{
+				DieselandPawn->BasicAttackTimer = 0.0f;
+			}
+		}
+		if (DieselandPawn->SkillOneTimer > 0.0f)
+		{
+			DieselandPawn->SkillOneTimer -= DeltaSeconds;
+			if (DieselandPawn->SkillOneTimer < 0.0f)
+			{
+				DieselandPawn->SkillOneTimer = 0.0f;
+			}
+		}
+
+		if (DieselandPawn->SkillTwoTimer > 0.0f)
+		{
+			DieselandPawn->SkillTwoTimer -= DeltaSeconds;
+			if (DieselandPawn->SkillTwoTimer < 0.0f)
+			{
+				DieselandPawn->SkillTwoTimer = 0.0f;
+			}
+		}
+
+		if (DieselandPawn->SkillThreeTimer > 0.0f)
+		{
+			DieselandPawn->SkillThreeTimer -= DeltaSeconds;
+			if (DieselandPawn->SkillThreeTimer < 0.0f)
+			{
+				DieselandPawn->SkillThreeTimer = 0.0f;
+			}
+		}
+
+		// Basic Attack actions
+		if (DieselandPawn->BasicAttackTimer <= 0.0f && DieselandPawn->BasicAttackActive)
+		{
+			ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+			if (DieselandPawn->IsMelee)
+			{
+				ServerMeleeAttack();
+				DieselandPawn->BasicAttackTimer = DieselandPawn->BasicAttackCooldown;
+			}
+			else
+			{
+				ServerRangedAttack();
+				DieselandPawn->BasicAttackTimer = DieselandPawn->BasicAttackCooldown;
+			}
+		}
 	}
 }
 
@@ -30,39 +89,20 @@ void ADieselandPlayerController::SetupInputComponent()
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &ADieselandPlayerController::OnSetDestinationPressed);
-	InputComponent->BindAction("SetDestination", IE_Released, this, &ADieselandPlayerController::OnSetDestinationReleased);
+	InputComponent->BindAxis("MoveForward", this, &ADieselandPlayerController::OnMoveForward);
+	InputComponent->BindAxis("MoveRight", this, &ADieselandPlayerController::OnMoveRight);
 
-	// support touch devices 
-	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &ADieselandPlayerController::MoveToTouchLocation);
-	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &ADieselandPlayerController::MoveToTouchLocation);
-}
+	InputComponent->BindAxis("LookNorth", this, &ADieselandPlayerController::OnFaceNorth);
+	InputComponent->BindAxis("LookEast", this, &ADieselandPlayerController::OnFaceEast);
 
-void ADieselandPlayerController::MoveToMouseCursor()
-{
-	// Trace to see what is under the mouse cursor
-	FHitResult Hit;
-	GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, Hit);
+	InputComponent->BindAction("Attack", IE_Pressed, this, &ADieselandPlayerController::OnAttackPress);
+	InputComponent->BindAction("Attack", IE_Released, this, &ADieselandPlayerController::OnAttackRelease);
 
-	if(Hit.bBlockingHit)
-	{
-		// We hit something, move there
-		SetNewMoveDestination(Hit.ImpactPoint);
-	}
-}
+	InputComponent->BindAction("Skill_1", IE_Pressed, this, &ADieselandPlayerController::OnSkillOne);
+	InputComponent->BindAction("Skill_2", IE_Pressed, this, &ADieselandPlayerController::OnSkillTwo);
+	InputComponent->BindAction("Skill_3", IE_Pressed, this, &ADieselandPlayerController::OnSkillThree);
 
-void ADieselandPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
-{
-	FVector2D ScreenSpaceLocation(Location);
-
-	// Trace to see what is under the touch location
-	FHitResult HitResult;
-	GetHitResultAtScreenPosition(ScreenSpaceLocation, CurrentClickTraceChannel, true, HitResult);
-	if (HitResult.bBlockingHit)
-	{
-		// We hit something, move there
-		SetNewMoveDestination(HitResult.ImpactPoint);
-	}
+	InputComponent->BindAction("Debug_MeleeSwap", IE_Released, this, &ADieselandPlayerController::SwapMelee);
 }
 
 bool ADieselandPlayerController::ServerEditHealth_Validate(int32 Amt, AActor* Target)
@@ -72,78 +112,137 @@ bool ADieselandPlayerController::ServerEditHealth_Validate(int32 Amt, AActor* Ta
 
 void ADieselandPlayerController::ServerEditHealth_Implementation(int32 Amt, AActor* Target)
 {
-	Cast<ADieselandCharacter>(this->GetControlledPawn())->EditHealth(Amt, Target);
+	// Edit the health of the specific pawn
+	if (GetPawn() != nullptr)
+	{
+		Cast<ADieselandCharacter>(GetPawn())->EditHealth(Amt, Target);
+	}
 }
 
-void ADieselandPlayerController::SetNewMoveDestination(const FVector DestLocation)
+void ADieselandPlayerController::OnMoveForward(float Val)
 {
-	APawn* const Pawn = GetPawn();
-	if (Pawn)
-	{
-		//UNavigationSystem* const NavSys = GetWorld()->GetNavigationSystem();
-		UNavigationSystem* const NavSys = UNavigationSystem::GetCurrent(this);
-		float const Distance = FVector::Dist(DestLocation, Pawn->GetActorLocation());
+	if (GetPawn() != nullptr){
+		GetPawn()->AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Val);
+	}
+}
 
-		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if (NavSys && (Distance > 120.0f))
-		{
-			NavSys->SimpleMoveToLocation(this, DestLocation);
-			
+void ADieselandPlayerController::OnMoveRight(float Val)
+{
+	if (GetPawn() != nullptr){
+		GetPawn()->AddMovementInput(FVector(0.0f, 1.0f, 0.0f), Val);
+	}
+}
+
+void ADieselandPlayerController::OnFaceNorth(float Val)
+{
+	if (GetPawn() != nullptr && Val != 0.0f){
+		ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+
+		// Convert the joystick axis to a rotator
+		FVector TempAxisVector = FVector(Val, (GetInputAxisValue("LookEast") * 1.0f), 0.0f);
+		FacingRotation = FRotationMatrix::MakeFromX(TempAxisVector).Rotator();
+		
+		// If the rotation value is different from previous, change the rotation
+		if (DieselandPawn->AimRotation != FacingRotation){
+			// Edit the pawn's spine rotation
+			DieselandPawn->AimRotation = FacingRotation;
+			// If this is the client, send the the rotator to the server
+			if (Role < ROLE_Authority){
+				ServerOnAim(FacingRotation);
+			}
 		}
 	}
-	if (Role < ROLE_Authority)
-	{
-		ServerSetNewMoveDestination(DestLocation);
+}
+void ADieselandPlayerController::OnFaceEast(float Val)
+{
+	if (GetPawn() != nullptr && Val != 0.0f){
+		ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+		
+		// Convert the joystick axis to a rotator
+		FVector TempAxisVector = FVector(GetInputAxisValue("LookNorth"), Val * 1.0f, 0.0f);
+		FacingRotation = FRotationMatrix::MakeFromX(TempAxisVector).Rotator();
+
+		// If the rotation value is different from previous, change the rotation
+		if (DieselandPawn->AimRotation != FacingRotation){
+			// Edit the pawn's spine rotation
+			DieselandPawn->AimRotation = FacingRotation;
+			// If this is the client, send the the rotator to the server
+			if (Role < ROLE_Authority){
+				ServerOnAim(FacingRotation);
+			}
+		}
 	}
+}
+
+void ADieselandPlayerController::OnAttackPress()
+{
+	Cast<ADieselandCharacter>(GetPawn())->BasicAttackActive = true;
+}
+
+void ADieselandPlayerController::OnAttackRelease()
+{
+	Cast<ADieselandCharacter>(GetPawn())->BasicAttackActive = false;
+}
+
+void ADieselandPlayerController::OnSkillOne()
+{
 
 }
-void ADieselandPlayerController::OnRep_PawnRotation()
+
+void ADieselandPlayerController::OnSkillTwo()
 {
-	ControlRotation = PawnRotation;
+
 }
-void ADieselandPlayerController::ServerSetNewMoveDestination_Implementation(const FVector DestLocation)
+
+void ADieselandPlayerController::OnSkillThree()
 {
-	SetNewMoveDestination(DestLocation);
-	PawnRotation = ControlRotation;
 	
 }
-bool ADieselandPlayerController::ServerSetNewMoveDestination_Validate(const FVector DestLocation)
+
+void ADieselandPlayerController::SwapMelee()
+{
+	if (Cast<ADieselandCharacter>(GetPawn())->IsMelee)
+	{
+		Cast<ADieselandCharacter>(GetPawn())->IsMelee = false;
+	}
+	else
+	{
+		Cast<ADieselandCharacter>(GetPawn())->IsMelee = true;
+	}
+	
+}
+
+bool ADieselandPlayerController::ServerMeleeAttack_Validate()
 {
 	return true;
 }
 
-void ADieselandPlayerController::OnSetDestinationPressed()
+void ADieselandPlayerController::ServerMeleeAttack_Implementation()
 {
-	// Trace to see what is under the mouse cursor
-	FHitResult Hit;
-	GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, Hit);
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	DieselandPawn->MeleeAttack();
+}
 
-	if (Hit.Component->GetOwner() != nullptr && Hit.Component->GetOwner()->ActorHasTag("Player") && Hit.Component->GetOwner() != Cast<AActor>(this->GetControlledPawn()))
-	{
-		Cast<ADieselandCharacter>(this->GetControlledPawn())->BasicAttack(Hit.Component->GetOwner());
-		if (Role < ROLE_Authority)
-		{
-			ServerEditHealth(-1, Hit.Component->GetOwner());
-		}
-	}
+bool ADieselandPlayerController::ServerRangedAttack_Validate()
+{
+	return true;
+}
 
-	else
-	{
-		// set flag to keep updating destination until released
-		bMoveToMouseCursor = true;
+void ADieselandPlayerController::ServerRangedAttack_Implementation()
+{
+	if (GetPawn() != nullptr){
+		Cast<ADieselandCharacter>(GetPawn())->RangedAttack();
 	}
 }
 
-void ADieselandPlayerController::OnSetDestinationReleased()
+bool ADieselandPlayerController::ServerOnAim_Validate(FRotator Rotation)
 {
-	// clear flag to indicate we should stop updating the destination
-	bMoveToMouseCursor = false;
+	return true;
 }
 
-void ADieselandPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+void ADieselandPlayerController::ServerOnAim_Implementation(FRotator Rotation)
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	// Replicate to everyone
-	DOREPLIFETIME(ADieselandPlayerController, PawnRotation);
+	if (GetPawn() != nullptr){
+		Cast<ADieselandCharacter>(GetPawn())->AimRotation = Rotation;
+	}
 }
