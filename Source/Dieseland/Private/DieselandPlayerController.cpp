@@ -128,13 +128,10 @@ void ADieselandPlayerController::OnMoveForward(float Val)
 
 void ADieselandPlayerController::OnMoveRight(float Val)
 {
-<<<<<<< HEAD
 	Cast<ADieselandCharacter>(this->GetPawn())->EditHealth(Amt, Target);
-=======
 	if (GetPawn() != nullptr){
 		GetPawn()->AddMovementInput(FVector(0.0f, 1.0f, 0.0f), Val);
 	}
->>>>>>> FETCH_HEAD
 }
 
 void ADieselandPlayerController::OnFaceNorth(float Val)
@@ -204,9 +201,13 @@ void ADieselandPlayerController::OnSkillThree()
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	if (Hit.Component->GetOwner() != nullptr && Hit.Component->GetOwner()->ActorHasTag("Player") && Hit.Component->GetOwner() != Cast<AActor>(this->GetPawn()))
+=======
+	if (Hit.Component->GetOwner() != nullptr && Hit.Component->GetOwner()->ActorHasTag("Player") && Hit.Component->GetOwner() != Cast<AActor>(this->GetControlledPawn()))
+>>>>>>> parent of c390076... Creating level tiles
 	{
-		Cast<ADieselandCharacter>(this->GetPawn())->BasicAttack(Hit.Component->GetOwner());
+		Cast<ADieselandCharacter>(this->GetControlledPawn())->BasicAttack(Hit.Component->GetOwner());
 		if (Role < ROLE_Authority)
 		{
 			ServerEditHealth(-1, Hit.Component->GetOwner());
