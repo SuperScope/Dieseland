@@ -26,14 +26,14 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerRangedAttack();
 
-	/*UFUNCTION(Reliable, Server, WithValidation)
+	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerSkillOne();
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerSkillTwo();
 
 	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerSkillThree();*/
+	void ServerSkillThree();
 
 	void UpdateCooldownTimers(float DeltaSeconds);
 
@@ -47,9 +47,6 @@ protected:
 	// Input events
 	void OnAttackPress();
 	void OnAttackRelease();
-	void OnSkillOne();
-	void OnSkillTwo();
-	void OnSkillThree();
 
 	void SwapMelee();
 

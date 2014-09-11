@@ -144,6 +144,7 @@ void ADieselandCharacter::RangedAttack()
 		{
 			Projectile->ProjectileDamage = BasicAttackDamage;
 			Projectile->ServerActivateProjectile();
+
 			//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
 		}
 	}
@@ -171,7 +172,30 @@ void ADieselandCharacter::MeleeAttack()
 
 void ADieselandCharacter::SkillOne()
 {
+	UWorld* const World = GetWorld();
+	if (World)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
+		SpawnParams.Instigator = Instigator;
 
+		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
+
+		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+
+		// spawn the projectile at the muzzle
+		ABaseProjectile* const Projectile = World->SpawnActor<ABaseProjectile>(ABaseProjectile::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+		if (Projectile)
+		{
+			Projectile->ProjectileDamage = BasicAttackDamage;
+			Projectile->ServerActivateProjectile();
+
+			Projectile->SetLifeSpan(4.0f);
+			Projectile->Piercing = true;
+
+			//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
+		}
+	}
 }
 
 void ADieselandCharacter::SkillTwo()

@@ -98,9 +98,9 @@ void ADieselandPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Attack", IE_Pressed, this, &ADieselandPlayerController::OnAttackPress);
 	InputComponent->BindAction("Attack", IE_Released, this, &ADieselandPlayerController::OnAttackRelease);
 
-	InputComponent->BindAction("Skill_1", IE_Pressed, this, &ADieselandPlayerController::OnSkillOne);
-	InputComponent->BindAction("Skill_2", IE_Pressed, this, &ADieselandPlayerController::OnSkillTwo);
-	InputComponent->BindAction("Skill_3", IE_Pressed, this, &ADieselandPlayerController::OnSkillThree);
+	InputComponent->BindAction("Skill_1", IE_Pressed, this, &ADieselandPlayerController::ServerSkillOne);
+	InputComponent->BindAction("Skill_2", IE_Pressed, this, &ADieselandPlayerController::ServerSkillTwo);
+	InputComponent->BindAction("Skill_3", IE_Pressed, this, &ADieselandPlayerController::ServerSkillThree);
 
 	InputComponent->BindAction("Debug_MeleeSwap", IE_Released, this, &ADieselandPlayerController::SwapMelee);
 }
@@ -184,19 +184,44 @@ void ADieselandPlayerController::OnAttackRelease()
 	Cast<ADieselandCharacter>(GetPawn())->BasicAttackActive = false;
 }
 
-void ADieselandPlayerController::OnSkillOne()
-{
 
+void ADieselandPlayerController::ServerSkillOne_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr){
+		DieselandPawn->SkillOne();
+	}
 }
 
-void ADieselandPlayerController::OnSkillTwo()
+bool ADieselandPlayerController::ServerSkillOne_Validate()
 {
-
+	return true;
 }
 
-void ADieselandPlayerController::OnSkillThree()
+void ADieselandPlayerController::ServerSkillTwo_Implementation()
 {
-	
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr){
+		DieselandPawn->SkillTwo();
+	}
+}
+
+bool ADieselandPlayerController::ServerSkillTwo_Validate()
+{
+	return true;
+}
+
+void ADieselandPlayerController::ServerSkillThree_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr){
+		DieselandPawn->SkillThree();
+	}
+}
+
+bool ADieselandPlayerController::ServerSkillThree_Validate()
+{
+	return true;
 }
 
 void ADieselandPlayerController::SwapMelee()
@@ -220,7 +245,9 @@ bool ADieselandPlayerController::ServerMeleeAttack_Validate()
 void ADieselandPlayerController::ServerMeleeAttack_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	DieselandPawn->MeleeAttack();
+	if (DieselandPawn != nullptr){
+		DieselandPawn->MeleeAttack();
+	}
 }
 
 bool ADieselandPlayerController::ServerRangedAttack_Validate()
@@ -230,8 +257,9 @@ bool ADieselandPlayerController::ServerRangedAttack_Validate()
 
 void ADieselandPlayerController::ServerRangedAttack_Implementation()
 {
-	if (GetPawn() != nullptr){
-		Cast<ADieselandCharacter>(GetPawn())->RangedAttack();
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr){
+		DieselandPawn->RangedAttack();
 	}
 }
 

@@ -29,6 +29,10 @@ public:
 	UPROPERTY(Replicated, Category = Visual, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UParticleSystemComponent> Particle;
 
+	UPROPERTY(Replicated, Category = Visual, BlueprintReadWrite, EditAnywhere)
+	bool Piercing;
+
+	UPROPERTY(Replicated, Category = Visual, BlueprintReadWrite, EditAnywhere)
 	int32 ProjectileDamage;
 
 	UFUNCTION(Reliable, NetMulticast, WithValidation)
