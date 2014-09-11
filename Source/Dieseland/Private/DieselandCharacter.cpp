@@ -91,7 +91,9 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	MeleeCollision->AddLocalOffset(FVector(0.0f, 0.0f, (MeleeRange / 2.0f) + 50.0f));
 	MeleeCollision->SetCapsuleHalfHeight(MeleeRange / 2.0f);
 	MeleeCollision->SetCapsuleRadius(MeleeRange / 2.0f);
+	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
+
 
 	// Ensure replication
 	bReplicates = true;
@@ -141,7 +143,7 @@ void ADieselandCharacter::RangedAttack()
 		if (Projectile)
 		{
 			Projectile->ProjectileDamage = BasicAttackDamage;
-			Projectile->Particle->ActivateSystem();
+			Projectile->ServerActivateProjectile();
 			//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
 		}
 	}
@@ -149,7 +151,10 @@ void ADieselandCharacter::RangedAttack()
 
 void ADieselandCharacter::MeleeAttack()
 {
+	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	MeleeCollision->SetCollisionProfileName(TEXT("OverlapAll"));
 	MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
+	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	AActor* CurActor = NULL;
 	for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)

@@ -4,6 +4,7 @@
 #include "BaseProjectile.h"
 #include "UnrealNetwork.h"
 #include "DieselandCharacter.h"
+#include "DieselandPlayerController.h"
 #include "ParticleDefinitions.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -46,16 +47,26 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	Particle->SetIsReplicated(true);
 }
 
+void ABaseProjectile::ServerActivateProjectile_Implementation()
+{
+	Particle->ActivateSystem();
+}
+
+bool ABaseProjectile::ServerActivateProjectile_Validate()
+{
+	return true;
+}
+
 void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
 	Super::ReceiveActorBeginOverlap(OtherActor);
-	if (GetOwner() != OtherActor)
+	if (Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor && OtherActor->ActorHasTag(TEXT("Player")))
 	{
 		if (Role == ROLE_Authority)
 		{
-			Cast<ADieselandCharacter>(GetOwner())->EditHealth(-1 * ProjectileDamage, OtherActor);
+			Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
+			this->Destroy();
 		}
-		this->Destroy();
 	}
 	
 }
