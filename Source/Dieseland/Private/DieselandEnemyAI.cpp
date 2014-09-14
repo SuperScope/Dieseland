@@ -1,6 +1,6 @@
 
-
 #include "Dieseland.h"
+#include "Engine.h"
 #include "GameFramework/Character.h"
 #include "DieselandEnemyAI.h"
 #include "DieselandEnemyBot.h"
@@ -19,6 +19,9 @@ ADieselandEnemyAI::ADieselandEnemyAI(const class FPostConstructInitializePropert
 
 
 	bReplicates = true;
+	PrimaryActorTick.bCanEverTick = true;
+
+	Tags.Add(FName("Player"));
 }
 
 //in this function the AI sets its enemy id and detection id, from there
@@ -33,15 +36,17 @@ void ADieselandEnemyAI::Possess(class APawn* InPawn)
 
 		EnemyKeyID = BlackboardComp->GetKeyID("Enemy");
 		EnemyKeyLocationID = BlackboardComp->GetKeyID("Destination");
-
 		BehaviorComp->StartTree(Bot->BottBehavior);
+		
 	}
 }
+
 //here the AI searches for an enemy player to attack
 void ADieselandEnemyAI::SearchForEnemy()
 {
+	ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
 	APawn* MyBot = GetPawn();
-	if (MyBot == NULL)
+	if (MyBot == NULL || BotPawn->isAggressive == false)
 	{
 		return;
 	}
@@ -88,7 +93,7 @@ void ADieselandEnemyAI::ServerEditHealth_Implementation(int32 Amt, AActor* Targe
 	// Edit the health of the specific pawn
 	if (GetPawn() != nullptr)
 	{
-		Cast<ADieselandEnemyBot>(GetPawn())->EditHealth(Amt, Target);
+		Cast<ADieselandCharacter>(GetPawn())->EditHealth(Amt, Target);
 	}
 }
 
@@ -113,18 +118,20 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 			DieselandPawn->BasicAttackTimer -= DeltaSeconds;
 			if (DieselandPawn->BasicAttackTimer < 0.0f)
 			{
-				DieselandPawn->BasicAttackTimer = 0.0f;
+				DieselandPawn->OnZoneEnter();
+				ServerMeleeAttack();
+				DieselandPawn->BasicAttackTimer = 1.0f;
 			}
 		}
 		// Basic Attack actions
 		if (DieselandPawn->BasicAttackTimer <= 0.0f && DieselandPawn->BasicAttackActive)
 		{
 			ADieselandEnemyBot* DieselandPawn = Cast<ADieselandEnemyBot>(GetPawn());
-				ServerMeleeAttack();
 				DieselandPawn->BasicAttackTimer = DieselandPawn->BasicAttackCooldown;
 		}
 	}
 }
+
 
 void ADieselandEnemyAI::Tick(float DeltaTime)
 {

@@ -1,7 +1,10 @@
 
 
 #include "Dieseland.h"
+#include "GameFramework/Actor.h"
 #include "DieselandEnemyBot.h"
+#include "DieselandCharacter.h"
+#include "DieselandPlayerController.h"
 #include "DieselandEnemyAI.h"
 #include "UnrealNetwork.h"
 
@@ -43,15 +46,17 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 
 	// Set default ranges
 	MeleeRange = 144.0f;
+	AttackZone = 1200.0f;
 
 	// Cooldown values
 	BasicAttackCooldown = 0.2f;
 
 
 	// Timer values
-	BasicAttackTimer = 0.0f;
+	BasicAttackTimer = 1.0f;
 
 
+	//all of the variables needed for creating a collider
 	MeleeCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("MeleeCollision"));
 	MeleeCollision->AttachParent = (Mesh);
 	MeleeCollision->AttachSocketName = FName(TEXT("AimSocket"));
@@ -60,11 +65,22 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	MeleeCollision->SetCapsuleRadius(MeleeRange / 2.0f);
 	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	//all of the variables needed for creating a collider for the attack zone
+	AttackZoneCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("AttackZone"));
+	AttackZoneCollision->AttachParent = (Mesh);
+	//AttackZoneCollision->AddLocalOffset(FVector(0.0f, 0.0f, (MeleeRange / 2.0f) + 50.0f));
+	AttackZoneCollision->SetCapsuleHalfHeight(AttackZone / 2.0f);
+	AttackZoneCollision->SetCapsuleRadius(AttackZone / 2.0f);
+	AttackZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	// Ensure replication
 	bReplicates = true;
 	AimMesh->SetIsReplicated(true);
 	Mesh->SetIsReplicated(true);
+	PrimaryActorTick.bCanEverTick = true;
 
+	//here we set the dieseland aggresion to true
+	isAggressive = false;
 	
 }
 
@@ -81,17 +97,19 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Target)
 {
 	if (Target->ActorHasTag(FName(TEXT("Player"))))
 	{
-		Cast<ADieselandEnemyBot>(Target)->Health += Amt;
-
+		Cast<ADieselandCharacter>(Target)->Health += Amt;
 		PlayerLabel->SetText(FString::FromInt(Health));
 
+		//i Don't think we need this function for the AI
 		if (Role < ROLE_Authority)
 		{
-			Cast<ADieselandEnemyAI>(Controller)->ServerEditHealth(Amt, Target);
+			Cast<ADieselandPlayerController>(Controller)->ServerEditHealth(Amt, Target);
 		}
 	}
 }
 
+
+//here is the basic melee attack for the AI
 void ADieselandEnemyBot::MeleeAttack()
 {
 	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -123,4 +141,37 @@ void ADieselandEnemyBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackTimer);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackActive);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackDamage);
+}
+
+void ADieselandEnemyBot::OnZoneEnter()
+{
+	ADieselandEnemyAI* BotController = Cast<ADieselandEnemyAI>(Controller);
+
+	AttackZoneCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	AttackZoneCollision->SetCollisionProfileName(TEXT("OverlapAll"));
+	AttackZoneCollision->GetOverlappingActors(ActorsInZoneRange);
+	AttackZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AActor* CurActor = NULL;
+	isAggressive = false;
+	for (int32 b = 0; b < ActorsInZoneRange.Num(); b++)
+	{
+		CurActor = ActorsInZoneRange[b];
+		if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Player")))) continue;
+		if (!CurActor->IsValidLowLevel()) continue;
+
+		if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player")))){
+			this->CharacterMovement->MaxWalkSpeed = 400;
+			isAggressive = true;
+		}
+	}
+	if (!isAggressive)
+	{
+		this->CharacterMovement->MaxWalkSpeed = 0;
+	}
+}
+
+void ADieselandEnemyBot::OnZoneExit()
+{
+	
+
 }
