@@ -125,6 +125,9 @@ public:
 	UFUNCTION(Reliable, NetMulticast, WithValidation)
 	void ServerActivateProjectile();
 
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerDamageEnemy(int32 Amt, AActor* Target);
+
 protected:
 	virtual void Tick(float DeltaSeconds) override;
 

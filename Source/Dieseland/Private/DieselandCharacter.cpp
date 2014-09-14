@@ -3,6 +3,7 @@
 #include "Dieseland.h"
 #include "DieselandCharacter.h"
 #include "DieselandPlayerController.h"
+#include "DieselandEnemyBot.h"
 #include "UnrealNetwork.h"
 #include "BaseProjectile.h"
 #include "ParticleDefinitions.h"
@@ -139,8 +140,21 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 			Cast<ADieselandPlayerController>(Controller)->ServerEditHealth(Amt, Target);
 		}
 	}
+	else if (Target->ActorHasTag(FName(TEXT("Enemy"))))
+	{
+		ServerDamageEnemy(Amt, Target);
+	}
 }
 
+void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Target)
+{
+	Cast<ADieselandEnemyBot>(Target)->Health += Amt;
+}
+
+bool ADieselandCharacter::ServerDamageEnemy_Validate(int32 Amt, AActor* Target)
+{
+	return true;
+}
 void ADieselandCharacter::RangedAttack()
 {
 	UWorld* const World = GetWorld();
@@ -177,7 +191,7 @@ void ADieselandCharacter::MeleeAttack()
 	for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)
 	{
 		CurActor = ActorsInMeleeRange[b];
-		if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Player")))) continue;
+		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
 		if (!CurActor->IsValidLowLevel()) continue;
 		
 		if (Role == ROLE_Authority && CurActor != this)
@@ -258,7 +272,7 @@ void ADieselandCharacter::SkillThree()
 	for (int32 b = 0; b < ActorsInPulseRange.Num(); b++)
 	{
 		CurActor = ActorsInPulseRange[b];
-		if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Player")))) continue;
+		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
 		if (!CurActor->IsValidLowLevel()) continue;
 
 		if (Role == ROLE_Authority && CurActor != this)
