@@ -70,6 +70,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	// Set default ranges
 	MeleeRange = 144.0f;
 	RangedRange = 1200.0f;
+	BlinkDist = 500.0f;
 
 	// Damage values
 
@@ -93,12 +94,27 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	MeleeCollision->SetCapsuleRadius(MeleeRange / 2.0f);
 	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
+	PulseCollision = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("PulseCollision"));
+	PulseCollision->AttachParent = (Mesh);
+	PulseCollision->AttachSocketName = FName(TEXT("AimSocket"));
+	PulseCollision->SetSphereRadius(300.0f);
+	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> PulseParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse_WIP.Unreal_Particle_EngletonPulse_WIP'"));
+	ParticleSystem = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
+	ParticleSystem->Template = PulseParticleAsset.Object;
+	ParticleSystem->AttachTo(RootComponent);
+	ParticleSystem->bAutoActivate = false;
+	ParticleSystem->SetHiddenInGame(false);
+	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// Ensure replication
 	bReplicates = true;
 	AimMesh->SetIsReplicated(true);
 	Mesh->SetIsReplicated(true);
+	ParticleSystem->SetIsReplicated(true);
+
+	this->SetOwner(Controller);
 }
 
 void ADieselandCharacter::Tick(float DeltaSeconds)
@@ -144,6 +160,7 @@ void ADieselandCharacter::RangedAttack()
 		{
 			Projectile->ProjectileDamage = BasicAttackDamage;
 			Projectile->ServerActivateProjectile();
+
 			//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
 		}
 	}
@@ -163,7 +180,8 @@ void ADieselandCharacter::MeleeAttack()
 		if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Player")))) continue;
 		if (!CurActor->IsValidLowLevel()) continue;
 		
-		if (Role == ROLE_Authority){
+		if (Role == ROLE_Authority && CurActor != this)
+		{
 			EditHealth(-1 * BasicAttackDamage, CurActor);
 		}
 	}
@@ -171,21 +189,98 @@ void ADieselandCharacter::MeleeAttack()
 
 void ADieselandCharacter::SkillOne()
 {
+	UWorld* const World = GetWorld();
+	if (World)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
+		SpawnParams.Instigator = Instigator;
 
+		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
+
+		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+
+		// spawn the projectile at the muzzle
+		ABaseProjectile* const Projectile = World->SpawnActor<ABaseProjectile>(ABaseProjectile::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+		if (Projectile)
+		{
+			Projectile->ProjectileDamage = BasicAttackDamage;
+			Projectile->ServerActivateProjectile();
+
+			Projectile->SetLifeSpan(1.0f);
+			Projectile->Piercing = true;
+
+			//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
+		}
+	}
 }
 
 void ADieselandCharacter::SkillTwo()
 {
+	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
+	RV_TraceParams.bTraceComplex = true;
+	RV_TraceParams.bTraceAsyncScene = true;
+	RV_TraceParams.bReturnPhysicalMaterial = false;
 
+	//Re-initialize hit info
+	FHitResult RV_Hit(ForceInit);
+
+	//call GetWorld() from within an actor extending class
+	GetWorld()->LineTraceSingle(
+		RV_Hit,        //result
+		Mesh->GetSocketLocation(FName(TEXT("AimSocket"))),    //start
+		(Mesh->GetSocketLocation(FName(TEXT("AimSocket"))) + (AimRotation.GetNormalized().Vector() * BlinkDist)), //end
+		ECC_Pawn, //collision channel
+		RV_TraceParams
+		);
+	FVector TargetLocation;
+	if (RV_Hit.IsValidBlockingHit())
+	{
+		TargetLocation = RV_Hit.Location;
+	}
+	else
+	{
+		TargetLocation = Mesh->GetSocketLocation(FName(TEXT("AimSocket"))) + (AimRotation.GetNormalized().Vector() * BlinkDist);
+	}
+	// Make sure the player doesn't fall through the bottom of the map
+	TargetLocation.Z = Mesh->GetSocketLocation(FName(TEXT("AimSocket"))).Z;
+	SetActorLocation(TargetLocation);
 }
 
 void ADieselandCharacter::SkillThree()
 {
+	PulseCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	PulseCollision->SetCollisionProfileName(TEXT("OverlapAll"));
+	PulseCollision->GetOverlappingActors(ActorsInPulseRange);
+	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	AActor* CurActor = NULL;
+	for (int32 b = 0; b < ActorsInPulseRange.Num(); b++)
+	{
+		CurActor = ActorsInPulseRange[b];
+		if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Player")))) continue;
+		if (!CurActor->IsValidLowLevel()) continue;
+
+		if (Role == ROLE_Authority && CurActor != this)
+		{
+			EditHealth(-1 * BasicAttackDamage, CurActor);
+		}
+	}
 }
 void ADieselandCharacter::OnRep_AimRotation()
 {
 
+}
+
+
+void ADieselandCharacter::ServerActivateProjectile_Implementation()
+{
+	ParticleSystem->ActivateSystem();
+}
+
+bool ADieselandCharacter::ServerActivateProjectile_Validate()
+{
+	return true;
 }
 
 void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -196,6 +291,10 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, Health);
 	DOREPLIFETIME(ADieselandCharacter, AimMesh);
 	DOREPLIFETIME(ADieselandCharacter, AimRotation);
+
+	DOREPLIFETIME(ADieselandCharacter, IsMelee);
+
+	DOREPLIFETIME(ADieselandCharacter, ParticleSystem);
 
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackTimer);
 	DOREPLIFETIME(ADieselandCharacter, SkillOneTimer);

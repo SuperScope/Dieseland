@@ -60,12 +60,17 @@ bool ABaseProjectile::ServerActivateProjectile_Validate()
 void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
 	Super::ReceiveActorBeginOverlap(OtherActor);
-	if (Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor && OtherActor->ActorHasTag(TEXT("Player")))
+	if (Role == ROLE_Authority)
 	{
-		if (Role == ROLE_Authority)
+		if (Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor && OtherActor->ActorHasTag(TEXT("Player")))
 		{
+		
 			Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
-			this->Destroy();
+			if (!Piercing)
+			{
+				this->Destroy();
+			}
+
 		}
 	}
 	
