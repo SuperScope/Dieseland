@@ -5,6 +5,9 @@
 #include "AI/Navigation/NavigationSystem.h"
 #include "DieselandCharacter.h"
 #include "UnrealNetwork.h"
+#include "ParticleDefinitions.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 
 ADieselandPlayerController::ADieselandPlayerController(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
@@ -22,10 +25,18 @@ void ADieselandPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 
 	UpdateCooldownTimers(DeltaTime);
-
+	
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr){
+		// Temporary on screen cooldown display
+		GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor::Blue, FString("Basic Attack: ") + FString::SanitizeFloat(DieselandPawn->BasicAttackTimer));
+		GEngine->AddOnScreenDebugMessage(2, 10.0f, FColor::Red, FString("Skill One: ") + FString::SanitizeFloat(DieselandPawn->SkillOneTimer));
+		GEngine->AddOnScreenDebugMessage(3, 10.0f, FColor::Green, FString("Skill Two: ") + FString::SanitizeFloat(DieselandPawn->SkillTwoTimer));
+		GEngine->AddOnScreenDebugMessage(4, 10.0f, FColor::Yellow, FString("Skill Three: ") + FString::SanitizeFloat(DieselandPawn->SkillThreeTimer));
+	}
 }
 
-void ADieselandPlayerController::UpdateCooldownTimers(float DeltaSeconds)
+void ADieselandPlayerController::UpdateCooldownTimers_Implementation(float DeltaSeconds)
 {
 	if (Cast<ADieselandCharacter>(GetPawn()) != nullptr){
 		ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
@@ -69,7 +80,6 @@ void ADieselandPlayerController::UpdateCooldownTimers(float DeltaSeconds)
 		// Basic Attack actions
 		if (DieselandPawn->BasicAttackTimer <= 0.0f && DieselandPawn->BasicAttackActive)
 		{
-			ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 			if (DieselandPawn->IsMelee)
 			{
 				ServerMeleeAttack();
@@ -82,6 +92,11 @@ void ADieselandPlayerController::UpdateCooldownTimers(float DeltaSeconds)
 			}
 		}
 	}
+}
+
+bool ADieselandPlayerController::UpdateCooldownTimers_Validate(float DeltaSeconds)
+{
+	return true;
 }
 
 void ADieselandPlayerController::SetupInputComponent()
@@ -101,6 +116,8 @@ void ADieselandPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Skill_1", IE_Pressed, this, &ADieselandPlayerController::ServerSkillOne);
 	InputComponent->BindAction("Skill_2", IE_Pressed, this, &ADieselandPlayerController::ServerSkillTwo);
 	InputComponent->BindAction("Skill_3", IE_Pressed, this, &ADieselandPlayerController::ServerSkillThree);
+
+	InputComponent->BindAction("UpgradeStrength", IE_Pressed, this, &ADieselandPlayerController::UpgradeStrength);
 
 	InputComponent->BindAction("Debug_MeleeSwap", IE_Released, this, &ADieselandPlayerController::SwapMelee);
 }
@@ -174,22 +191,35 @@ void ADieselandPlayerController::OnFaceEast(float Val)
 	}
 }
 
-void ADieselandPlayerController::OnAttackPress()
+void ADieselandPlayerController::OnAttackPress_Implementation()
 {
 	Cast<ADieselandCharacter>(GetPawn())->BasicAttackActive = true;
 }
 
-void ADieselandPlayerController::OnAttackRelease()
+bool ADieselandPlayerController::OnAttackPress_Validate()
+{
+	return true;
+}
+
+void ADieselandPlayerController::OnAttackRelease_Implementation()
 {
 	Cast<ADieselandCharacter>(GetPawn())->BasicAttackActive = false;
 }
 
+bool ADieselandPlayerController::OnAttackRelease_Validate()
+{
+	return true;
+}
 
 void ADieselandPlayerController::ServerSkillOne_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 	if (DieselandPawn != nullptr){
-		DieselandPawn->SkillOne();
+		if (DieselandPawn->SkillOneTimer <= 0.0f)
+		{
+			DieselandPawn->SkillOne();
+			DieselandPawn->SkillOneTimer = DieselandPawn->SkillOneCooldown;
+		}
 	}
 }
 
@@ -202,7 +232,11 @@ void ADieselandPlayerController::ServerSkillTwo_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 	if (DieselandPawn != nullptr){
-		DieselandPawn->SkillTwo();
+		if (DieselandPawn->SkillTwoTimer <= 0.0f)
+		{
+			DieselandPawn->SkillTwo();
+			DieselandPawn->SkillTwoTimer = DieselandPawn->SkillTwoCooldown;
+		}
 	}
 }
 
@@ -215,7 +249,12 @@ void ADieselandPlayerController::ServerSkillThree_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 	if (DieselandPawn != nullptr){
-		DieselandPawn->SkillThree();
+		if (DieselandPawn->SkillThreeTimer <= 0.0f)
+		{
+			DieselandPawn->SkillThree();
+			DieselandPawn->ServerActivateProjectile();
+			DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
+		}
 	}
 }
 
@@ -224,17 +263,38 @@ bool ADieselandPlayerController::ServerSkillThree_Validate()
 	return true;
 }
 
-void ADieselandPlayerController::SwapMelee()
+void ADieselandPlayerController::UpgradeStrength_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr){
+		DieselandPawn->BasicAttackDamage = DieselandPawn->BasicAttackDamage * 2;
+		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Strength!"));
+	}
+}
+
+bool ADieselandPlayerController::UpgradeStrength_Validate()
+{
+	return true;
+}
+
+void ADieselandPlayerController::SwapMelee_Implementation()
 {
 	if (Cast<ADieselandCharacter>(GetPawn())->IsMelee)
 	{
 		Cast<ADieselandCharacter>(GetPawn())->IsMelee = false;
+		GEngine->AddOnScreenDebugMessage(6, 10.0f, FColor::Cyan, FString("Now using ranged attack"));
 	}
 	else
 	{
 		Cast<ADieselandCharacter>(GetPawn())->IsMelee = true;
+		GEngine->AddOnScreenDebugMessage(6, 10.0f, FColor::Cyan, FString("Now using melee attack"));
 	}
 	
+}
+
+bool ADieselandPlayerController::SwapMelee_Validate()
+{
+	return true;
 }
 
 bool ADieselandPlayerController::ServerMeleeAttack_Validate()

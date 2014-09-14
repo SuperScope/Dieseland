@@ -35,7 +35,20 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerSkillThree();
 
+	UFUNCTION(Reliable, Server, WithValidation)
+	void UpgradeStrength();
+
+	UFUNCTION(Reliable, Server, WithValidation)
 	void UpdateCooldownTimers(float DeltaSeconds);
+
+	// Input events
+	UFUNCTION(Reliable, Server, WithValidation)
+	void OnAttackPress();
+	UFUNCTION(Reliable, Server, WithValidation)
+	void OnAttackRelease();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void SwapMelee();
 
 protected:
 
@@ -43,12 +56,6 @@ protected:
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
-
-	// Input events
-	void OnAttackPress();
-	void OnAttackRelease();
-
-	void SwapMelee();
 
 	// Movment input events
 	void OnMoveForward(float Val);
