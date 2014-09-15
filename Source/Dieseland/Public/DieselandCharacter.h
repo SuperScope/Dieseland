@@ -104,22 +104,22 @@ public:
 
 	///TODO : PARAMETERS MUST MATCH FORMULAS
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
-		void calculateSpeed(int32 Amt, AActor* Target);
+		void calculateSpeed(int32 coreAmt, int32 secondaryAmt, AActor* Target);
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
-		void calculateAttkSpeed(int32 Amt, AActor* Target);
+		void calculateAttkSpeed(int32 coreAmt, int32 secondaryAmt, AActor* Target);
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
-		void calculateArmor(int32 Amt, AActor* Target);
+		void calculateArmor(int32 coreAmt, int32 secondaryAmt, AActor* Target);
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
-		void calculateDamage(int32 Amt, AActor* Target);
+		void calculateDamage(int32 coreAmt, int32 secondaryAmt, AActor* Target);
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
-		void calculateHealth(int32 Amt, AActor* Target);
+		void calculateHealth(int32 coreAmt, int32 secondaryAmt, AActor* Target);
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
-		void calculateAbilityDamage(int32 Amt, AActor* Target);
+		void calculateAbilityDamage(int32 coreAmt, int32 secondaryAmt, AActor* Target);
 
 	//CORE ATTRIBUTES ENDS HERE
 

@@ -128,10 +128,80 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 
 // CORE ATTRIBUTE CALCULATION FUNCTIONS
 
-void ADieselandCharacter::calculateSpeed(int32 Amt, AActor* Target)
+void ADieselandCharacter::calculateSpeed(int32 coreAmt, int32 secondaryAmt, AActor* Target)
 {
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
 
+		if (Role < ROLE_Authority)
+		{
+
+		}
+	}
 }
+
+void ADieselandCharacter::calculateAttkSpeed(int32 coreAmt, int32 secondaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+
+		if (Role < ROLE_Authority)
+		{
+
+		}
+	}
+}
+
+void ADieselandCharacter::calculateArmor(int32 coreAmt, int32 secondaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+
+		if (Role < ROLE_Authority)
+		{
+
+		}
+	}
+}
+
+void ADieselandCharacter::calculateDamage(int32 coreAmt, int32 secondaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+
+		if (Role < ROLE_Authority)
+		{
+
+		}
+	}
+}
+
+//Might simply use "editHealth" function
+void ADieselandCharacter::calculateHealth(int32 coreAmt, int32 secondaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+
+		if (Role < ROLE_Authority)
+		{
+
+		}
+	}
+}
+
+void ADieselandCharacter::calculateAbilityDamage(int32 coreAmt, int32 secondaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+
+		if (Role < ROLE_Authority)
+		{
+			
+		}
+	}
+}
+
+
 
 
 void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
@@ -311,4 +381,11 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackActive);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackDamage);
+
+	//Necessary?
+	DOREPLIFETIME(ADieselandCharacter, Strength);
+	DOREPLIFETIME(ADieselandCharacter, Constitution);
+	DOREPLIFETIME(ADieselandCharacter, Dexterity);
+	DOREPLIFETIME(ADieselandCharacter, Intelligence);
+
 }
