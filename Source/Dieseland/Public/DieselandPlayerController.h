@@ -9,40 +9,60 @@ class ADieselandPlayerController : public APlayerController
 	GENERATED_UCLASS_BODY()
 
 public:
-		UFUNCTION(reliable, Server, WithValidation)
-		void ServerEditHealth(int32 Amt, AActor* Target);
+	// Called by the server to edit client's health
+	UFUNCTION(reliable, Server, WithValidation)
+	void ServerEditHealth(int32 Amt, AActor* Target);
 
-		UPROPERTY(Replicated, ReplicatedUsing=OnRep_PawnRotation, EditAnywhere, BlueprintReadWrite, Category = Network)
-		FRotator PawnRotation;
+	// Calculated rotation of torso
+	FRotator FacingRotation;
+
+	// Called when aim input is recieved
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerOnAim(FRotator Rotation);
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerMeleeAttack();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerRangedAttack();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerSkillOne();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerSkillTwo();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerSkillThree();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void UpgradeStrength();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void UpdateCooldownTimers(float DeltaSeconds);
+
+	// Input events
+	UFUNCTION(Reliable, Server, WithValidation)
+	void OnAttackPress();
+	UFUNCTION(Reliable, Server, WithValidation)
+	void OnAttackRelease();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void SwapMelee();
 
 protected:
-	/** True if the controlled character should navigate to the mouse cursor. */
-	uint32 bMoveToMouseCursor : 1;
 
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
-	/** Navigate player to the current mouse cursor location. */
-	void MoveToMouseCursor();
-
-	/** Navigate player to the current touch location. */
-	void MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location);
+	// Movment input events
+	void OnMoveForward(float Val);
+	void OnMoveRight(float Val);
+	void OnFaceNorth(float Val);
+	void OnFaceEast(float Val);
 	
-	/** Navigate player to the given world location. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerSetNewMoveDestination(const FVector DestLocation);
-
-	/** Navigate player to the given world location. */
-	void SetNewMoveDestination(const FVector DestLocation);
-
-	/** Input handlers for SetDestination action. */
-	void OnSetDestinationPressed();
-	void OnSetDestinationReleased();
-
-	UFUNCTION()
-	void OnRep_PawnRotation();
 };
 
 
