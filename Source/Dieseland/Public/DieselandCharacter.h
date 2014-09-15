@@ -87,6 +87,42 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	TArray<AActor*> ActorsInPulseRange;
 
+
+	//CORE ATTRIBUTES BEGINS HERE
+	
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int32 Strength;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int32 Constitution;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int32 Dexterity;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int32 Intelligence;
+
+	///TODO : PARAMETERS MUST MATCH FORMULAS
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+		void calculateSpeed(int32 Amt, AActor* Target);
+
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+		void calculateAttkSpeed(int32 Amt, AActor* Target);
+
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+		void calculateArmor(int32 Amt, AActor* Target);
+
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+		void calculateDamage(int32 Amt, AActor* Target);
+
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+		void calculateHealth(int32 Amt, AActor* Target);
+
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+		void calculateAbilityDamage(int32 Amt, AActor* Target);
+
+	//CORE ATTRIBUTES ENDS HERE
+
 	// Combat functions
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void RangedAttack();

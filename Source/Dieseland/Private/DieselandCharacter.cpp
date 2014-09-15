@@ -126,6 +126,14 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
+// CORE ATTRIBUTE CALCULATION FUNCTIONS
+
+void ADieselandCharacter::calculateSpeed(int32 Amt, AActor* Target)
+{
+
+}
+
+
 void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 {
 	if (Target->ActorHasTag(FName(TEXT("Player"))))
