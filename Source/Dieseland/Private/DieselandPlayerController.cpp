@@ -33,6 +33,14 @@ void ADieselandPlayerController::PlayerTick(float DeltaTime)
 		GEngine->AddOnScreenDebugMessage(2, 10.0f, FColor::Red, FString("Skill One: ") + FString::SanitizeFloat(DieselandPawn->SkillOneTimer));
 		GEngine->AddOnScreenDebugMessage(3, 10.0f, FColor::Green, FString("Skill Two: ") + FString::SanitizeFloat(DieselandPawn->SkillTwoTimer));
 		GEngine->AddOnScreenDebugMessage(4, 10.0f, FColor::Yellow, FString("Skill Three: ") + FString::SanitizeFloat(DieselandPawn->SkillThreeTimer));
+
+
+		if (DieselandPawn->Health <= 0)
+		{
+			RespawnPawn();
+
+			
+		}
 	}
 }
 
@@ -120,6 +128,22 @@ void ADieselandPlayerController::SetupInputComponent()
 	InputComponent->BindAction("UpgradeStrength", IE_Pressed, this, &ADieselandPlayerController::UpgradeStrength);
 
 	InputComponent->BindAction("Debug_MeleeSwap", IE_Released, this, &ADieselandPlayerController::SwapMelee);
+}
+
+bool ADieselandPlayerController::RespawnPawn_Validate()
+{
+	return true;
+}
+
+void ADieselandPlayerController::RespawnPawn_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+
+	if (DieselandPawn != nullptr)
+	{
+		DieselandPawn->SetActorLocation(SpawnLocation);
+		DieselandPawn->Health = 100;
+	}
 }
 
 bool ADieselandPlayerController::ServerEditHealth_Validate(int32 Amt, AActor* Target)
@@ -235,6 +259,7 @@ void ADieselandPlayerController::ServerSkillTwo_Implementation()
 		if (DieselandPawn->SkillTwoTimer <= 0.0f)
 		{
 			DieselandPawn->SkillTwo();
+			DieselandPawn->ServerActivateParticle();
 			DieselandPawn->SkillTwoTimer = DieselandPawn->SkillTwoCooldown;
 		}
 	}
@@ -252,7 +277,7 @@ void ADieselandPlayerController::ServerSkillThree_Implementation()
 		if (DieselandPawn->SkillThreeTimer <= 0.0f)
 		{
 			DieselandPawn->SkillThree();
-			DieselandPawn->ServerActivateProjectile();
+			DieselandPawn->ServerActivateParticle();
 			DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
 		}
 	}
