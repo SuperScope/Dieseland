@@ -123,7 +123,7 @@ public:
 	TSubobjectPtr<class UParticleSystemComponent> ParticleSystem;
 
 	UFUNCTION(Reliable, NetMulticast, WithValidation)
-	void ServerActivateParticle();
+		void ServerActivateParticle(UParticleSystem* Particle);
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerDamageEnemy(int32 Amt, AActor* Target);

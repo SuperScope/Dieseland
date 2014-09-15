@@ -259,7 +259,7 @@ void ADieselandPlayerController::ServerSkillTwo_Implementation()
 		if (DieselandPawn->SkillTwoTimer <= 0.0f)
 		{
 			DieselandPawn->SkillTwo();
-			DieselandPawn->ServerActivateParticle();
+			DieselandPawn->ServerActivateParticle(DieselandPawn->BlinkParticle);
 			DieselandPawn->SkillTwoTimer = DieselandPawn->SkillTwoCooldown;
 		}
 	}
@@ -277,7 +277,7 @@ void ADieselandPlayerController::ServerSkillThree_Implementation()
 		if (DieselandPawn->SkillThreeTimer <= 0.0f)
 		{
 			DieselandPawn->SkillThree();
-			DieselandPawn->ServerActivateParticle();
+			DieselandPawn->ServerActivateParticle(DieselandPawn->PulseParticle);
 			DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
 		}
 	}

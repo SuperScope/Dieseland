@@ -270,8 +270,6 @@ void ADieselandCharacter::SkillTwo()
 	// Make sure the player doesn't fall through the bottom of the map
 	TargetLocation.Z = Mesh->GetSocketLocation(FName(TEXT("AimSocket"))).Z;
 	SetActorLocation(TargetLocation);
-
-	ParticleSystem->SetTemplate(BlinkParticle);
 }
 
 void ADieselandCharacter::SkillThree()
@@ -293,7 +291,6 @@ void ADieselandCharacter::SkillThree()
 			EditHealth(-1 * BasicAttackDamage, CurActor);
 		}
 	}
-	ParticleSystem->SetTemplate(PulseParticle);
 }
 void ADieselandCharacter::OnRep_AimRotation()
 {
@@ -301,12 +298,13 @@ void ADieselandCharacter::OnRep_AimRotation()
 }
 
 
-void ADieselandCharacter::ServerActivateParticle_Implementation()
+void ADieselandCharacter::ServerActivateParticle_Implementation(UParticleSystem* Particle)
 {
+	ParticleSystem->SetTemplate(Particle);
 	ParticleSystem->ActivateSystem();
 }
 
-bool ADieselandCharacter::ServerActivateParticle_Validate()
+bool ADieselandCharacter::ServerActivateParticle_Validate(UParticleSystem* Particle)
 {
 	return true;
 }
