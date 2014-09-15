@@ -42,7 +42,8 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 	// Set the starting health value
 	Health = 100;
-
+	// Armor value
+	Armor = -1;
 	// Create the text component
 	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
 	PlayerLabel->AttachTo(RootComponent);
@@ -67,12 +68,16 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 	BasicAttackDamage = 10;
 
+	// Move Speed
+	moveSpeed = 500;
+
 	// Set default ranges
 	MeleeRange = 144.0f;
 	RangedRange = 1200.0f;
 	BlinkDist = 500.0f;
 
 	// Damage values
+	BasicAttackDamage = -1;
 
 	// Cooldown values
 	BasicAttackCooldown = 0.2f;
@@ -128,23 +133,26 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 
 // CORE ATTRIBUTE CALCULATION FUNCTIONS
 
+//coreAmt = Dexterity	
 void ADieselandCharacter::calculateSpeed(int32 coreAmt, int32 secondaryAmt, AActor* Target)
 {
 	if (Target->ActorHasTag(FName(TEXT("Player"))))
 	{
-
+		Cast<ADieselandCharacter>(Target)->moveSpeed = 400.0f + (coreAmt*1.5f);
 		if (Role < ROLE_Authority)
 		{
-
+			//Cast<ADieselandPlayerController>(Controller)->		//ServerEditMoveSpeed?
+				//ServerEditHealth(Amt, Target);
 		}
 	}
 }
 
+ //coreAmt = Dexterity
 void ADieselandCharacter::calculateAttkSpeed(int32 coreAmt, int32 secondaryAmt, AActor* Target)
 {
 	if (Target->ActorHasTag(FName(TEXT("Player"))))
 	{
-
+		Cast<ADieselandCharacter>(Target)->BasicAttackCooldown = 2.0f - (coreAmt / 50.0f);
 		if (Role < ROLE_Authority)
 		{
 
@@ -152,23 +160,24 @@ void ADieselandCharacter::calculateAttkSpeed(int32 coreAmt, int32 secondaryAmt, 
 	}
 }
 
+  //coreAmt = constitution
 void ADieselandCharacter::calculateArmor(int32 coreAmt, int32 secondaryAmt, AActor* Target)
 {
 	if (Target->ActorHasTag(FName(TEXT("Player"))))
 	{
-
+		Cast<ADieselandCharacter>(Target)->Armor = (coreAmt * 2.0f);
 		if (Role < ROLE_Authority)
 		{
 
 		}
 	}
 }
-
-void ADieselandCharacter::calculateDamage(int32 coreAmt, int32 secondaryAmt, AActor* Target)
+	//coreAmt = Strength		secondaryAmt = Dexterity		tertiaryAmt = Intelligence
+void ADieselandCharacter::calculateDamage(int32 coreAmt, int32 secondaryAmt, int32 tertiaryAmt, AActor* Target)
 {
 	if (Target->ActorHasTag(FName(TEXT("Player"))))
 	{
-
+		Cast<ADieselandCharacter>(Target)->BasicAttackDamage = (coreAmt * 3.0f) + (secondaryAmt * 0.3f) + (tertiaryAmt * 0.3);
 		if (Role < ROLE_Authority)
 		{
 
@@ -181,28 +190,13 @@ void ADieselandCharacter::calculateHealth(int32 coreAmt, int32 secondaryAmt, AAc
 {
 	if (Target->ActorHasTag(FName(TEXT("Player"))))
 	{
-
+		Cast<ADieselandCharacter>(Target)->Health = (coreAmt * 20.0f) + (secondaryAmt * 3.0f);
 		if (Role < ROLE_Authority)
 		{
 
 		}
 	}
 }
-
-void ADieselandCharacter::calculateAbilityDamage(int32 coreAmt, int32 secondaryAmt, AActor* Target)
-{
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-
-		if (Role < ROLE_Authority)
-		{
-			
-		}
-	}
-}
-
-
-
 
 void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 {
@@ -369,7 +363,7 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, Health);
 	DOREPLIFETIME(ADieselandCharacter, AimMesh);
 	DOREPLIFETIME(ADieselandCharacter, AimRotation);
-
+	DOREPLIFETIME(ADieselandCharacter, moveSpeed);		//Does this need to be replicated?
 	DOREPLIFETIME(ADieselandCharacter, IsMelee);
 
 	DOREPLIFETIME(ADieselandCharacter, ParticleSystem);

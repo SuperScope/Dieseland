@@ -42,6 +42,10 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
 
+	// Public armor value of this character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 Armor;
+
 	// Damage amount for the basic attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	int32 BasicAttackDamage;
@@ -57,6 +61,10 @@ public:
 	// The range of this character's ranged attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float RangedRange;
+
+	// The movement speed of a character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float moveSpeed;
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float BlinkDist;
@@ -113,13 +121,10 @@ public:
 		void calculateArmor(int32 coreAmt, int32 secondaryAmt, AActor* Target);
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
-		void calculateDamage(int32 coreAmt, int32 secondaryAmt, AActor* Target);
+		void calculateDamage(int32 coreAmt, int32 secondaryAmt, int32 tertiaryAmt, AActor* Target);
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 		void calculateHealth(int32 coreAmt, int32 secondaryAmt, AActor* Target);
-
-	UFUNCTION(BlueprintCallable, Category = Gameplay)
-		void calculateAbilityDamage(int32 coreAmt, int32 secondaryAmt, AActor* Target);
 
 	//CORE ATTRIBUTES ENDS HERE
 
