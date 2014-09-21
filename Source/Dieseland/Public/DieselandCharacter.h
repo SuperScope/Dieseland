@@ -134,6 +134,9 @@ public:
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
 	UParticleSystem* SkillOneParticle;
 
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+	UParticleSystem* BasicAttackParticle;
+
 protected:
 	virtual void Tick(float DeltaSeconds) override;
 
