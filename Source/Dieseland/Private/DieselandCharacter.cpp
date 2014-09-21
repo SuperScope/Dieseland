@@ -45,6 +45,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	Health = 100;
 
 	// Create the text component
+	// TODO: Remove when UI is implemented
 	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
 	PlayerLabel->AttachTo(RootComponent);
 	PlayerLabel->AddRelativeLocation(FVector(-80.0f, 0.0f, 0.0f), false);
@@ -64,16 +65,15 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	// Tag this character as a player
 	Tags.Add(FName("Player"));
 
-	IsMelee = true;
+	// Does the player use a melee attack
+	IsMelee = false;
 
+	// Damage values
 	BasicAttackDamage = 10;
 
 	// Set default ranges
 	MeleeRange = 144.0f;
 	RangedRange = 1200.0f;
-	BlinkDist = 500.0f;
-
-	// Damage values
 
 	// Cooldown values
 	BasicAttackCooldown = 0.2f;
@@ -87,6 +87,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	SkillTwoTimer = 0.0f;
 	SkillThreeTimer = 0.0f;
 
+	// Set up collision area for melee attacks
 	MeleeCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("MeleeCollision"));
 	MeleeCollision->AttachParent = (Mesh);
 	MeleeCollision->AttachSocketName = FName(TEXT("AimSocket"));
@@ -95,21 +96,24 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	MeleeCollision->SetCapsuleRadius(MeleeRange / 2.0f);
 	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	PulseCollision = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("PulseCollision"));
-	PulseCollision->AttachParent = (Mesh);
-	PulseCollision->AttachSocketName = FName(TEXT("AimSocket"));
-	PulseCollision->SetSphereRadius(300.0f);
-	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	AOECollision = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("AOECollision"));
+	AOECollision->AttachParent = (Mesh);
+	AOECollision->AttachSocketName = FName(TEXT("AimSocket"));
+	AOECollision->SetSphereRadius(300.0f);
+	AOECollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// Retrieve particle assets
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> BlinkParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_StrykerBlinkCloak_WIP.Unreal_Particle_StrykerBlinkCloak_WIP'"));
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> PulseParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse_WIP.Unreal_Particle_EngletonPulse_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillTwoParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_StrykerBlinkCloak_WIP.Unreal_Particle_StrykerBlinkCloak_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillThreeParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse_WIP.Unreal_Particle_EngletonPulse_WIP'"));
 	
-	this->PulseParticle = PulseParticleAsset.Object;
-	this->BlinkParticle = BlinkParticleAsset.Object;
+	this->SkillOneParticle = SkillOneParticleAsset.Object;
+	this->SkillTwoParticle = SkillTwoParticleAsset.Object;
+	this->SkillThreeParticle = SkillThreeParticleAsset.Object;
 
 	ParticleSystem = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
-	ParticleSystem->Template = PulseParticleAsset.Object;
+	ParticleSystem->Template = SkillThreeParticle;
 	ParticleSystem->AttachTo(RootComponent);
 	ParticleSystem->bAutoActivate = false;
 	ParticleSystem->SetHiddenInGame(false);
@@ -242,6 +246,8 @@ void ADieselandCharacter::SkillOne()
 
 void ADieselandCharacter::SkillTwo()
 {
+	ServerActivateParticle(SkillTwoParticle);
+
 	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
 	RV_TraceParams.bTraceComplex = true;
 	RV_TraceParams.bTraceAsyncScene = true;
@@ -254,7 +260,7 @@ void ADieselandCharacter::SkillTwo()
 	GetWorld()->LineTraceSingle(
 		RV_Hit,        //result
 		Mesh->GetSocketLocation(FName(TEXT("AimSocket"))),    //start
-		(Mesh->GetSocketLocation(FName(TEXT("AimSocket"))) + (AimRotation.GetNormalized().Vector() * BlinkDist)), //end
+		(Mesh->GetSocketLocation(FName(TEXT("AimSocket"))) + (AimRotation.GetNormalized().Vector() * 500.0f)), //end
 		ECC_Pawn, //collision channel
 		RV_TraceParams
 		);
@@ -265,7 +271,7 @@ void ADieselandCharacter::SkillTwo()
 	}
 	else
 	{
-		TargetLocation = Mesh->GetSocketLocation(FName(TEXT("AimSocket"))) + (AimRotation.GetNormalized().Vector() * BlinkDist);
+		TargetLocation = Mesh->GetSocketLocation(FName(TEXT("AimSocket"))) + (AimRotation.GetNormalized().Vector() * 500.0f);
 	}
 	// Make sure the player doesn't fall through the bottom of the map
 	TargetLocation.Z = Mesh->GetSocketLocation(FName(TEXT("AimSocket"))).Z;
@@ -274,15 +280,17 @@ void ADieselandCharacter::SkillTwo()
 
 void ADieselandCharacter::SkillThree()
 {
-	PulseCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	PulseCollision->SetCollisionProfileName(TEXT("OverlapAll"));
-	PulseCollision->GetOverlappingActors(ActorsInPulseRange);
-	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ServerActivateParticle(SkillThreeParticle);
+
+	AOECollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	AOECollision->SetCollisionProfileName(TEXT("OverlapAll"));
+	AOECollision->GetOverlappingActors(ActorsInAOERange);
+	AOECollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	AActor* CurActor = NULL;
-	for (int32 b = 0; b < ActorsInPulseRange.Num(); b++)
+	for (int32 b = 0; b < ActorsInAOERange.Num(); b++)
 	{
-		CurActor = ActorsInPulseRange[b];
+		CurActor = ActorsInAOERange[b];
 		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
 		if (!CurActor->IsValidLowLevel()) continue;
 

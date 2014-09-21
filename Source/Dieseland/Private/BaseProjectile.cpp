@@ -21,6 +21,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	RootComponent = Mesh;
 	Mesh->SetWorldScale3D(FVector(0.3f, 0.3f, 0.3f));
 	Mesh->SetCollisionProfileName(FName(TEXT("OverlapAll")));
+	Mesh->SetHiddenInGame(true);
 
 	ProjCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("ProjectileCollision"));
 	ProjCollision->SetCapsuleHalfHeight(50.0f);
@@ -32,7 +33,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	ProjectileMovement->InitialSpeed = 800.0f;
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/MovingBulletTest_WIP.MovingBulletTest_WIP'"));
 	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	Particle->Template = ParticleSystemAsset.Object;
 	Particle->AttachTo(Mesh);

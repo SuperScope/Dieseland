@@ -259,7 +259,6 @@ void ADieselandPlayerController::ServerSkillTwo_Implementation()
 		if (DieselandPawn->SkillTwoTimer <= 0.0f)
 		{
 			DieselandPawn->SkillTwo();
-			DieselandPawn->ServerActivateParticle(DieselandPawn->BlinkParticle);
 			DieselandPawn->SkillTwoTimer = DieselandPawn->SkillTwoCooldown;
 		}
 	}
@@ -277,7 +276,6 @@ void ADieselandPlayerController::ServerSkillThree_Implementation()
 		if (DieselandPawn->SkillThreeTimer <= 0.0f)
 		{
 			DieselandPawn->SkillThree();
-			DieselandPawn->ServerActivateParticle(DieselandPawn->PulseParticle);
 			DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
 		}
 	}
@@ -290,11 +288,12 @@ bool ADieselandPlayerController::ServerSkillThree_Validate()
 
 void ADieselandPlayerController::UpgradeStrength_Implementation()
 {
-	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr){
-		DieselandPawn->BasicAttackDamage = DieselandPawn->BasicAttackDamage * 2;
-		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Strength!"));
-	}
+	//TODO: Replace with real level up function
+	//ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	//if (DieselandPawn != nullptr){
+	//	DieselandPawn->BasicAttackDamage = DieselandPawn->BasicAttackDamage * 2;
+	//	GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Strength!"));
+	//}
 }
 
 bool ADieselandPlayerController::UpgradeStrength_Validate()
@@ -304,7 +303,8 @@ bool ADieselandPlayerController::UpgradeStrength_Validate()
 
 void ADieselandPlayerController::SwapMelee_Implementation()
 {
-	if (Cast<ADieselandCharacter>(GetPawn())->IsMelee)
+	//Uncomment only if you need to test melee/ranged swapping
+	/*if (Cast<ADieselandCharacter>(GetPawn())->IsMelee)
 	{
 		Cast<ADieselandCharacter>(GetPawn())->IsMelee = false;
 		GEngine->AddOnScreenDebugMessage(6, 10.0f, FColor::Cyan, FString("Now using ranged attack"));
@@ -313,7 +313,7 @@ void ADieselandPlayerController::SwapMelee_Implementation()
 	{
 		Cast<ADieselandCharacter>(GetPawn())->IsMelee = true;
 		GEngine->AddOnScreenDebugMessage(6, 10.0f, FColor::Cyan, FString("Now using melee attack"));
-	}
+	}*/
 	
 }
 

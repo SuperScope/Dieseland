@@ -30,9 +30,9 @@ public:
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UCapsuleComponent> MeleeCollision;
 
-	// Collider used to detect pulse range
+	// Collider used to detect AoE range
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
-	TSubobjectPtr<class USphereComponent> PulseCollision;
+	TSubobjectPtr<class USphereComponent> AOECollision;
 
 	// Called to subtract and/or add health to the target player
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
@@ -58,9 +58,6 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float RangedRange;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
-	float BlinkDist;
-
 	// The Cooldown for the basic attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float BasicAttackCooldown;
@@ -85,7 +82,7 @@ public:
 	TArray<AActor*> ActorsInMeleeRange;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
-	TArray<AActor*> ActorsInPulseRange;
+	TArray<AActor*> ActorsInAOERange;
 
 	// Combat functions
 	UFUNCTION(BlueprintCallable, Category = Combat)
@@ -123,16 +120,19 @@ public:
 	TSubobjectPtr<class UParticleSystemComponent> ParticleSystem;
 
 	UFUNCTION(Reliable, NetMulticast, WithValidation)
-		void ServerActivateParticle(UParticleSystem* Particle);
+	void ServerActivateParticle(UParticleSystem* Particle);
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerDamageEnemy(int32 Amt, AActor* Target);
 
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
-	UParticleSystem* PulseParticle;
+	UParticleSystem* SkillThreeParticle;
 
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
-	UParticleSystem* BlinkParticle;
+	UParticleSystem* SkillTwoParticle;
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+	UParticleSystem* SkillOneParticle;
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;
