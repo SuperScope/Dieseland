@@ -47,6 +47,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	ProjectileDamage = 10;
 
 	InitialLifeSpan = 10.0f;
+	Tags.Add(FName("Projectile"));
 
 	bReplicates = true;
 	bReplicateMovement = true;
@@ -78,7 +79,7 @@ void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 			}
 
 		}
-		else
+		else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
 		{
 			this->Destroy();
 		}

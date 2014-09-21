@@ -46,6 +46,14 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	int32 BasicAttackDamage;
 
+	// Current ammo for basic ranged attack
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	int32 BasicAttackAmmo;
+
+	// Max ammo size
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	int32 BasicAttackMag;
+
 	// Does this character use melee for it's basic attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	bool IsMelee;
@@ -61,6 +69,10 @@ public:
 	// The Cooldown for the basic attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float BasicAttackCooldown;
+
+	// The reload time for the basic ranged attack
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float BasicAttackReloadSpeed;
 
 	// The Cooldown for skill 1
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
@@ -106,6 +118,8 @@ public:
 
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	float BasicAttackTimer;
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	float BasicAttackReloadTimer;
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	float SkillOneTimer;
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)

@@ -71,18 +71,24 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	// Damage values
 	BasicAttackDamage = 10;
 
+	// Ammo values
+	BasicAttackMag = 20;
+	BasicAttackAmmo = BasicAttackMag;
+
 	// Set default ranges
 	MeleeRange = 144.0f;
 	RangedRange = 1200.0f;
 
 	// Cooldown values
 	BasicAttackCooldown = 0.2f;
+	BasicAttackReloadSpeed = 3.0f;
 	SkillOneCooldown = 2.0f;
 	SkillTwoCooldown = 3.5f;
 	SkillThreeCooldown = 4.0f;
 
 	// Timer values
 	BasicAttackTimer = 0.0f;
+	BasicAttackReloadTimer = 0.0f;
 	SkillOneTimer = 0.0f;
 	SkillTwoTimer = 0.0f;
 	SkillThreeTimer = 0.0f;
@@ -194,7 +200,7 @@ void ADieselandCharacter::RangedAttack()
 			Projectile->ServerActivateProjectile();
 
 			// Add the character's velocity to the projectile
-			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + GetVelocity().GetAbs());
+			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 		}
 	}
 }
@@ -245,7 +251,7 @@ void ADieselandCharacter::SkillOne()
 			Projectile->Piercing = true;
 
 			// Add the character's velocity to the projectile
-			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + GetVelocity().GetAbs());
+			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 		}
 	}
 }
@@ -337,10 +343,13 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, ParticleSystem);
 
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackTimer);
+	DOREPLIFETIME(ADieselandCharacter, BasicAttackReloadTimer);
 	DOREPLIFETIME(ADieselandCharacter, SkillOneTimer);
 	DOREPLIFETIME(ADieselandCharacter, SkillTwoTimer);
 	DOREPLIFETIME(ADieselandCharacter, SkillThreeTimer);
 
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackActive);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackDamage);
+	DOREPLIFETIME(ADieselandCharacter, BasicAttackReloadSpeed);
+	DOREPLIFETIME(ADieselandCharacter, BasicAttackAmmo);
 }

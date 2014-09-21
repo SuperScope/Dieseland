@@ -36,6 +36,9 @@ public:
 	void ServerSkillThree();
 
 	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerReload();
+
+	UFUNCTION(Reliable, Server, WithValidation)
 	void UpgradeStrength();
 
 	UFUNCTION(Reliable, Server, WithValidation)
