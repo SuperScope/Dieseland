@@ -123,10 +123,16 @@ public:
 	TSubobjectPtr<class UParticleSystemComponent> ParticleSystem;
 
 	UFUNCTION(Reliable, NetMulticast, WithValidation)
-	void ServerActivateProjectile();
+		void ServerActivateParticle(UParticleSystem* Particle);
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerDamageEnemy(int32 Amt, AActor* Target);
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+	UParticleSystem* PulseParticle;
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+	UParticleSystem* BlinkParticle;
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;

@@ -50,6 +50,9 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void SwapMelee();
 
+	UFUNCTION(Reliable, Server, WithValidation)
+	void RespawnPawn();
+
 protected:
 
 	// Begin PlayerController interface

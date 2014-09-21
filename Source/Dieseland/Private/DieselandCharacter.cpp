@@ -101,14 +101,21 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	PulseCollision->SetSphereRadius(300.0f);
 	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	// Retrieve particle assets
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> BlinkParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_StrykerBlinkCloak_WIP.Unreal_Particle_StrykerBlinkCloak_WIP'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> PulseParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse_WIP.Unreal_Particle_EngletonPulse_WIP'"));
+	
+	this->PulseParticle = PulseParticleAsset.Object;
+	this->BlinkParticle = BlinkParticleAsset.Object;
+
 	ParticleSystem = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	ParticleSystem->Template = PulseParticleAsset.Object;
 	ParticleSystem->AttachTo(RootComponent);
 	ParticleSystem->bAutoActivate = false;
 	ParticleSystem->SetHiddenInGame(false);
 	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
+	
+	
 	// Ensure replication
 	bReplicates = true;
 	AimMesh->SetIsReplicated(true);
@@ -149,6 +156,10 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Target)
 {
 	Cast<ADieselandEnemyBot>(Target)->Health += Amt;
+	if (Cast<ADieselandEnemyBot>(Target)->Health <= 0)
+	{
+		Target->Destroy();
+	}
 }
 
 bool ADieselandCharacter::ServerDamageEnemy_Validate(int32 Amt, AActor* Target)
@@ -283,16 +294,17 @@ void ADieselandCharacter::SkillThree()
 }
 void ADieselandCharacter::OnRep_AimRotation()
 {
-
+	
 }
 
 
-void ADieselandCharacter::ServerActivateProjectile_Implementation()
+void ADieselandCharacter::ServerActivateParticle_Implementation(UParticleSystem* Particle)
 {
+	ParticleSystem->SetTemplate(Particle);
 	ParticleSystem->ActivateSystem();
 }
 
-bool ADieselandCharacter::ServerActivateProjectile_Validate()
+bool ADieselandCharacter::ServerActivateParticle_Validate(UParticleSystem* Particle)
 {
 	return true;
 }
