@@ -21,7 +21,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	RootComponent = Mesh;
 	Mesh->SetWorldScale3D(FVector(0.3f, 0.3f, 0.3f));
 	Mesh->SetCollisionProfileName(FName(TEXT("OverlapAll")));
-	Mesh->SetHiddenInGame(false);
+	Mesh->SetHiddenInGame(true);
 
 	ProjCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("ProjectileCollision"));
 	ProjCollision->SetCapsuleHalfHeight(50.0f);
