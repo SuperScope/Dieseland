@@ -238,12 +238,14 @@ void ADieselandCharacter::SkillOne()
 		if (Projectile)
 		{
 			Projectile->ProjectileDamage = BasicAttackDamage;
+			// Start the particle effect
 			Projectile->ServerActivateProjectile();
 
 			Projectile->SetLifeSpan(1.0f);
 			Projectile->Piercing = true;
 
-			//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
+			// Add the character's velocity to the projectile
+			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + GetVelocity().GetAbs());
 		}
 	}
 }

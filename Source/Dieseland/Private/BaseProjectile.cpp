@@ -66,9 +66,9 @@ bool ABaseProjectile::ServerActivateProjectile_Validate()
 void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
 	Super::ReceiveActorBeginOverlap(OtherActor);
-	if (Role == ROLE_Authority)
+	if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 	{
-		if (Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor && (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(FName(TEXT("Enemy")))))
+		if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(FName(TEXT("Enemy"))))
 		{
 		
 			Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
@@ -78,8 +78,11 @@ void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 			}
 
 		}
+		else
+		{
+			this->Destroy();
+		}
 	}
-	
 }
 
 void ABaseProjectile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
