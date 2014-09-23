@@ -86,6 +86,17 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float SkillThreeCooldown;
 
+	//FireTrap Damage Timer
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Trap)
+	float LingerTimer;
+
+	//FireTrap Damage Coolown
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	float LingerCoolDown;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	int32 LingerDamage;
+
 	// Replicated Rotation of the torso for aiming purposess
 	UPROPERTY(Replicated, ReplicatedUsing = OnRep_AimRotation, EditAnywhere, BlueprintReadWrite, Category = Network)
 	FRotator AimRotation;

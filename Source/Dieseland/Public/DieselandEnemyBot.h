@@ -39,11 +39,21 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 
 	//public health value of this character
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-		int32 Health;
+	int32 Health;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	float LingerTimer;
+
+	//Damage done to actors from fire traps upon exitting them
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	int32 LingerDamage;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	int32 LingerCount;
 
 	//set for the AIs aggresion
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-		bool isAggressive;
+	bool isAggressive;
 
 	// Damage amount for basic attacks
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)

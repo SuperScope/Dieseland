@@ -92,6 +92,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	SkillOneTimer = 0.0f;
 	SkillTwoTimer = 0.0f;
 	SkillThreeTimer = 0.0f;
+	LingerTimer = 0.0f;
 
 	// Set up collision area for melee attacks
 	MeleeCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("MeleeCollision"));
@@ -341,6 +342,8 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, IsMelee);
 
 	DOREPLIFETIME(ADieselandCharacter, ParticleSystem);
+
+	DOREPLIFETIME(ADieselandCharacter, LingerTimer);
 
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackTimer);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackReloadTimer);

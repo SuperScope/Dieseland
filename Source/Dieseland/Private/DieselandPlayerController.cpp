@@ -5,6 +5,7 @@
 #include "AI/Navigation/NavigationSystem.h"
 #include "DieselandCharacter.h"
 #include "UnrealNetwork.h"
+#include "BaseTrap.h"
 #include "ParticleDefinitions.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -17,6 +18,7 @@ ADieselandPlayerController::ADieselandPlayerController(const class FPostConstruc
 	//DefaultMouseCursor = EMouseCursor::Crosshairs;
 
 	bReplicates = true;
+	LingerCount = 0;
 	
 }
 
@@ -35,6 +37,8 @@ void ADieselandPlayerController::PlayerTick(float DeltaTime)
 		GEngine->AddOnScreenDebugMessage(2, 10.0f, FColor::Red, FString("Skill One: ") + FString::SanitizeFloat(DieselandPawn->SkillOneTimer));
 		GEngine->AddOnScreenDebugMessage(3, 10.0f, FColor::Green, FString("Skill Two: ") + FString::SanitizeFloat(DieselandPawn->SkillTwoTimer));
 		GEngine->AddOnScreenDebugMessage(4, 10.0f, FColor::Yellow, FString("Skill Three: ") + FString::SanitizeFloat(DieselandPawn->SkillThreeTimer));
+		GEngine->AddOnScreenDebugMessage(5, 10.0f, FColor::Black, FString("Trap Countdown: ") + FString::SanitizeFloat(DieselandPawn->LingerTimer));
+
 		if (DieselandPawn->BasicAttackReloadTimer > 0.0f){
 			GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor::Yellow, FString("Basic Attack Reload: ") + FString::SanitizeFloat(DieselandPawn->BasicAttackReloadTimer));
 		}
@@ -42,8 +46,8 @@ void ADieselandPlayerController::PlayerTick(float DeltaTime)
 		if (DieselandPawn->Health <= 0)
 		{
 			RespawnPawn();
+			DieselandPawn->LingerTimer = 0;
 
-			
 		}
 	}
 }
@@ -72,6 +76,25 @@ void ADieselandPlayerController::UpdateCooldownTimers_Implementation(float Delta
 			if (DieselandPawn->BasicAttackReloadTimer == 0.0f && DieselandPawn->BasicAttackAmmo == 0)
 			{
 				DieselandPawn->BasicAttackAmmo = DieselandPawn->BasicAttackMag;
+			}
+		}
+		if (DieselandPawn->LingerTimer > 0.0f)
+		{
+			DieselandPawn->LingerTimer -= DeltaSeconds;
+			if (DieselandPawn->LingerTimer < 0.0f)
+			{
+				DieselandPawn->LingerTimer = 0;
+				LingerCount = 0;
+			}
+			if ((((DieselandPawn->LingerTimer < 5.f) && (DieselandPawn->LingerTimer > 4.f)) || ((DieselandPawn->LingerTimer < 3.f) && (DieselandPawn->LingerTimer > 2.f)) || ((DieselandPawn->LingerTimer < 1.f) && (DieselandPawn->LingerTimer > 0.f))) && (LingerCount == 0))
+			{
+				DieselandPawn->Health = DieselandPawn->Health - DieselandPawn->LingerDamage;
+				LingerCount = 1;
+			}
+			else if ((((DieselandPawn->LingerTimer < 4.f) && (DieselandPawn->LingerTimer > 3.f)) || ((DieselandPawn->LingerTimer < 2.f) && (DieselandPawn->LingerTimer > 1.f))) && (LingerCount == 1))
+			{
+				DieselandPawn->Health = DieselandPawn->Health - DieselandPawn->LingerDamage;
+				LingerCount = 0;
 			}
 		}
 		if (DieselandPawn->SkillOneTimer > 0.0f)
@@ -165,6 +188,7 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 	{
 		DieselandPawn->SetActorLocation(SpawnLocation);
 		DieselandPawn->Health = 100;
+		DieselandPawn->LingerTimer = 0;
 	}
 }
 

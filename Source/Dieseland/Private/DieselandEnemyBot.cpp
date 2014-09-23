@@ -81,6 +81,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 
 	//here we set the dieseland aggresion to true
 	isAggressive = false;
+	LingerCount = 0;
 	
 }
 
@@ -91,6 +92,25 @@ void ADieselandEnemyBot::Tick(float DeltaSeconds)
 	PlayerLabel->SetText(FString::FromInt(Health));
 
 	Super::Tick(DeltaSeconds);
+	if (LingerTimer > 0.0f)
+	{
+		LingerTimer -= DeltaSeconds;
+		if (LingerTimer < 0.0f)
+		{
+			LingerTimer = 0;
+			LingerCount = 0;
+		}
+		if ((((LingerTimer < 5.f) && (LingerTimer > 4.f)) || ((LingerTimer < 3.f) && (LingerTimer > 2.f)) || ((LingerTimer < 1.f) && (LingerTimer > 0.f))) && (LingerCount == 0))
+		{
+			Health = Health - LingerDamage;
+			LingerCount = 1;
+		}
+		else if ((((LingerTimer < 4.f) && (LingerTimer > 3.f)) || ((LingerTimer < 2.f) && (LingerTimer > 1.f))) && (LingerCount == 1))
+		{
+			Health = Health - LingerDamage;
+			LingerCount = 0;
+		}
+	}
 }
 
 void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Target)
