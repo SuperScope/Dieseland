@@ -30,9 +30,9 @@ public:
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UCapsuleComponent> MeleeCollision;
 
-	// Collider used to detect pulse range
+	// Collider used to detect AoE range
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
-	TSubobjectPtr<class USphereComponent> PulseCollision;
+	TSubobjectPtr<class USphereComponent> AOECollision;
 
 	// Called to subtract and/or add health to the target player
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
@@ -42,9 +42,25 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
 
+	// Public armor value of this character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 Armor;
+
+	// The movement speed of a character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float MoveSpeed;
+
 	// Damage amount for the basic attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	int32 BasicAttackDamage;
+
+	// Current ammo for basic ranged attack
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	int32 BasicAttackAmmo;
+
+	// Max ammo size
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	int32 BasicAttackMag;
 
 	// Does this character use melee for it's basic attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
@@ -58,12 +74,13 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float RangedRange;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
-	float BlinkDist;
-
 	// The Cooldown for the basic attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float BasicAttackCooldown;
+
+	// The reload time for the basic ranged attack
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float BasicAttackReloadSpeed;
 
 	// The Cooldown for skill 1
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
@@ -85,7 +102,39 @@ public:
 	TArray<AActor*> ActorsInMeleeRange;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
-	TArray<AActor*> ActorsInPulseRange;
+	TArray<AActor*> ActorsInAOERange;
+
+	//CORE ATTRIBUTES BEGINS HERE
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int32 Strength;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int32 Constitution;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int32 Dexterity;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int32 Intelligence;
+
+	///TODO : PARAMETERS MUST MATCH FORMULAS
+	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
+	void CalculateSpeed(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
+
+	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
+	void CalculateAttkSpeed(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
+
+	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
+	void CalculateArmor(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
+
+	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
+	void CalculateDamage(int32 CoreAmt, int32 SecondaryAmt, int32 TertiaryAmt, AActor* Target);
+
+	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
+	void CalculateHealth(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
+
+	//CORE ATTRIBUTES ENDS HERE
 
 	// Combat functions
 	UFUNCTION(BlueprintCallable, Category = Combat)
@@ -110,6 +159,8 @@ public:
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	float BasicAttackTimer;
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	float BasicAttackReloadTimer;
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	float SkillOneTimer;
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	float SkillTwoTimer;
@@ -123,7 +174,22 @@ public:
 	TSubobjectPtr<class UParticleSystemComponent> ParticleSystem;
 
 	UFUNCTION(Reliable, NetMulticast, WithValidation)
-	void ServerActivateProjectile();
+	void ServerActivateParticle(UParticleSystem* Particle);
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerDamageEnemy(int32 Amt, AActor* Target);
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+	UParticleSystem* SkillThreeParticle;
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+	UParticleSystem* SkillTwoParticle;
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+	UParticleSystem* SkillOneParticle;
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+	UParticleSystem* BasicAttackParticle;
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;

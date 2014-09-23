@@ -3,6 +3,7 @@
 #include "Dieseland.h"
 #include "DieselandCharacter.h"
 #include "DieselandPlayerController.h"
+#include "DieselandEnemyBot.h"
 #include "UnrealNetwork.h"
 #include "BaseProjectile.h"
 #include "ParticleDefinitions.h"
@@ -42,8 +43,14 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 	// Set the starting health value
 	Health = 100;
+	// Armor value
+	Armor = -1;
+
+	// Move Speed
+	MoveSpeed = 500;
 
 	// Create the text component
+	// TODO: Remove when UI is implemented
 	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
 	PlayerLabel->AttachTo(RootComponent);
 	PlayerLabel->AddRelativeLocation(FVector(-80.0f, 0.0f, 0.0f), false);
@@ -63,29 +70,35 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	// Tag this character as a player
 	Tags.Add(FName("Player"));
 
-	IsMelee = true;
+	// Does the player use a melee attack
+	IsMelee = false;
 
+	// Damage values
 	BasicAttackDamage = 10;
+
+	// Ammo values
+	BasicAttackMag = 20;
+	BasicAttackAmmo = BasicAttackMag;
 
 	// Set default ranges
 	MeleeRange = 144.0f;
 	RangedRange = 1200.0f;
-	BlinkDist = 500.0f;
-
-	// Damage values
 
 	// Cooldown values
 	BasicAttackCooldown = 0.2f;
+	BasicAttackReloadSpeed = 3.0f;
 	SkillOneCooldown = 2.0f;
 	SkillTwoCooldown = 3.5f;
 	SkillThreeCooldown = 4.0f;
 
 	// Timer values
 	BasicAttackTimer = 0.0f;
+	BasicAttackReloadTimer = 0.0f;
 	SkillOneTimer = 0.0f;
 	SkillTwoTimer = 0.0f;
 	SkillThreeTimer = 0.0f;
 
+	// Set up collision area for melee attacks
 	MeleeCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("MeleeCollision"));
 	MeleeCollision->AttachParent = (Mesh);
 	MeleeCollision->AttachSocketName = FName(TEXT("AimSocket"));
@@ -94,20 +107,32 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	MeleeCollision->SetCapsuleRadius(MeleeRange / 2.0f);
 	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	PulseCollision = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("PulseCollision"));
-	PulseCollision->AttachParent = (Mesh);
-	PulseCollision->AttachSocketName = FName(TEXT("AimSocket"));
-	PulseCollision->SetSphereRadius(300.0f);
-	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> PulseParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse_WIP.Unreal_Particle_EngletonPulse_WIP'"));
+	AOECollision = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("AOECollision"));
+	AOECollision->AttachParent = (Mesh);
+	AOECollision->AttachSocketName = FName(TEXT("AimSocket"));
+	AOECollision->SetSphereRadius(300.0f);
+	AOECollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// Retrieve particle assets
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> BasicAttackParticleAsset(TEXT("ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillTwoParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_StrykerBlinkCloak_WIP.Unreal_Particle_StrykerBlinkCloak_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillThreeParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse2_WIP.Unreal_Particle_EngletonPulse2_WIP'"));
+	
+	this->BasicAttackParticle = BasicAttackParticleAsset.Object;
+	this->SkillOneParticle = SkillOneParticleAsset.Object;
+	this->SkillTwoParticle = SkillTwoParticleAsset.Object;
+	this->SkillThreeParticle = SkillThreeParticleAsset.Object;
+
 	ParticleSystem = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
-	ParticleSystem->Template = PulseParticleAsset.Object;
+	ParticleSystem->Template = SkillThreeParticle;
 	ParticleSystem->AttachTo(RootComponent);
 	ParticleSystem->bAutoActivate = false;
 	ParticleSystem->SetHiddenInGame(false);
 	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
+	
+	
 	// Ensure replication
 	bReplicates = true;
 	AimMesh->SetIsReplicated(true);
@@ -126,6 +151,99 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
+// CORE ATTRIBUTE CALCULATION FUNCTIONS
+
+//CoreAmt = Dexterity	
+void ADieselandCharacter::CalculateSpeed_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+		Cast<ADieselandCharacter>(Target)->MoveSpeed = 400.0f + (CoreAmt*1.5f);
+		if (Role < ROLE_Authority)
+		{
+			//Cast<ADieselandPlayerController>(Controller)->		//ServerEditMoveSpeed?
+			//ServerEditHealth(Amt, Target);
+		}
+	}
+}
+
+bool ADieselandCharacter::CalculateSpeed_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	return true;
+}
+
+// CoreAmt = Dexterity
+void ADieselandCharacter::CalculateAttkSpeed_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+		Cast<ADieselandCharacter>(Target)->BasicAttackCooldown = 2.0f - (CoreAmt / 50.0f);
+		if (Role < ROLE_Authority)
+		{
+
+		}
+	}
+}
+
+bool ADieselandCharacter::CalculateAttkSpeed_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	return true;
+}
+
+// CoreAmt = constitution
+void ADieselandCharacter::CalculateArmor_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+		Cast<ADieselandCharacter>(Target)->Armor = (CoreAmt * 2.0f);
+		if (Role < ROLE_Authority)
+		{
+
+		}
+	}
+}
+
+bool ADieselandCharacter::CalculateArmor_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	return true;
+}
+
+// CoreAmt = Strength		SecondaryAmt = Dexterity		TertiaryAmt = Intelligence
+void ADieselandCharacter::CalculateDamage_Implementation(int32 CoreAmt, int32 SecondaryAmt, int32 TertiaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+		Cast<ADieselandCharacter>(Target)->BasicAttackDamage = (CoreAmt * 3.0f) + (SecondaryAmt * 0.3f) + (TertiaryAmt * 0.3);
+		if (Role < ROLE_Authority)
+		{
+
+		}
+	}
+}
+
+bool ADieselandCharacter::CalculateDamage_Validate(int32 CoreAmt, int32 SecondaryAmt, int32 TertiaryAmt, AActor* Target)
+{
+	return true;
+}
+
+// Might simply use "EditHealth" function
+void ADieselandCharacter::CalculateHealth_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+		Cast<ADieselandCharacter>(Target)->Health = (CoreAmt * 20.0f) + (SecondaryAmt * 3.0f);
+		if (Role < ROLE_Authority)
+		{
+
+		}
+	}
+}
+
+bool ADieselandCharacter::CalculateHealth_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	return true;
+}
+
 void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 {
 	if (Target->ActorHasTag(FName(TEXT("Player"))))
@@ -139,6 +257,24 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 			Cast<ADieselandPlayerController>(Controller)->ServerEditHealth(Amt, Target);
 		}
 	}
+	else if (Target->ActorHasTag(FName(TEXT("Enemy"))))
+	{
+		ServerDamageEnemy(Amt, Target);
+	}
+}
+
+void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Target)
+{
+	Cast<ADieselandEnemyBot>(Target)->Health += Amt;
+	if (Cast<ADieselandEnemyBot>(Target)->Health <= 0)
+	{
+		Target->Destroy();
+	}
+}
+
+bool ADieselandCharacter::ServerDamageEnemy_Validate(int32 Amt, AActor* Target)
+{
+	return true;
 }
 
 void ADieselandCharacter::RangedAttack()
@@ -159,9 +295,11 @@ void ADieselandCharacter::RangedAttack()
 		if (Projectile)
 		{
 			Projectile->ProjectileDamage = BasicAttackDamage;
+			// Start the particle effect
 			Projectile->ServerActivateProjectile();
 
-			//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
+			// Add the character's velocity to the projectile
+			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 		}
 	}
 }
@@ -177,7 +315,7 @@ void ADieselandCharacter::MeleeAttack()
 	for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)
 	{
 		CurActor = ActorsInMeleeRange[b];
-		if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Player")))) continue;
+		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
 		if (!CurActor->IsValidLowLevel()) continue;
 		
 		if (Role == ROLE_Authority && CurActor != this)
@@ -205,18 +343,22 @@ void ADieselandCharacter::SkillOne()
 		if (Projectile)
 		{
 			Projectile->ProjectileDamage = BasicAttackDamage;
+			// Start the particle effect
 			Projectile->ServerActivateProjectile();
 
 			Projectile->SetLifeSpan(1.0f);
 			Projectile->Piercing = true;
 
-			//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
+			// Add the character's velocity to the projectile
+			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 		}
 	}
 }
 
 void ADieselandCharacter::SkillTwo()
 {
+	ServerActivateParticle(SkillTwoParticle);
+
 	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
 	RV_TraceParams.bTraceComplex = true;
 	RV_TraceParams.bTraceAsyncScene = true;
@@ -229,7 +371,7 @@ void ADieselandCharacter::SkillTwo()
 	GetWorld()->LineTraceSingle(
 		RV_Hit,        //result
 		Mesh->GetSocketLocation(FName(TEXT("AimSocket"))),    //start
-		(Mesh->GetSocketLocation(FName(TEXT("AimSocket"))) + (AimRotation.GetNormalized().Vector() * BlinkDist)), //end
+		(Mesh->GetSocketLocation(FName(TEXT("AimSocket"))) + (AimRotation.GetNormalized().Vector() * 500.0f)), //end
 		ECC_Pawn, //collision channel
 		RV_TraceParams
 		);
@@ -240,7 +382,7 @@ void ADieselandCharacter::SkillTwo()
 	}
 	else
 	{
-		TargetLocation = Mesh->GetSocketLocation(FName(TEXT("AimSocket"))) + (AimRotation.GetNormalized().Vector() * BlinkDist);
+		TargetLocation = Mesh->GetSocketLocation(FName(TEXT("AimSocket"))) + (AimRotation.GetNormalized().Vector() * 500.0f);
 	}
 	// Make sure the player doesn't fall through the bottom of the map
 	TargetLocation.Z = Mesh->GetSocketLocation(FName(TEXT("AimSocket"))).Z;
@@ -249,16 +391,18 @@ void ADieselandCharacter::SkillTwo()
 
 void ADieselandCharacter::SkillThree()
 {
-	PulseCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	PulseCollision->SetCollisionProfileName(TEXT("OverlapAll"));
-	PulseCollision->GetOverlappingActors(ActorsInPulseRange);
-	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ServerActivateParticle(SkillThreeParticle);
+
+	AOECollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	AOECollision->SetCollisionProfileName(TEXT("OverlapAll"));
+	AOECollision->GetOverlappingActors(ActorsInAOERange);
+	AOECollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	AActor* CurActor = NULL;
-	for (int32 b = 0; b < ActorsInPulseRange.Num(); b++)
+	for (int32 b = 0; b < ActorsInAOERange.Num(); b++)
 	{
-		CurActor = ActorsInPulseRange[b];
-		if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Player")))) continue;
+		CurActor = ActorsInAOERange[b];
+		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
 		if (!CurActor->IsValidLowLevel()) continue;
 
 		if (Role == ROLE_Authority && CurActor != this)
@@ -269,16 +413,17 @@ void ADieselandCharacter::SkillThree()
 }
 void ADieselandCharacter::OnRep_AimRotation()
 {
-
+	
 }
 
 
-void ADieselandCharacter::ServerActivateProjectile_Implementation()
+void ADieselandCharacter::ServerActivateParticle_Implementation(UParticleSystem* Particle)
 {
+	ParticleSystem->SetTemplate(Particle);
 	ParticleSystem->ActivateSystem();
 }
 
-bool ADieselandCharacter::ServerActivateProjectile_Validate()
+bool ADieselandCharacter::ServerActivateParticle_Validate(UParticleSystem* Particle)
 {
 	return true;
 }
@@ -294,13 +439,24 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
 	DOREPLIFETIME(ADieselandCharacter, IsMelee);
 
+	DOREPLIFETIME(ADieselandCharacter, MoveSpeed);
+
 	DOREPLIFETIME(ADieselandCharacter, ParticleSystem);
 
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackTimer);
+	DOREPLIFETIME(ADieselandCharacter, BasicAttackReloadTimer);
 	DOREPLIFETIME(ADieselandCharacter, SkillOneTimer);
 	DOREPLIFETIME(ADieselandCharacter, SkillTwoTimer);
 	DOREPLIFETIME(ADieselandCharacter, SkillThreeTimer);
 
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackActive);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackDamage);
+	DOREPLIFETIME(ADieselandCharacter, BasicAttackReloadSpeed);
+	DOREPLIFETIME(ADieselandCharacter, BasicAttackAmmo);
+
+	// Necessary
+	DOREPLIFETIME(ADieselandCharacter, Strength);
+	DOREPLIFETIME(ADieselandCharacter, Constitution);
+	DOREPLIFETIME(ADieselandCharacter, Dexterity);
+	DOREPLIFETIME(ADieselandCharacter, Intelligence);
 }

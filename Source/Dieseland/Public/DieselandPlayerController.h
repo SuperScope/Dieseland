@@ -36,6 +36,9 @@ public:
 	void ServerSkillThree();
 
 	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerReload();
+
+	UFUNCTION(Reliable, Server, WithValidation)
 	void UpgradeStrength();
 
 	UFUNCTION(Reliable, Server, WithValidation)
@@ -49,6 +52,9 @@ public:
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void SwapMelee();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void RespawnPawn();
 
 protected:
 
