@@ -6,6 +6,7 @@
 #include "UnrealNetwork.h"
 #include "DieselandEnemyBot.generated.h"
 
+
 /**
  * 
  */
@@ -91,6 +92,7 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void OnProjectileZoneEnter();
 
+
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void OnZoneExit();
 
@@ -106,6 +108,7 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	//check to see if the basic attack is active
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	bool BasicAttackActive;
+
 
 protected:
 
