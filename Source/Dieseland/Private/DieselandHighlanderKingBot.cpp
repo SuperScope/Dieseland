@@ -14,3 +14,11 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 
 }
 
+void ADieselandHighlanderKingBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+
+	// Replicate to everyone
+	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonZoneCollision);
+}
