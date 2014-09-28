@@ -21,7 +21,7 @@ ADieselandEnemyAI::ADieselandEnemyAI(const class FPostConstructInitializePropert
 	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true;
 
-	Tags.Add(FName("Player"));
+	Tags.Add(FName("Enemy"));
 }
 
 //in this function the AI sets its enemy id and detection id, from there
@@ -47,7 +47,6 @@ void ADieselandEnemyAI::SearchForSpawnLocation()
 	ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
 	if (BotPawn->isAggressive == false){
 		EnemyKeyLocationID = BlackboardComp->GetKeyID("Destination");
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
 		BlackboardComp->SetValueAsVector(EnemyKeyLocationID, SpawnLocation);
 	}
 	else{
@@ -161,7 +160,6 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 void ADieselandEnemyAI::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	UpdateCooldownTimers(DeltaTime);
-
+	
 }

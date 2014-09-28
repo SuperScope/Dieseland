@@ -13,6 +13,7 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 	: Super(PCIP)
 {
 	CannonRange = 800;
+	CannonAttackDamage = 10;
 
 	//all of the variables needed for creating a collider
 	CannonZoneCollision = PCIP.CreateDefaultSubobject<UBoxComponent>(this, TEXT("CannonZone"));
@@ -23,6 +24,11 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 	//CannonZoneCollision->SetCapsuleHalfHeight(CannonRange / 2.0f);
 	//CannonZoneCollision->SetCapsuleRadius(CannonRange / 2.0f);
 	CannonZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	// Timer values
+	CannonDamageUpdate = 0.2f;
+
+	AttackPatternTimer = 20.0f;
 
 }
 
@@ -34,8 +40,10 @@ void ADieselandHighlanderKingBot::GetLifetimeReplicatedProps(TArray< FLifetimePr
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonZoneCollision);
 	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonRange);
-	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonDamagePerSecond);
-
+	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonDamageUpdate);
+	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonAttackDamage);
+	DOREPLIFETIME(ADieselandHighlanderKingBot, AttackPatternTimer);
+	DOREPLIFETIME(ADieselandHighlanderKingBot, IsFiringCannons);
 
 }
 
@@ -55,7 +63,7 @@ void ADieselandHighlanderKingBot::CannonAttack()
 		if (!CurActor->IsValidLowLevel()) continue;
 
 		if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player")))){
-			EditHealth(-1 * BasicAttackDamage, CurActor);
+			EditHealth(-1 * CannonAttackDamage, CurActor);
 		}
 	}
 }
