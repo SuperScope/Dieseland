@@ -25,6 +25,19 @@ public:
 	// Movement component
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UProjectileMovementComponent> ProjectileMovement;
-	
+
+	UPROPERTY(Replicated, Category = Visual, BlueprintReadOnly, VisibleAnywhere)
+	TSubobjectPtr<class UParticleSystemComponent> Particle;
+
+	UPROPERTY(Replicated, Category = Visual, BlueprintReadWrite, EditAnywhere)
+	bool Piercing;
+
+	UPROPERTY(Replicated, Category = Visual, BlueprintReadWrite, EditAnywhere)
+	int32 ProjectileDamage;
+
+	UFUNCTION(Reliable, NetMulticast, WithValidation)
+	void ServerActivateProjectile();
+
 	virtual void ReceiveActorBeginOverlap(AActor* OtherActor) override;
+	
 };

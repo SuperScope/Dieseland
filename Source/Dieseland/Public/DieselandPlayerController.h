@@ -26,14 +26,42 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerRangedAttack();
 
-	/*UFUNCTION(Reliable, Server, WithValidation)
+	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerSkillOne();
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerSkillTwo();
 
 	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerSkillThree();*/
+	void ServerSkillThree();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerReload();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void UpgradeStrength();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void UpdateCooldownTimers(float DeltaSeconds);
+
+	//Damage done to actors from fire traps upon exitting them
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	int32 LingerDamage;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	int32 LingerCount;
+
+	// Input events
+	UFUNCTION(Reliable, Server, WithValidation)
+	void OnAttackPress();
+	UFUNCTION(Reliable, Server, WithValidation)
+	void OnAttackRelease();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void SwapMelee();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void RespawnPawn();
 
 protected:
 
@@ -41,14 +69,6 @@ protected:
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
-
-	// Input events
-	void OnAttack();
-	void OnSkillOne();
-	void OnSkillTwo();
-	void OnSkillThree();
-
-	void SwapMelee();
 
 	// Movment input events
 	void OnMoveForward(float Val);
