@@ -1,0 +1,34 @@
+
+
+#include "Dieseland.h"
+#include "DieselandEnemyBot.h"
+#include "DieselandEnemyAI.h"
+#include "EnemyBaseProjectile.h"
+
+
+AEnemyBaseProjectile::AEnemyBaseProjectile(const class FPostConstructInitializeProperties& PCIP)
+	: Super(PCIP)
+{
+
+}
+
+void AEnemyBaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
+{
+	AActor::ReceiveActorBeginOverlap(OtherActor);
+	if (Role == ROLE_Authority)
+	{
+		if (Cast<ADieselandEnemyAI>(GetOwner())->GetPawn() != OtherActor && (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(FName(TEXT("Enemy")))))
+		{
+
+			Cast<ADieselandEnemyBot>(Cast<ADieselandEnemyAI>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
+			if (!Piercing)
+			{
+				this->Destroy();
+			}
+
+		}
+	}
+
+}
+
+

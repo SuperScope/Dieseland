@@ -36,10 +36,20 @@ public:
 	void ServerSkillThree();
 
 	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerReload();
+
+	UFUNCTION(Reliable, Server, WithValidation)
 	void UpgradeStrength();
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void UpdateCooldownTimers(float DeltaSeconds);
+
+	//Damage done to actors from fire traps upon exitting them
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	int32 LingerDamage;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	int32 LingerCount;
 
 	// Input events
 	UFUNCTION(Reliable, Server, WithValidation)
@@ -49,6 +59,9 @@ public:
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void SwapMelee();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void RespawnPawn();
 
 protected:
 
