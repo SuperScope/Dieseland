@@ -6,6 +6,8 @@
 #include "DieselandCharacter.h"
 #include "DieselandPlayerController.h"
 #include "DieselandEnemyAI.h"
+#include "BaseProjectile.h"
+#include "EnemyBaseProjectile.h"
 #include "UnrealNetwork.h"
 
 
@@ -46,7 +48,8 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 
 	// Set default ranges
 	MeleeRange = 144.0f;
-	AttackZone = 1200.0f;
+	AttackZone = 1600.0f;
+	ProjectileZone = 1000.0f;
 
 	// Cooldown values
 	BasicAttackCooldown = 0.2f;
@@ -73,6 +76,14 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	AttackZoneCollision->SetCapsuleRadius(AttackZone / 2.0f);
 	AttackZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	//all of the variables needed for creating a collider for the projectile zone
+	ProjectileZoneCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("ProjectileZone"));
+	ProjectileZoneCollision->AttachParent = (Mesh);
+	//AttackZoneCollision->AddLocalOffset(FVector(0.0f, 0.0f, (MeleeRange / 2.0f) + 50.0f));
+	ProjectileZoneCollision->SetCapsuleHalfHeight(ProjectileZone / 2.0f);
+	ProjectileZoneCollision->SetCapsuleRadius(ProjectileZone / 2.0f);
+	ProjectileZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	// Ensure replication
 	bReplicates = true;
 	AimMesh->SetIsReplicated(true);
@@ -81,6 +92,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 
 	//here we set the dieseland aggresion to true
 	isAggressive = false;
+	LingerCount = 0;
 	
 }
 
@@ -91,6 +103,25 @@ void ADieselandEnemyBot::Tick(float DeltaSeconds)
 	PlayerLabel->SetText(FString::FromInt(Health));
 
 	Super::Tick(DeltaSeconds);
+	if (LingerTimer > 0.0f)
+	{
+		LingerTimer -= DeltaSeconds;
+		if (LingerTimer < 0.0f)
+		{
+			LingerTimer = 0;
+			LingerCount = 0;
+		}
+		if ((((LingerTimer < 5.f) && (LingerTimer > 4.f)) || ((LingerTimer < 3.f) && (LingerTimer > 2.f)) || ((LingerTimer < 1.f) && (LingerTimer > 0.f))) && (LingerCount == 0))
+		{
+			Health = Health - LingerDamage;
+			LingerCount = 1;
+		}
+		else if ((((LingerTimer < 4.f) && (LingerTimer > 3.f)) || ((LingerTimer < 2.f) && (LingerTimer > 1.f))) && (LingerCount == 1))
+		{
+			Health = Health - LingerDamage;
+			LingerCount = 0;
+		}
+	}
 }
 
 void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Target)
@@ -112,23 +143,56 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Target)
 //here is the basic melee attack for the AI
 void ADieselandEnemyBot::MeleeAttack()
 {
-	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	MeleeCollision->SetCollisionProfileName(TEXT("OverlapAll"));
-	MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
-	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//here I do an if check to test and see if the Bot is of melee type, if so then I proceed with the melee attack.
+	if (IsMelee){
+		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		MeleeCollision->SetCollisionProfileName(TEXT("OverlapAll"));
+		MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
+		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	AActor* CurActor = NULL;
-	for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)
-	{
-		CurActor = ActorsInMeleeRange[b];
-		if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Player")))) continue;
-		if (!CurActor->IsValidLowLevel()) continue;
+		AActor* CurActor = NULL;
+		for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)
+		{
+			CurActor = ActorsInMeleeRange[b];
+			if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Player")))) continue;
+			if (!CurActor->IsValidLowLevel()) continue;
 
-		if (Role == ROLE_Authority){
-			EditHealth(-1 * BasicAttackDamage, CurActor);
+			if (Role == ROLE_Authority){
+				EditHealth(-1 * BasicAttackDamage, CurActor);
+			}
 		}
 	}
 }
+
+//here is the basic ranged attack for the AI
+void ADieselandEnemyBot::RangedAttack()
+{
+	//here I do an if check to test and see if the Bot is not of melee type, if so then I proceed with the ranged attack.
+	if (!IsMelee){
+		UWorld* const World = GetWorld();
+		if (World)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = Cast<ADieselandEnemyAI>(this->Controller);
+			SpawnParams.Instigator = Instigator;
+
+			FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
+
+			ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+
+			// spawn the projectile at the muzzle
+			AEnemyBaseProjectile* const Projectile = World->SpawnActor<AEnemyBaseProjectile>(AEnemyBaseProjectile::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+			if (Projectile)
+			{
+				Projectile->ProjectileDamage = BasicAttackDamage;
+				Projectile->ServerActivateProjectile();
+
+				//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
+			}
+		}
+	}
+}
+
 
 
 void ADieselandEnemyBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -166,9 +230,36 @@ void ADieselandEnemyBot::OnZoneEnter()
 	}
 	if (!isAggressive)
 	{
-		this->CharacterMovement->MaxWalkSpeed = 0;
+		this->CharacterMovement->MaxWalkSpeed = 400;
 	}
 }
+
+void ADieselandEnemyBot::OnProjectileZoneEnter()
+{
+	ADieselandEnemyAI* BotController = Cast<ADieselandEnemyAI>(Controller);
+
+	ProjectileZoneCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	ProjectileZoneCollision->SetCollisionProfileName(TEXT("OverlapAll"));
+	ProjectileZoneCollision->GetOverlappingActors(ActorsInZoneRange);
+	ProjectileZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AActor* CurActor = NULL;
+	for (int32 b = 0; b < ActorsInZoneRange.Num(); b++)
+	{
+		CurActor = ActorsInZoneRange[b];
+		if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Player")))) continue;
+		if (!CurActor->IsValidLowLevel()) continue;
+
+		if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player")))){
+			if (!IsMelee)
+			{
+				this->CharacterMovement->MaxWalkSpeed = 0;
+				RangedAttack();
+			}
+		}
+	}
+
+}
+
 
 void ADieselandEnemyBot::OnZoneExit()
 {

@@ -6,6 +6,7 @@
 #include "UnrealNetwork.h"
 #include "DieselandEnemyBot.generated.h"
 
+
 /**
  * 
  */
@@ -32,6 +33,10 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UCapsuleComponent> AttackZoneCollision;
 
+	// Collider used to detect attack zone radius
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+		TSubobjectPtr<class UCapsuleComponent> ProjectileZoneCollision;
+
 	//Called to subtract and/or add health to the enemy
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 		void EditHealth(int32 Amt, AActor* Target);
@@ -39,11 +44,25 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 
 	//public health value of this character
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-		int32 Health;
+	int32 Health;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	float LingerTimer;
+
+	//Damage done to actors from fire traps upon exitting them
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	int32 LingerDamage;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	int32 LingerCount;
 
 	//set for the AIs aggresion
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-		bool isAggressive;
+	bool isAggressive;
+
+	//set for the AIs attack type
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	bool IsMelee;
 
 	// Damage amount for basic attacks
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
@@ -57,6 +76,10 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float AttackZone;
 
+	// The range of this character's attack zone radius
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		float ProjectileZone;
+
 	// The Cooldown for the basic attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 		float BasicAttackCooldown;
@@ -69,8 +92,16 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	UFUNCTION(BlueprintCallable, Category = Combat)
 		void MeleeAttack();
 
+	//combat functions
+	UFUNCTION(BlueprintCallable, Category = Combat)
+		void RangedAttack();
+
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void OnZoneEnter();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void OnProjectileZoneEnter();
+
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void OnZoneExit();
@@ -87,6 +118,7 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	//check to see if the basic attack is active
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	bool BasicAttackActive;
+
 
 protected:
 
