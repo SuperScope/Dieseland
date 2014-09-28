@@ -40,7 +40,30 @@ void ADieselandEnemyAI::Possess(class APawn* InPawn)
 		
 	}
 }
+void ADieselandEnemyAI::SearchForSpawnLocation()
+{
 
+
+	ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
+	if (BotPawn->isAggressive == false){
+		EnemyKeyLocationID = BlackboardComp->GetKeyID("Destination");
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
+		BlackboardComp->SetValueAsVector(EnemyKeyLocationID, SpawnLocation);
+	}
+	else{
+		SearchForEnemy();
+	}
+}
+//this function runs at the start so that I can get necessary enemy locations
+void ADieselandEnemyAI::BeginPlay()
+{
+	Super::BeginPlay();
+	ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
+	SpawnLocationID = BlackboardComp->GetKeyID("SpawnPoint");
+	SpawnLocation = BotPawn->GetActorLocation();
+	BlackboardComp->SetValueAsVector(SpawnLocationID, BotPawn->GetActorLocation());
+
+}
 //here the AI searches for an enemy player to attack
 void ADieselandEnemyAI::SearchForEnemy()
 {
@@ -119,7 +142,9 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 			if (DieselandPawn->BasicAttackTimer < 0.0f)
 			{
 				DieselandPawn->OnZoneEnter();
+				DieselandPawn->OnProjectileZoneEnter();
 				ServerMeleeAttack();
+				SearchForSpawnLocation();
 				DieselandPawn->BasicAttackTimer = 1.0f;
 			}
 		}

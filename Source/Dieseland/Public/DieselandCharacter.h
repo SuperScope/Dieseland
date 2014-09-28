@@ -42,6 +42,14 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
 
+	// Public armor value of this character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 Armor;
+
+	// The movement speed of a character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float MoveSpeed;
+
 	// Damage amount for the basic attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	int32 BasicAttackDamage;
@@ -86,6 +94,17 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float SkillThreeCooldown;
 
+	//FireTrap Damage Timer
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Trap)
+	float LingerTimer;
+
+	//FireTrap Damage Coolown
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	float LingerCoolDown;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	int32 LingerDamage;
+
 	// Replicated Rotation of the torso for aiming purposess
 	UPROPERTY(Replicated, ReplicatedUsing = OnRep_AimRotation, EditAnywhere, BlueprintReadWrite, Category = Network)
 	FRotator AimRotation;
@@ -95,6 +114,38 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	TArray<AActor*> ActorsInAOERange;
+
+	//CORE ATTRIBUTES BEGINS HERE
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int32 Strength;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int32 Constitution;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int32 Dexterity;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int32 Intelligence;
+
+	///TODO : PARAMETERS MUST MATCH FORMULAS
+	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
+	void CalculateSpeed(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
+
+	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
+	void CalculateAttkSpeed(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
+
+	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
+	void CalculateArmor(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
+
+	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
+	void CalculateDamage(int32 CoreAmt, int32 SecondaryAmt, int32 TertiaryAmt, AActor* Target);
+
+	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
+	void CalculateHealth(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
+
+	//CORE ATTRIBUTES ENDS HERE
 
 	// Combat functions
 	UFUNCTION(BlueprintCallable, Category = Combat)

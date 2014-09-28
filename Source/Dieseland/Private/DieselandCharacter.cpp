@@ -43,6 +43,11 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 	// Set the starting health value
 	Health = 100;
+	// Armor value
+	Armor = -1;
+
+	// Move Speed
+	MoveSpeed = 500;
 
 	// Create the text component
 	// TODO: Remove when UI is implemented
@@ -92,6 +97,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	SkillOneTimer = 0.0f;
 	SkillTwoTimer = 0.0f;
 	SkillThreeTimer = 0.0f;
+	LingerTimer = 0.0f;
 
 	// Set up collision area for melee attacks
 	MeleeCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("MeleeCollision"));
@@ -113,7 +119,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> BasicAttackParticleAsset(TEXT("ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillTwoParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_StrykerBlinkCloak_WIP.Unreal_Particle_StrykerBlinkCloak_WIP'"));
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillThreeParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse_WIP.Unreal_Particle_EngletonPulse_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillThreeParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse2_WIP.Unreal_Particle_EngletonPulse2_WIP'"));
 	
 	this->BasicAttackParticle = BasicAttackParticleAsset.Object;
 	this->SkillOneParticle = SkillOneParticleAsset.Object;
@@ -144,6 +150,99 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	PlayerLabel->SetText(FString::FromInt(Health));
 
 	Super::Tick(DeltaSeconds);
+}
+
+// CORE ATTRIBUTE CALCULATION FUNCTIONS
+
+//CoreAmt = Dexterity	
+void ADieselandCharacter::CalculateSpeed_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+		Cast<ADieselandCharacter>(Target)->MoveSpeed = 400.0f + (CoreAmt*1.5f);
+		if (Role < ROLE_Authority)
+		{
+			//Cast<ADieselandPlayerController>(Controller)->		//ServerEditMoveSpeed?
+			//ServerEditHealth(Amt, Target);
+		}
+	}
+}
+
+bool ADieselandCharacter::CalculateSpeed_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	return true;
+}
+
+// CoreAmt = Dexterity
+void ADieselandCharacter::CalculateAttkSpeed_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+		Cast<ADieselandCharacter>(Target)->BasicAttackCooldown = 2.0f - (CoreAmt / 50.0f);
+		if (Role < ROLE_Authority)
+		{
+
+		}
+	}
+}
+
+bool ADieselandCharacter::CalculateAttkSpeed_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	return true;
+}
+
+// CoreAmt = constitution
+void ADieselandCharacter::CalculateArmor_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+		Cast<ADieselandCharacter>(Target)->Armor = (CoreAmt * 2.0f);
+		if (Role < ROLE_Authority)
+		{
+
+		}
+	}
+}
+
+bool ADieselandCharacter::CalculateArmor_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	return true;
+}
+
+// CoreAmt = Strength		SecondaryAmt = Dexterity		TertiaryAmt = Intelligence
+void ADieselandCharacter::CalculateDamage_Implementation(int32 CoreAmt, int32 SecondaryAmt, int32 TertiaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+		Cast<ADieselandCharacter>(Target)->BasicAttackDamage = (CoreAmt * 3.0f) + (SecondaryAmt * 0.3f) + (TertiaryAmt * 0.3);
+		if (Role < ROLE_Authority)
+		{
+
+		}
+	}
+}
+
+bool ADieselandCharacter::CalculateDamage_Validate(int32 CoreAmt, int32 SecondaryAmt, int32 TertiaryAmt, AActor* Target)
+{
+	return true;
+}
+
+// Might simply use "EditHealth" function
+void ADieselandCharacter::CalculateHealth_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+		Cast<ADieselandCharacter>(Target)->Health = (CoreAmt * 20.0f) + (SecondaryAmt * 3.0f);
+		if (Role < ROLE_Authority)
+		{
+
+		}
+	}
+}
+
+bool ADieselandCharacter::CalculateHealth_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+{
+	return true;
 }
 
 void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
@@ -178,6 +277,7 @@ bool ADieselandCharacter::ServerDamageEnemy_Validate(int32 Amt, AActor* Target)
 {
 	return true;
 }
+
 void ADieselandCharacter::RangedAttack()
 {
 	UWorld* const World = GetWorld();
@@ -340,7 +440,11 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
 	DOREPLIFETIME(ADieselandCharacter, IsMelee);
 
+	DOREPLIFETIME(ADieselandCharacter, MoveSpeed);
+
 	DOREPLIFETIME(ADieselandCharacter, ParticleSystem);
+
+	DOREPLIFETIME(ADieselandCharacter, LingerTimer);
 
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackTimer);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackReloadTimer);
@@ -352,4 +456,10 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackDamage);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackReloadSpeed);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackAmmo);
+
+	// Necessary
+	DOREPLIFETIME(ADieselandCharacter, Strength);
+	DOREPLIFETIME(ADieselandCharacter, Constitution);
+	DOREPLIFETIME(ADieselandCharacter, Dexterity);
+	DOREPLIFETIME(ADieselandCharacter, Intelligence);
 }
