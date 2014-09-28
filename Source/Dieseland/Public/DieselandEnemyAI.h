@@ -27,6 +27,9 @@ class DIESELAND_API ADieselandEnemyAI : public AAIController
 	UPROPERTY(transient)
 	TSubobjectPtr<class UBehaviorTreeComponent> BehaviorComp;
 
+	
+	
+
 	//function used to gain control of the enemy
 	virtual void Possess(class APawn *InPawn);
 
@@ -44,20 +47,28 @@ class DIESELAND_API ADieselandEnemyAI : public AAIController
 		void ServerEditHealth(int32 Amt, AActor* Target);
 
 
+
 	//here we update our  cooldown timers
 	void UpdateCooldownTimers(float DeltaSeconds);
 	
 	//here we start our melee attack
 	void MeleeAttack(float DeltaSeconds);
 
+	//search for spawn location
+	UFUNCTION(BlueprintCallable, Category = Behavior)
+		void SearchForSpawnLocation();
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerMeleeAttack();
 
 	uint8 EnemyKeyID;
 	uint8 EnemyKeyLocationID;
+	uint8 SpawnLocationID;
+	FVector SpawnLocation;
 
 	// Begin tick timer
 	virtual void Tick(float DeltaTime) override;
+	protected:
+		virtual void BeginPlay() override;
 
 };
