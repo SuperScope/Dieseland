@@ -43,12 +43,17 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 	// Set the starting health value
 	Health = 100;
+	BaseHealth = 100;
 	// Armor value
 	Armor = -1;
 
 	// Move Speed
 	MoveSpeed = 500;
+	//baseDamage
+	BaseDamage = 10;
 
+	//baseCooldownSpeed
+	BaseCooldownSpeed = 2.0f;
 	// Create the text component
 	// TODO: Remove when UI is implemented
 	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
@@ -235,7 +240,7 @@ void ADieselandCharacter::CalculateHealth_Implementation(int32 CoreAmt, int32 Se
 		Cast<ADieselandCharacter>(Target)->Health = (CoreAmt * 20.0f) + (SecondaryAmt * 3.0f);
 		if (Role < ROLE_Authority)
 		{
-
+			Cast<ADieselandPlayerController>(Controller)->ServerEditHealth((CoreAmt * 20.0f) + (SecondaryAmt * 3.0f), Target);
 		}
 	}
 }
@@ -244,7 +249,25 @@ bool ADieselandCharacter::CalculateHealth_Validate(int32 CoreAmt, int32 Secondar
 {
 	return true;
 }
+void ADieselandCharacter::CalculateStats_Implementation()
+{
+	if (this->ActorHasTag(FName(TEXT("Player"))))
+	{
+		//adjustments for health
+		Health = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
+		//show those adjustments
+		PlayerLabel->SetText(FString::FromInt(Health));
+		//adjustments for damage
+		BasicAttackDamage = BaseDamage + (Strength * 3.0f) + (Dexterity * 1.0f) + (Intelligence * 1.0f);
+		//adjusments for attackspeed
+		BasicAttackCooldown = BaseCooldownSpeed - (Dexterity / 25.0f);
+	}
+}
 
+bool ADieselandCharacter::CalculateStats_Validate()
+{
+	return true;
+}
 void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 {
 	if (Target->ActorHasTag(FName(TEXT("Player"))))
@@ -456,6 +479,10 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackDamage);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackReloadSpeed);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackAmmo);
+
+	DOREPLIFETIME(ADieselandCharacter, BaseDamage);
+	DOREPLIFETIME(ADieselandCharacter, BaseCooldownSpeed);
+	DOREPLIFETIME(ADieselandCharacter, BaseHealth);
 
 	// Necessary
 	DOREPLIFETIME(ADieselandCharacter, Strength);

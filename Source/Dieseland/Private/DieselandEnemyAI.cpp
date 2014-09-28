@@ -20,6 +20,7 @@ ADieselandEnemyAI::ADieselandEnemyAI(const class FPostConstructInitializePropert
 
 	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true;
+	GameTimer = 0;
 
 	Tags.Add(FName("Enemy"));
 }
@@ -56,11 +57,8 @@ void ADieselandEnemyAI::SearchForSpawnLocation()
 //this function runs at the start so that I can get necessary enemy locations
 void ADieselandEnemyAI::BeginPlay()
 {
-	Super::BeginPlay();
-	ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
-	SpawnLocationID = BlackboardComp->GetKeyID("SpawnPoint");
-	SpawnLocation = BotPawn->GetActorLocation();
-	BlackboardComp->SetValueAsVector(SpawnLocationID, BotPawn->GetActorLocation());
+	//Super::BeginPlay();
+
 
 }
 //here the AI searches for an enemy player to attack
@@ -154,6 +152,14 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 				DieselandPawn->BasicAttackTimer = DieselandPawn->BasicAttackCooldown;
 		}
 	}
+	GameTimer += DeltaSeconds;
+	if (GameTimer > 1 && GameTimer < 2)
+	{
+		ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
+		SpawnLocationID = BlackboardComp->GetKeyID("SpawnPoint");
+		SpawnLocation = BotPawn->GetActorLocation();
+		BlackboardComp->SetValueAsVector(SpawnLocationID, BotPawn->GetActorLocation());
+	}
 }
 
 
@@ -162,4 +168,12 @@ void ADieselandEnemyAI::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	UpdateCooldownTimers(DeltaTime);
 	
+}
+
+void ADieselandEnemyAI::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Replicate to everyone
+	DOREPLIFETIME(ADieselandEnemyAI, GameTimer);
 }

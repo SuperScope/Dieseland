@@ -42,6 +42,16 @@ public:
 	void UpgradeStrength();
 
 	UFUNCTION(Reliable, Server, WithValidation)
+	void UpgradeDexterity();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void UpgradeIntelligence();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void UpgradeConstitution();
+
+
+	UFUNCTION(Reliable, Server, WithValidation)
 	void UpdateCooldownTimers(float DeltaSeconds);
 
 	//Damage done to actors from fire traps upon exitting them

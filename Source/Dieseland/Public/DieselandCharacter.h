@@ -54,6 +54,14 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	int32 BasicAttackDamage;
 
+
+	// Setting base stats
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		int32 BaseDamage;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		int32 BaseCooldownSpeed;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		int32 BaseHealth;
 	// Current ammo for basic ranged attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	int32 BasicAttackAmmo;
@@ -144,6 +152,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
 	void CalculateHealth(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
+
+
+	//One forumla > many <3
+	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
+	void CalculateStats();
 
 	//CORE ATTRIBUTES ENDS HERE
 
