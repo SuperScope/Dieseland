@@ -14,9 +14,9 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 	: Super(PCIP)
 {
 	IsMelee = true;
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_MayhemSkullCrusher_WIP.Unreal_Particle_MayhemSkullCrusher_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> MayhemSkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_MayhemSkullCrusher_WIP.Unreal_Particle_MayhemSkullCrusher_WIP'"));
 
-	SkillOneParticle = SkillOneParticleAsset.Object;
+	SkillOneParticle = MayhemSkillOneParticleAsset.Object;
 
 	// TODO: Edit attributes for Mayhem
 }
@@ -55,7 +55,6 @@ void AMayhemCharacter::SkillOne()
 	for (int32 b = 0; b < ActorsInAOERange.Num(); b++)
 	{
 		CurActor = ActorsInAOERange[b];
-		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
 		if (!CurActor->IsValidLowLevel()) continue;
 
 		if (Role == ROLE_Authority && CurActor != this)
@@ -64,12 +63,16 @@ void AMayhemCharacter::SkillOne()
 			if (CurActor->ActorHasTag(FName(TEXT("Player"))))
 			{
 				ADieselandCharacter* PlayerActor = Cast<ADieselandCharacter>(CurActor);
-				PlayerActor->DisableInput(Cast<ADieselandPlayerController>(PlayerActor->Controller));
+				//PlayerActor->DisableInput(Cast<ADieselandPlayerController>(PlayerActor->Controller));
+				
+				EditHealth(-1 * BasicAttackDamage, CurActor);
 			}
-			else
+			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
 			{
 				ADieselandEnemyBot* EnemyActor = Cast<ADieselandEnemyBot>(CurActor);
-				Cast<ADieselandEnemyAI>(EnemyActor->Controller)->BlackboardComp->Deactivate();
+				//Cast<ADieselandEnemyAI>(EnemyActor->Controller)->StopMovement();
+			
+				EditHealth(-1 * BasicAttackDamage, CurActor);
 			}
 		}
 	}
