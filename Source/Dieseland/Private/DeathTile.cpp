@@ -7,7 +7,7 @@
 ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-    // Create the Static Mesh Component
+    // Create the Static Mesh Component(Octogon)
     DeathTileMesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("DeathTileMesh"));
     
     //Create the Scene Component
@@ -15,6 +15,9 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     
     //Set Root Component as the Dummy Component
     RootComponent = DummyComponent;
+    
+    //Create the Sphere Component to be used for collision
+    SphereComponent = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("SphereComponent"));
     
     //Find the Octogon mesh
     static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshOctogon(TEXT("StaticMesh'/Game/Level/Maya_Octogon_export.Maya_Octogon_export'"));
@@ -30,6 +33,7 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     
     //Set Dummy Component as parent
     DeathTileMesh->AttachParent = DummyComponent;
+    SphereComponent->AttachParent = DummyComponent; 
     
     //Set Mesh rotation and scale
     DeathTileMesh->SetWorldRotation(DTRotation);
@@ -46,6 +50,21 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     
     
 
+}
+
+void ADeathTile::OnOverlap(AActor* Enemy, UPrimitiveComponent* Sphere)
+{
+    if(Enemy->ActorHasTag(FName(TEXT("Enemy"))))
+    {
+        EnemiesRemaining = true;
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("The player is colliding!"));
+    }
+    else
+    {
+        EnemiesRemaining = false;
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("The player is not colliding!"));
+    }
+    
 }
 
 

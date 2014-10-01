@@ -21,9 +21,13 @@ class DIESELAND_API ADeathTile : public AActor
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Death Tile")
     TSubobjectPtr<USceneComponent> DummyComponent;
     
+    /* Volume for collision detection*/
+    UPROPERTY(VisibleAnywhere, Category = "Death Tile")
+    TSubobjectPtr<USphereComponent> SphereComponent;
+    
     //Function for collision detection
-   // UFUNCTION()
-    //void OnEndOverlap(AActor* Other);
+    UFUNCTION()
+    void OnOverlap(class AActor* Enemy, class UPrimitiveComponent* Sphere);
     
     //Rotation for Tile
     FRotator DTRotation;
