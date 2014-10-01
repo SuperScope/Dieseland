@@ -44,14 +44,15 @@ void ADieselandEnemyAI::Possess(class APawn* InPawn)
 void ADieselandEnemyAI::SearchForSpawnLocation()
 {
 
-
-	ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
-	if (BotPawn->isAggressive == false){
-		EnemyKeyLocationID = BlackboardComp->GetKeyID("Destination");
-		BlackboardComp->SetValueAsVector(EnemyKeyLocationID, SpawnLocation);
-	}
-	else{
-		SearchForEnemy();
+	if (Cast<ADieselandEnemyBot>(GetPawn()) != nullptr){
+		ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
+		if (BotPawn->isAggressive == false){
+			EnemyKeyLocationID = BlackboardComp->GetKeyID("Destination");
+			BlackboardComp->SetValueAsVector(EnemyKeyLocationID, SpawnLocation);
+		}
+		else{
+			SearchForEnemy();
+		}
 	}
 }
 //this function runs at the start so that I can get necessary enemy locations
@@ -64,6 +65,7 @@ void ADieselandEnemyAI::BeginPlay()
 //here the AI searches for an enemy player to attack
 void ADieselandEnemyAI::SearchForEnemy()
 {
+
 	ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
 	APawn* MyBot = GetPawn();
 	if (MyBot == NULL || BotPawn->isAggressive == false)

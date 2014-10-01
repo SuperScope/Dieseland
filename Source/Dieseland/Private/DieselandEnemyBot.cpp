@@ -187,7 +187,8 @@ void ADieselandEnemyBot::RangedAttack()
 				Projectile->ProjectileDamage = BasicAttackDamage;
 				Projectile->ServerActivateProjectile();
 
-				//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
+				// Add the character's velocity to the projectile
+				//Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 			}
 		}
 	}

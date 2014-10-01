@@ -47,8 +47,9 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	// Armor value
 	Armor = -1;
 
-	// Move Speed
-	MoveSpeed = 500;
+	// Base Move Speed
+	BaseMoveSpeed = 400;
+	this->CharacterMovement->MaxWalkSpeed = BaseMoveSpeed;
 	//baseDamage
 	BaseDamage = 10;
 
@@ -157,98 +158,7 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
-// CORE ATTRIBUTE CALCULATION FUNCTIONS
-
-//CoreAmt = Dexterity	
-void ADieselandCharacter::CalculateSpeed_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-		Cast<ADieselandCharacter>(Target)->MoveSpeed = 400.0f + (CoreAmt*1.5f);
-		if (Role < ROLE_Authority)
-		{
-			//Cast<ADieselandPlayerController>(Controller)->		//ServerEditMoveSpeed?
-			//ServerEditHealth(Amt, Target);
-		}
-	}
-}
-
-bool ADieselandCharacter::CalculateSpeed_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	return true;
-}
-
-// CoreAmt = Dexterity
-void ADieselandCharacter::CalculateAttkSpeed_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-		Cast<ADieselandCharacter>(Target)->BasicAttackCooldown = 2.0f - (CoreAmt / 50.0f);
-		if (Role < ROLE_Authority)
-		{
-
-		}
-	}
-}
-
-bool ADieselandCharacter::CalculateAttkSpeed_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	return true;
-}
-
-// CoreAmt = constitution
-void ADieselandCharacter::CalculateArmor_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-		Cast<ADieselandCharacter>(Target)->Armor = (CoreAmt * 2.0f);
-		if (Role < ROLE_Authority)
-		{
-
-		}
-	}
-}
-
-bool ADieselandCharacter::CalculateArmor_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	return true;
-}
-
-// CoreAmt = Strength		SecondaryAmt = Dexterity		TertiaryAmt = Intelligence
-void ADieselandCharacter::CalculateDamage_Implementation(int32 CoreAmt, int32 SecondaryAmt, int32 TertiaryAmt, AActor* Target)
-{
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-		Cast<ADieselandCharacter>(Target)->BasicAttackDamage = (CoreAmt * 3.0f) + (SecondaryAmt * 0.3f) + (TertiaryAmt * 0.3);
-		if (Role < ROLE_Authority)
-		{
-
-		}
-	}
-}
-
-bool ADieselandCharacter::CalculateDamage_Validate(int32 CoreAmt, int32 SecondaryAmt, int32 TertiaryAmt, AActor* Target)
-{
-	return true;
-}
-
-// Might simply use "EditHealth" function
-void ADieselandCharacter::CalculateHealth_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-		Cast<ADieselandCharacter>(Target)->Health = (CoreAmt * 20.0f) + (SecondaryAmt * 3.0f);
-		if (Role < ROLE_Authority)
-		{
-			Cast<ADieselandPlayerController>(Controller)->ServerEditHealth((CoreAmt * 20.0f) + (SecondaryAmt * 3.0f), Target);
-		}
-	}
-}
-
-bool ADieselandCharacter::CalculateHealth_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	return true;
-}
+// CORE ATTRIBUTE CALCULATION FUNCTION
 void ADieselandCharacter::CalculateStats_Implementation()
 {
 	if (this->ActorHasTag(FName(TEXT("Player"))))
@@ -258,9 +168,12 @@ void ADieselandCharacter::CalculateStats_Implementation()
 		//show those adjustments
 		PlayerLabel->SetText(FString::FromInt(Health));
 		//adjustments for damage
-		BasicAttackDamage = BaseDamage + (Strength * 3.0f) + (Dexterity * 1.0f) + (Intelligence * 1.0f);
+		BasicAttackDamage = BaseDamage + (Strength * 1.5f) + (Dexterity * .5f) + (Intelligence * .5f);
 		//adjusments for attackspeed
-		BasicAttackCooldown = BaseCooldownSpeed - (Dexterity / 25.0f);
+		BasicAttackCooldown = BaseCooldownSpeed / (1 + (Dexterity/50));
+		//adjustments for movement Speed
+		MoveSpeed = BaseMoveSpeed + (Dexterity * 3);
+		this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
 	}
 }
 
