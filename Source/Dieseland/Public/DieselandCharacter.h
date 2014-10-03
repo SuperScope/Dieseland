@@ -78,7 +78,7 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	bool IsMelee;
 
-	// The range of this character's melee attack
+	// The range of this character's Melee Attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float MeleeRange;
 
@@ -150,19 +150,19 @@ public:
 
 	// Combat functions
 	UFUNCTION(BlueprintCallable, Category = Combat)
-	void RangedAttack();
+	virtual void RangedAttack();
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
-	void MeleeAttack();
+	virtual void MeleeAttack();
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
-	void SkillOne();
+	virtual void SkillOne();
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
-	void SkillTwo();
+	virtual void SkillTwo();
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
-	void SkillThree();
+	virtual void SkillThree();
 
 	// Called when AimRotation is replicated
 	UFUNCTION()
