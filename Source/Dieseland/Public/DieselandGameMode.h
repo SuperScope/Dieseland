@@ -10,7 +10,7 @@ class ADieselandGameMode : public AGameMode
     
     //Array for the Death Tiles
     TArray<UClass*> DeathTileArray;
-    
+
     //Array for the Death Tile Locations
     TArray<FVector> LocationArray;
 };
