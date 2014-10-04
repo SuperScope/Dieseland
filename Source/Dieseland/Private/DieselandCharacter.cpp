@@ -398,6 +398,9 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, BaseCooldownSpeed);
 	DOREPLIFETIME(ADieselandCharacter, BaseHealth);
 
+	DOREPLIFETIME(ADieselandCharacter, StatusEffects);
+	DOREPLIFETIME(ADieselandCharacter, StunRemaining);
+
 	// Necessary
 	DOREPLIFETIME(ADieselandCharacter, Strength);
 	DOREPLIFETIME(ADieselandCharacter, Constitution);

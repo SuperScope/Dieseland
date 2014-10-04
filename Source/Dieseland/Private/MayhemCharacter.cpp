@@ -88,8 +88,8 @@ void AMayhemCharacter::SkillOne()
 			{
 				ADieselandCharacter* PlayerActor = Cast<ADieselandCharacter>(CurActor);
 				//PlayerActor->DisableInput(Cast<ADieselandPlayerController>(PlayerActor->Controller));
-				Cast<ADieselandPlayerController>(PlayerActor->Controller)->StatusEffects.Add(FString("Stunned"));
-				Cast<ADieselandPlayerController>(PlayerActor->Controller)->StunRemaining = 10.0f;
+				PlayerActor->StatusEffects.Add(FString("Stunned"));
+				PlayerActor->StunRemaining = 10.0f;
 
 				EditHealth(-1 * BasicAttackDamage, CurActor);
 			}
