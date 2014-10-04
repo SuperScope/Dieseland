@@ -8,8 +8,9 @@
 AEngletonMachineGun::AEngletonMachineGun(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	//Engleton's Projectiles are meant to move very quickly, nearly undodgeable
-	ProjectileMovement->InitialSpeed = 1400.0f;
+	//Engleton's Projectiles are meant to move very quickly.
+	ProjectileMovement->InitialSpeed = 1000.0f;
+	InitialLifeSpan = 0.8f;
 
 	//TODO reset attack damage for engleton machine gun
 

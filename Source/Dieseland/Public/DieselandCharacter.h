@@ -63,7 +63,7 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 		int32 BaseDamage;
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
-		int32 BaseCooldownSpeed;
+		float BaseCooldownSpeed;
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 		int32 BaseHealth;
 	// Current ammo for basic ranged attack

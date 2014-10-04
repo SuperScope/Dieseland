@@ -93,7 +93,6 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	//here we set the dieseland aggresion to true
 	isAggressive = false;
 	LingerCount = 0;
-	
 }
 
 void ADieselandEnemyBot::Tick(float DeltaSeconds)
