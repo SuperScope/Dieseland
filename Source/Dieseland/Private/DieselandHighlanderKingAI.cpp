@@ -44,7 +44,7 @@ void ADieselandHighlanderKingAI::UpdateCooldownTimers(float DeltaSeconds)
 		}
 		
 		//here I check to see if the boss has  entered its CannonFiringPhase
-		if (DieselandPawn->AttackPatternTimer > 5.0f && DieselandPawn->AttackPatternTimer <= 10.0f){
+		if (DieselandPawn->AttackPatternTimer > 6.0f && DieselandPawn->AttackPatternTimer <= 10.0f){
 			DieselandPawn->IsFiringCannons = true;
 			DieselandPawn->CharacterMovement->MaxWalkSpeed = 1;
 			DieselandPawn->CharacterMovement->RotationRate = FRotator(0.0f, 40.0f, 0.0f);
@@ -66,6 +66,7 @@ void ADieselandHighlanderKingAI::UpdateCooldownTimers(float DeltaSeconds)
 			DieselandPawn->CharacterMovement->MaxWalkSpeed = 400;
 			DieselandPawn->CharacterMovement->RotationRate = FRotator(0.0f, 360.0f, 0.0f);
 			DieselandPawn->IsFiringCannons = false;
+			DieselandPawn->CannonAttackTicks = 0;
 		}
 	}//end of cast if statement
 

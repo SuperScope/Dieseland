@@ -29,18 +29,40 @@ class DIESELAND_API AEngletonCharacter : public ADieselandCharacter
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UCapsuleComponent> BombardmentCollision;
 
+
 	//here I check to see if Bombardment is active
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	bool BombardmentActivated;
 
+	//here I check to see if pulse is activated
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	bool PulseActivated;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+		TArray<AActor*> ActorsInBombardmentRange;
 
 	//here I check to see how long bobmarbment has been active
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float BombardmentTimer;
 
+	//here I check to see how pulse has been activated
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float PulseTimer;
+
 	//the number of times bombardment AOE damage is dealt
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	int16 BombardmentHitCounter;
+
+	//here we get our bombardment particle effect
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+		UParticleSystem* BombardmentParticle;
+	//here we get our pulse particle effect
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+		UParticleSystem* PulseParticle;
+	//here we get our machine gun fire particle effect
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+		UParticleSystem* MachineGunFireParticle;
 
 	//here we update time
 	void UpdateTimers(float DeltaSeconds);
