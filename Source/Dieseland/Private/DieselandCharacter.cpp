@@ -91,7 +91,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	RangedRange = 1200.0f;
 
 	// Cooldown values
-	BasicAttackCooldown = 0.2f;
+	BasicAttackCooldown = 1.0f;
 	BasicAttackReloadSpeed = 3.0f;
 	SkillOneCooldown = 2.0f;
 	SkillTwoCooldown = 3.5f;
@@ -236,7 +236,7 @@ void ADieselandCharacter::RangedAttack()
 			Projectile->ServerActivateProjectile();
 
 			// Add the character's velocity to the projectile
-			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 		}
 	}
 }

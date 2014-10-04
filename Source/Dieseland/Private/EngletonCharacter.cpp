@@ -3,6 +3,8 @@
 #include "Dieseland.h"
 #include "EngletonCharacter.h"
 #include "DieselandPlayerController.h"
+#include "EngletonCrazyLaser.h"
+#include "EngletonMachineGun.h"
 #include "ParticleDefinitions.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -14,8 +16,8 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	//here I set his base values
 	BaseMoveSpeed = 380;
 	BaseHealth = 350;
-	BaseDamage = 25;
-	BaseCooldownSpeed = 1.5;
+	BaseDamage = 15;
+	BaseCooldownSpeed = 1.2;
 	//here I set his base stats
 	Strength = 9;
 	Intelligence = 17;
@@ -26,13 +28,14 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 
 	//here I adjust those base values based on his stats
 	//adjustments for health
-	Health = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
+	Health = BaseHealth + (Constitution * 20.0f) + (Strength * 5.0f);
 	//show those adjustments
 	PlayerLabel->SetText(FString::FromInt(Health));
 	//adjustments for damage
 	BasicAttackDamage = BaseDamage + (Strength * 1.5f) + (Dexterity * .5f) + (Intelligence * .5f);
 	//adjusments for attackspeed
 	BasicAttackCooldown = BaseCooldownSpeed / (1 + (Dexterity / 50));
+
 	//adjustments for movement Speed
 	MoveSpeed = BaseMoveSpeed + (Dexterity * 3);
 	this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
@@ -43,8 +46,10 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	BombardmentRange = 600;
 	//Set our hitcount for bombardment
 	BombardmentHitCounter = 0;
-	//here I set the cooldown for Bombardment
-	SkillOneCooldown = 25.0f;
+	//here I set the cooldown for player abilities
+	SkillOneCooldown = 20.0f;
+	SkillTwoCooldown = 8.0f;
+	SkillThreeCooldown = 14.0f;
 
 	// Set up collision area for Bombardment attacks
 	BombardmentCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("BombardmentCollision"));
@@ -105,22 +110,69 @@ void AEngletonCharacter::SkillOne()
 	}
 }
 
+
 void AEngletonCharacter::SkillTwo()
 {
+	UWorld* const World = GetWorld();
+	if (World)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
+		SpawnParams.Instigator = Instigator;
 
+		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
+
+		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+
+		// spawn the projectile at the muzzle
+		AEngletonCrazyLaser* const Projectile = World->SpawnActor<AEngletonCrazyLaser>(AEngletonCrazyLaser::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+		if (Projectile)
+		{
+			Projectile->ProjectileDamage = 100 + (Intelligence * 3);
+			// Start the particle effect
+			Projectile->ServerActivateProjectile();
+
+			// Add the character's velocity to the projectile
+			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+		}
+	}
 }
 
+//here we a activate pulse
 void AEngletonCharacter::SkillThree()
 {
-	
+	PulseActivated = true;
+	ServerActivateParticle(PulseParticle);
 }
 
 void AEngletonCharacter::RangedAttack()
 {
+	UWorld* const World = GetWorld();
+	if (World)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
+		SpawnParams.Instigator = Instigator;
 
-	//particle base is set into play, just need to adjust it's spawn position to the same point as his hands
-	ServerActivateParticle(MachineGunFireParticle);
+		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
 
+		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+
+		// spawn the projectile at the muzzle
+		AEngletonMachineGun* const Projectile = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+		if (Projectile)
+		{
+			//particle base is set into play, just need to adjust it's spawn position to the same point as his hands
+			ServerActivateParticle(MachineGunFireParticle);
+
+			Projectile->ProjectileDamage = BasicAttackDamage;
+			// Start the particle effect
+			Projectile->ServerActivateProjectile();
+
+			// Add the character's velocity to the projectile
+			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+		}
+	}
 }
 void AEngletonCharacter::MeleeAttack()
 {
@@ -166,6 +218,7 @@ void AEngletonCharacter::UpdateTimers(float DeltaSeconds)
 		if (PulseTimer >= 4){
 			PulseActivated = false;
 			PulseTimer = 0;
+			this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
 		}
 	}//end of EngletonPulse
 
