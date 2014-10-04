@@ -61,6 +61,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
 	int32 LingerCount;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Status)
+	TArray<FString> StatusEffects;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Status)
+	float StunRemaining;
+
 	// Input events
 	UFUNCTION(Reliable, Server, WithValidation)
 	void OnAttackPress();
