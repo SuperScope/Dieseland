@@ -61,6 +61,11 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
 	int32 LingerCount;
 
+	// The health regen of a character
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float HealthRegenTimer;
+
+
 	// Input events
 	UFUNCTION(Reliable, Server, WithValidation)
 	void OnAttackPress();

@@ -28,7 +28,9 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 
 	//here I adjust those base values based on his stats
 	//adjustments for health
-	Health = BaseHealth + (Constitution * 20.0f) + (Strength * 5.0f);
+	MaxHealth= BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
+	Health = MaxHealth;
+	HealthRegeneration = 1 + (Constitution / 2.5f) + (Strength / 5.0f);
 	//show those adjustments
 	PlayerLabel->SetText(FString::FromInt(Health));
 	//adjustments for damage
@@ -47,9 +49,14 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	//Set our hitcount for bombardment
 	BombardmentHitCounter = 0;
 	//here I set the cooldown for player abilities
-	SkillOneCooldown = 20.0f;
-	SkillTwoCooldown = 8.0f;
-	SkillThreeCooldown = 14.0f;
+	BaseSkillOneCooldown = 25.0f;
+	BaseSkillTwoCooldown = 12.0f;
+	BaseSkillThreeCooldown = 16.0f;
+
+	SkillOneCooldown = BaseSkillOneCooldown / (1 + Intelligence / 100);
+	SkillTwoCooldown = BaseSkillTwoCooldown / (1 + Intelligence / 100);
+	SkillThreeCooldown = BaseSkillThreeCooldown / (1 + Intelligence / 100);
+
 
 	// Set up collision area for Bombardment attacks
 	BombardmentCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("BombardmentCollision"));
@@ -188,6 +195,8 @@ void AEngletonCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 }
 void AEngletonCharacter::UpdateTimers(float DeltaSeconds)
 {
+	//here I check to see if health is > maxhealth if so I set to health
+
 	//here I check to see if Bombardment has been activated, if it has I peridocally deal damage over a set amount of time
 	if (BombardmentActivated){
 

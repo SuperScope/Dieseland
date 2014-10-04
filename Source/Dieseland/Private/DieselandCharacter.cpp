@@ -42,7 +42,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	TopDownCameraComponent->bUseControllerViewRotation = false; // Camera does not rotate relative to arm
 
 	// Set the starting health value
-	Health = 100;
+	Health = MaxHealth;
 	BaseHealth = 100;
 	// Armor value
 	Armor = -1;
@@ -164,7 +164,9 @@ void ADieselandCharacter::CalculateStats_Implementation()
 	if (this->ActorHasTag(FName(TEXT("Player"))))
 	{
 		//adjustments for health
-		Health = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
+		MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
+		//adjustments for health regeneration
+		HealthRegeneration = 1 + (Constitution / 2.5f) + (Strength / 5.0f);
 		//show those adjustments
 		PlayerLabel->SetText(FString::FromInt(Health));
 		//adjustments for damage
@@ -174,6 +176,11 @@ void ADieselandCharacter::CalculateStats_Implementation()
 		//adjustments for movement Speed
 		MoveSpeed = BaseMoveSpeed + (Dexterity * 3);
 		this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
+
+		//adjusments for ability cooldown speed
+		SkillOneCooldown = BaseSkillOneCooldown / (1 + Intelligence / 100);
+		SkillTwoCooldown = BaseSkillTwoCooldown / (1 + Intelligence / 100);
+		SkillThreeCooldown = BaseSkillThreeCooldown / (1 + Intelligence / 100);
 	}
 }
 
