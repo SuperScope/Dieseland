@@ -146,7 +146,12 @@ void ADieselandEnemyBot::MeleeAttack()
 	//here I do an if check to test and see if the Bot is of melee type, if so then I proceed with the melee attack.
 	if (IsMelee){
 		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		MeleeCollision->SetCollisionProfileName(TEXT("OverlapAll"));
+		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
+		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Overlap);
+		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
 		MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
 		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -218,7 +223,12 @@ void ADieselandEnemyBot::OnZoneEnter()
 	ADieselandEnemyAI* BotController = Cast<ADieselandEnemyAI>(Controller);
 
 	AttackZoneCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	AttackZoneCollision->SetCollisionProfileName(TEXT("OverlapAll"));
+	AttackZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+	AttackZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+	AttackZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	AttackZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
+	AttackZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Overlap);
+	AttackZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
 	AttackZoneCollision->GetOverlappingActors(ActorsInZoneRange);
 	AttackZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AActor* CurActor = NULL;
@@ -245,7 +255,12 @@ void ADieselandEnemyBot::OnProjectileZoneEnter()
 	ADieselandEnemyAI* BotController = Cast<ADieselandEnemyAI>(Controller);
 
 	ProjectileZoneCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	ProjectileZoneCollision->SetCollisionProfileName(TEXT("OverlapAll"));
+	ProjectileZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+	ProjectileZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+	ProjectileZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	ProjectileZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
+	ProjectileZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Overlap);
+	ProjectileZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
 	ProjectileZoneCollision->GetOverlappingActors(ActorsInZoneRange);
 	ProjectileZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AActor* CurActor = NULL;
