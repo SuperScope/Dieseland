@@ -174,6 +174,8 @@ void ADieselandCharacter::CalculateStats_Implementation()
 		//adjustments for movement Speed
 		MoveSpeed = BaseMoveSpeed + (Dexterity * 3);
 		this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
+
+		
 	}
 }
 
@@ -198,6 +200,7 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 	{
 		ServerDamageEnemy(Amt, Target);
 	}
+
 }
 
 void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Target)

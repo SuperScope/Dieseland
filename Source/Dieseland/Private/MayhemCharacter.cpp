@@ -27,6 +27,9 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 
 	StunLength = 2.0f;
 
+	IronArmorDuration = 4.0f;
+	RageDuration = 3.0f;
+
 	//here I adjust those base values based on his stats
 	//adjustments for health
 	Health = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
@@ -45,6 +48,40 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> MayhemSkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_MayhemSkullCrusher_WIP.Unreal_Particle_MayhemSkullCrusher_WIP'"));
 	SkillOneParticle = MayhemSkillOneParticleAsset.Object;
 
+}
+
+void AMayhemCharacter::Tick(float DeltaSeconds)
+{
+	UpdateDurationTimers(DeltaSeconds);
+	
+	Super::Tick(DeltaSeconds);
+}
+
+void AMayhemCharacter::UpdateDurationTimers_Implementation(float DeltaSeconds)
+{
+	if (IronArmorTimer > 0.0f)
+	{
+		IronArmorTimer -= DeltaSeconds;
+		if (IronArmorTimer <= 0.0f)
+		{
+			IronArmorTimer = 0.0f;
+			//reset stats here
+		}
+	}
+	if (RageTimer > 0.0f)
+	{
+		RageTimer -= DeltaSeconds;
+		if (RageTimer <= 0.0f)
+		{
+			RageTimer = 0.0f;
+			//reset stats here
+		}
+	}
+}
+
+bool AMayhemCharacter::UpdateDurationTimers_Validate(float DeltaSeconds)
+{
+	return true;
 }
 
 void AMayhemCharacter::MeleeAttack()
@@ -125,4 +162,7 @@ void AMayhemCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AMayhemCharacter, StunLength);
+	
+	DOREPLIFETIME(AMayhemCharacter, IronArmorTimer);
+	DOREPLIFETIME(AMayhemCharacter, RageTimer);
 }
