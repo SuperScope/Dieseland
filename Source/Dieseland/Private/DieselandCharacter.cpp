@@ -166,7 +166,7 @@ void ADieselandCharacter::CalculateStats_Implementation()
 		//adjustments for health
 		MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
 		//adjustments for health regeneration
-		HealthRegeneration = 1 + (Constitution / 2.5f) + (Strength / 5.0f);
+		HealthRegeneration = 1.0f + (Constitution / 10.0f) + (Strength / 20.0f);
 		//show those adjustments
 		PlayerLabel->SetText(FString::FromInt(Health));
 		//adjustments for damage

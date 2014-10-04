@@ -64,8 +64,9 @@ void ADieselandPlayerController::UpdateCooldownTimers_Implementation(float Delta
 		}
 		HealthRegenTimer += DeltaSeconds;
 		//health regeneration
-		if (DieselandPawn->Health < DieselandPawn->MaxHealth && HealthRegenTimer >= 1){
+		if (HealthRegenTimer >= 1){
 			DieselandPawn->Health += DieselandPawn->HealthRegeneration;
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
 			HealthRegenTimer = 0;
 		}
 		// Update all of the timers
