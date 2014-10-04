@@ -127,7 +127,10 @@ bool ADieselandEnemyAI::ServerMeleeAttack_Validate()
 void ADieselandEnemyAI::ServerMeleeAttack_Implementation()
 {
 	ADieselandEnemyBot* DieselandPawn = Cast<ADieselandEnemyBot>(GetPawn());
-	DieselandPawn->MeleeAttack();
+	if (!DieselandPawn->StatusEffects.Contains(FString("Stunned")))
+	{
+		DieselandPawn->MeleeAttack();
+	}
 }
 
 void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
@@ -152,6 +155,20 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 		{
 			ADieselandEnemyBot* DieselandPawn = Cast<ADieselandEnemyBot>(GetPawn());
 				DieselandPawn->BasicAttackTimer = DieselandPawn->BasicAttackCooldown;
+		}
+
+		if (DieselandPawn->StunRemaining > 0.0f)
+		{
+			DieselandPawn->StunRemaining -= DeltaSeconds;
+			if (DieselandPawn->StunRemaining <= 0.0f)
+			{
+				DieselandPawn->StunRemaining = 0.0f;
+				DieselandPawn->StatusEffects.Remove(FString("Stunned"));
+
+				//TODO: Replace with calculated speeds based on enemy type/level
+				DieselandPawn->CharacterMovement->MaxWalkSpeed = 400.0f;
+				DieselandPawn->CharacterMovement->RotationRate = FRotator(0.0f, 360.0f, 0.0f);
+			}
 		}
 	}
 	GameTimer += DeltaSeconds;

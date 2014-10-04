@@ -25,6 +25,8 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 	Dexterity = 10;
 	Constitution = 14;
 
+	StunLength = 2.0f;
+
 	//here I adjust those base values based on his stats
 	//adjustments for health
 	Health = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
@@ -87,16 +89,20 @@ void AMayhemCharacter::SkillOne()
 			if (CurActor->ActorHasTag(FName(TEXT("Player"))))
 			{
 				ADieselandCharacter* PlayerActor = Cast<ADieselandCharacter>(CurActor);
-				//PlayerActor->DisableInput(Cast<ADieselandPlayerController>(PlayerActor->Controller));
+
 				PlayerActor->StatusEffects.Add(FString("Stunned"));
-				PlayerActor->StunRemaining = 10.0f;
+				PlayerActor->StunRemaining = StunLength;
 
 				EditHealth(-1 * BasicAttackDamage, CurActor);
 			}
 			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
 			{
 				ADieselandEnemyBot* EnemyActor = Cast<ADieselandEnemyBot>(CurActor);
-				//Cast<ADieselandEnemyAI>(EnemyActor->Controller)->StopMovement();
+
+				EnemyActor->StatusEffects.Add(FString("Stunned"));
+				EnemyActor->StunRemaining = StunLength;
+				EnemyActor->CharacterMovement->MaxWalkSpeed = 0.0f;
+				EnemyActor->CharacterMovement->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
 			
 				EditHealth(-1 * BasicAttackDamage, CurActor);
 			}
@@ -112,4 +118,11 @@ void AMayhemCharacter::SkillTwo()
 void AMayhemCharacter::SkillThree()
 {
 	
+}
+
+void AMayhemCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AMayhemCharacter, StunLength);
 }

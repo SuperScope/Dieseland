@@ -21,7 +21,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 
 	// Set the starting health value
-	Health = 100;
+	Health = 550;
 
 	// Create the text component
 	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
@@ -165,7 +165,7 @@ void ADieselandEnemyBot::MeleeAttack()
 }
 
 //here is the basic ranged attack for the AI
-void ADieselandEnemyBot::RangedAttack()
+void ADieselandEnemyBot::RangedAttack_Implementation()
 {
 	//here I do an if check to test and see if the Bot is not of melee type, if so then I proceed with the ranged attack.
 	if (!IsMelee){
@@ -193,8 +193,10 @@ void ADieselandEnemyBot::RangedAttack()
 		}
 	}
 }
-
-
+bool ADieselandEnemyBot::RangedAttack_Validate()
+{
+	return true;
+}
 
 void ADieselandEnemyBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
@@ -206,6 +208,9 @@ void ADieselandEnemyBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackTimer);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackActive);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackDamage);
+
+	DOREPLIFETIME(ADieselandEnemyBot, StatusEffects);
+	DOREPLIFETIME(ADieselandEnemyBot, StunRemaining);
 }
 
 void ADieselandEnemyBot::OnZoneEnter()
@@ -254,7 +259,10 @@ void ADieselandEnemyBot::OnProjectileZoneEnter()
 			if (!IsMelee)
 			{
 				this->CharacterMovement->MaxWalkSpeed = 0;
-				RangedAttack();
+				if (!StatusEffects.Contains(FString("Stunned")))
+				{
+					RangedAttack();
+				}
 			}
 		}
 	}
