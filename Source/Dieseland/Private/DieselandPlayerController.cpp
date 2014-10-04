@@ -17,6 +17,7 @@ ADieselandPlayerController::ADieselandPlayerController(const class FPostConstruc
 	//bShowMouseCursor = true;
 	//DefaultMouseCursor = EMouseCursor::Crosshairs;
 
+	HealthRegenTimer = 0;
 	bReplicates = true;
 	LingerCount = 0;
 	
@@ -57,6 +58,16 @@ void ADieselandPlayerController::UpdateCooldownTimers_Implementation(float Delta
 	if (Cast<ADieselandCharacter>(GetPawn()) != nullptr){
 		ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 
+		//reset to max health 
+		if (DieselandPawn->Health >= DieselandPawn->MaxHealth){
+			DieselandPawn->Health = DieselandPawn->MaxHealth;
+		}
+		HealthRegenTimer += DeltaSeconds;
+		//health regeneration
+		if (DieselandPawn->Health < DieselandPawn->MaxHealth && HealthRegenTimer >= 1){
+			DieselandPawn->Health += DieselandPawn->HealthRegeneration;
+			HealthRegenTimer = 0;
+		}
 		// Update all of the timers
 		if (DieselandPawn->BasicAttackTimer > 0.0f)
 		{

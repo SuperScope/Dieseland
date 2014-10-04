@@ -42,6 +42,14 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
 
+	// Public health value of this character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 MaxHealth;
+
+	// Health Regeneration
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	float HealthRegeneration;
+
 	// Public armor value of this character
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Armor;
@@ -105,6 +113,18 @@ public:
 	// The Cooldown for skill 3
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float SkillThreeCooldown;
+
+
+	// The Base Cooldown for skill 1
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		float BaseSkillOneCooldown;
+	// The Base Cooldown for skill 2
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		float BaseSkillTwoCooldown;
+	// The Base Cooldown for skill 3
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		float BaseSkillThreeCooldown;
+
 
 	//FireTrap Damage Timer
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Trap)

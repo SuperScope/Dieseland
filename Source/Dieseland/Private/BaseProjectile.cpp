@@ -69,7 +69,7 @@ void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 	Super::ReceiveActorBeginOverlap(OtherActor);
 	if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 	{
-		if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(FName(TEXT("Enemy"))))
+		if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")))
 		{
 		
 			Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);

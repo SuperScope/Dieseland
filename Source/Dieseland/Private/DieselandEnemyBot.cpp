@@ -76,6 +76,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	AttackZoneCollision->SetCapsuleRadius(AttackZone / 2.0f);
 	AttackZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+
 	//all of the variables needed for creating a collider for the projectile zone
 	ProjectileZoneCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("ProjectileZone"));
 	ProjectileZoneCollision->AttachParent = (Mesh);
