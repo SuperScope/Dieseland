@@ -21,7 +21,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 
 	// Set the starting health value
-	Health = 100;
+	Health = 550;
 
 	// Create the text component
 	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
@@ -76,6 +76,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	AttackZoneCollision->SetCapsuleRadius(AttackZone / 2.0f);
 	AttackZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+
 	//all of the variables needed for creating a collider for the projectile zone
 	ProjectileZoneCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("ProjectileZone"));
 	ProjectileZoneCollision->AttachParent = (Mesh);
@@ -93,7 +94,6 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	//here we set the dieseland aggresion to true
 	isAggressive = false;
 	LingerCount = 0;
-	
 }
 
 void ADieselandEnemyBot::Tick(float DeltaSeconds)
@@ -165,7 +165,7 @@ void ADieselandEnemyBot::MeleeAttack()
 }
 
 //here is the basic ranged attack for the AI
-void ADieselandEnemyBot::RangedAttack()
+void ADieselandEnemyBot::RangedAttack_Implementation()
 {
 	//here I do an if check to test and see if the Bot is not of melee type, if so then I proceed with the ranged attack.
 	if (!IsMelee){
@@ -187,13 +187,16 @@ void ADieselandEnemyBot::RangedAttack()
 				Projectile->ProjectileDamage = BasicAttackDamage;
 				Projectile->ServerActivateProjectile();
 
-				//Projectile->ProjectileMovement->SetVelocityInLocalSpace(Projectile->GetVelocity() + GetVelocity());
+				// Add the character's velocity to the projectile
+				//Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 			}
 		}
 	}
 }
-
-
+bool ADieselandEnemyBot::RangedAttack_Validate()
+{
+	return true;
+}
 
 void ADieselandEnemyBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
@@ -205,6 +208,9 @@ void ADieselandEnemyBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackTimer);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackActive);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackDamage);
+
+	DOREPLIFETIME(ADieselandEnemyBot, StatusEffects);
+	DOREPLIFETIME(ADieselandEnemyBot, StunRemaining);
 }
 
 void ADieselandEnemyBot::OnZoneEnter()
@@ -253,7 +259,10 @@ void ADieselandEnemyBot::OnProjectileZoneEnter()
 			if (!IsMelee)
 			{
 				this->CharacterMovement->MaxWalkSpeed = 0;
-				RangedAttack();
+				if (!StatusEffects.Contains(FString("Stunned")))
+				{
+					RangedAttack();
+				}
 			}
 		}
 	}
