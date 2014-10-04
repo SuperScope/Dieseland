@@ -43,8 +43,9 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	BombardmentRange = 600;
 	//Set our hitcount for bombardment
 	BombardmentHitCounter = 0;
-	//here I set the cooldown for Bombardment
-	SkillOneCooldown = 25.0f;
+	//here I set the cooldown for player abilities
+	SkillOneCooldown = 20.0f;
+	SkillTwoCooldown = 12.0f;
 
 	// Set up collision area for Bombardment attacks
 	BombardmentCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("BombardmentCollision"));
@@ -105,14 +106,17 @@ void AEngletonCharacter::SkillOne()
 	}
 }
 
+
 void AEngletonCharacter::SkillTwo()
 {
 
 }
 
+//here we a activate pulse
 void AEngletonCharacter::SkillThree()
 {
-	
+	PulseActivated = true;
+	ServerActivateParticle(PulseParticle);
 }
 
 void AEngletonCharacter::RangedAttack()
@@ -166,6 +170,7 @@ void AEngletonCharacter::UpdateTimers(float DeltaSeconds)
 		if (PulseTimer >= 4){
 			PulseActivated = false;
 			PulseTimer = 0;
+			this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
 		}
 	}//end of EngletonPulse
 
