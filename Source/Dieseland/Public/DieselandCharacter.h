@@ -203,6 +203,12 @@ public:
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
 	UParticleSystem* BasicAttackParticle;
 
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
+	TArray<FString> StatusEffects;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
+	float StunRemaining;
+
 protected:
 	virtual void Tick(float DeltaSeconds) override;
 
