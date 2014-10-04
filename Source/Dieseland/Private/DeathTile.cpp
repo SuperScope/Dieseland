@@ -2,6 +2,7 @@
 
 #include "Dieseland.h"
 #include "DeathTile.h"
+#include "DieselandGameMode.h"
 
 
 ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
@@ -30,6 +31,7 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     //Set values for rotation and scale
     DTRotation.Add(0, 22.5, 0);
     DTScale.Set(90, 90, 30);
+    SphereScale.Set(734, 734, 63);
     
     //Set Dummy Component as parent
     DeathTileMesh->AttachParent = DummyComponent;
@@ -39,32 +41,52 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     DeathTileMesh->SetWorldRotation(DTRotation);
     DeathTileMesh->SetWorldScale3D(DTScale);
     
-    //Check for enemies on tile
-    //TO DO: Function to detect collision and set EnemiesRemaining bool
+    //Set Sphere scale
+    SphereComponent->SetWorldScale3D(SphereScale);
     
-    //Check to see if enemies remaining
-    if(!EnemiesRemaining)
-    {
-        //Drop tile and switch it
-    }
+    //Set booleans at start
+    IsTileDown = false;
+    ReadyToRise = false;
+    
+    
     
     
 
 }
 
-void ADeathTile::OnOverlap(AActor* Enemy, UPrimitiveComponent* Sphere)
+void ADeathTile::ReceiveActorBeginOverlap(AActor* Enemy)
 {
-    if(Enemy->ActorHasTag(FName(TEXT("Enemy"))))
+    Super::ReceiveActorBeginOverlap(Enemy);
+    
+    if(Enemy->ActorHasTag(FName(TEXT("Player"))))
     {
         EnemiesRemaining = true;
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("The player is colliding!"));
-    }
-    else
-    {
-        EnemiesRemaining = false;
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("The player is not colliding!"));
-    }
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an ON screen message!"));    }
     
 }
+
+void ADeathTile::ReceiveActorEndOverlap(AActor* Enemy)
+{
+    Super::ReceiveActorEndOverlap(Enemy);
+    
+    if(Enemy->ActorHasTag(FName(TEXT("Player"))))
+    {
+        EnemiesRemaining = false;
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an OFF screen message!"));    }
+    
+}
+
+void ADeathTile::SwitchDeathTile()
+{
+    if(IsTileDown == true)
+    {
+        World->DestroyActor(this);
+        int32 RandomIndex = FMath::RandRange(0, 15);
+        UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, Cast <ADieselandGameMode> (World->GetAuthGameMode())->DeathTileArray[RandomIndex], TargetLocation, FRotator(0,0,0));
+        
+        
+    }
+}
+
 
 
