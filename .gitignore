@@ -42,3 +42,5 @@
 *.dat
 
 *.dep
+
+*.uasset
