@@ -43,12 +43,18 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 	// Set the starting health value
 	Health = 100;
+	BaseHealth = 100;
 	// Armor value
 	Armor = -1;
 
-	// Move Speed
-	MoveSpeed = 500;
+	// Base Move Speed
+	BaseMoveSpeed = 400;
+	this->CharacterMovement->MaxWalkSpeed = BaseMoveSpeed;
+	//baseDamage
+	BaseDamage = 10;
 
+	//baseCooldownSpeed
+	BaseCooldownSpeed = 2.0f;
 	// Create the text component
 	// TODO: Remove when UI is implemented
 	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
@@ -152,99 +158,29 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
-// CORE ATTRIBUTE CALCULATION FUNCTIONS
-
-//CoreAmt = Dexterity	
-void ADieselandCharacter::CalculateSpeed_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+// CORE ATTRIBUTE CALCULATION FUNCTION
+void ADieselandCharacter::CalculateStats_Implementation()
 {
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	if (this->ActorHasTag(FName(TEXT("Player"))))
 	{
-		Cast<ADieselandCharacter>(Target)->MoveSpeed = 400.0f + (CoreAmt*1.5f);
-		if (Role < ROLE_Authority)
-		{
-			//Cast<ADieselandPlayerController>(Controller)->		//ServerEditMoveSpeed?
-			//ServerEditHealth(Amt, Target);
-		}
+		//adjustments for health
+		Health = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
+		//show those adjustments
+		PlayerLabel->SetText(FString::FromInt(Health));
+		//adjustments for damage
+		BasicAttackDamage = BaseDamage + (Strength * 1.5f) + (Dexterity * .5f) + (Intelligence * .5f);
+		//adjusments for attackspeed
+		BasicAttackCooldown = BaseCooldownSpeed / (1 + (Dexterity/50));
+		//adjustments for movement Speed
+		MoveSpeed = BaseMoveSpeed + (Dexterity * 3);
+		this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
 	}
 }
 
-bool ADieselandCharacter::CalculateSpeed_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+bool ADieselandCharacter::CalculateStats_Validate()
 {
 	return true;
 }
-
-// CoreAmt = Dexterity
-void ADieselandCharacter::CalculateAttkSpeed_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-		Cast<ADieselandCharacter>(Target)->BasicAttackCooldown = 2.0f - (CoreAmt / 50.0f);
-		if (Role < ROLE_Authority)
-		{
-
-		}
-	}
-}
-
-bool ADieselandCharacter::CalculateAttkSpeed_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	return true;
-}
-
-// CoreAmt = constitution
-void ADieselandCharacter::CalculateArmor_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-		Cast<ADieselandCharacter>(Target)->Armor = (CoreAmt * 2.0f);
-		if (Role < ROLE_Authority)
-		{
-
-		}
-	}
-}
-
-bool ADieselandCharacter::CalculateArmor_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	return true;
-}
-
-// CoreAmt = Strength		SecondaryAmt = Dexterity		TertiaryAmt = Intelligence
-void ADieselandCharacter::CalculateDamage_Implementation(int32 CoreAmt, int32 SecondaryAmt, int32 TertiaryAmt, AActor* Target)
-{
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-		Cast<ADieselandCharacter>(Target)->BasicAttackDamage = (CoreAmt * 3.0f) + (SecondaryAmt * 0.3f) + (TertiaryAmt * 0.3);
-		if (Role < ROLE_Authority)
-		{
-
-		}
-	}
-}
-
-bool ADieselandCharacter::CalculateDamage_Validate(int32 CoreAmt, int32 SecondaryAmt, int32 TertiaryAmt, AActor* Target)
-{
-	return true;
-}
-
-// Might simply use "EditHealth" function
-void ADieselandCharacter::CalculateHealth_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-		Cast<ADieselandCharacter>(Target)->Health = (CoreAmt * 20.0f) + (SecondaryAmt * 3.0f);
-		if (Role < ROLE_Authority)
-		{
-
-		}
-	}
-}
-
-bool ADieselandCharacter::CalculateHealth_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	return true;
-}
-
 void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 {
 	if (Target->ActorHasTag(FName(TEXT("Player"))))
@@ -457,6 +393,10 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackDamage);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackReloadSpeed);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackAmmo);
+
+	DOREPLIFETIME(ADieselandCharacter, BaseDamage);
+	DOREPLIFETIME(ADieselandCharacter, BaseCooldownSpeed);
+	DOREPLIFETIME(ADieselandCharacter, BaseHealth);
 
 	// Necessary
 	DOREPLIFETIME(ADieselandCharacter, Strength);

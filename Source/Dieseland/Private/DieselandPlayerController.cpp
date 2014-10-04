@@ -171,6 +171,9 @@ void ADieselandPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Reload", IE_Pressed, this, &ADieselandPlayerController::ServerReload);
 
 	InputComponent->BindAction("UpgradeStrength", IE_Pressed, this, &ADieselandPlayerController::UpgradeStrength);
+	InputComponent->BindAction("UpgradeIntelligence", IE_Pressed, this, &ADieselandPlayerController::UpgradeIntelligence);
+	InputComponent->BindAction("UpgradeDexterity", IE_Pressed, this, &ADieselandPlayerController::UpgradeDexterity);
+	InputComponent->BindAction("UpgradeConstitution", IE_Pressed, this, &ADieselandPlayerController::UpgradeConstitution);
 
 	InputComponent->BindAction("Debug_MeleeSwap", IE_Released, this, &ADieselandPlayerController::SwapMelee);
 }
@@ -353,18 +356,67 @@ bool ADieselandPlayerController::ServerSkillThree_Validate()
 
 void ADieselandPlayerController::UpgradeStrength_Implementation()
 {
-	//TODO: Replace with real level up function
-	//ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	//if (DieselandPawn != nullptr){
-	//	DieselandPawn->BasicAttackDamage = DieselandPawn->BasicAttackDamage * 2;
-	//	GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Strength!"));
-	//}
+	//here is the real level up function
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr){
+		DieselandPawn->Strength += 3;
+		DieselandPawn->CalculateStats();
+		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Strength!"));
+	}
 }
+
 
 bool ADieselandPlayerController::UpgradeStrength_Validate()
 {
 	return true;
 }
+
+void ADieselandPlayerController::UpgradeIntelligence_Implementation()
+{
+	//here is the real level up function
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr){
+		DieselandPawn->Intelligence += 3;
+		DieselandPawn->CalculateStats();
+		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Intelligence!"));
+	}
+}
+
+bool ADieselandPlayerController::UpgradeIntelligence_Validate()
+{
+	return true;
+}
+void ADieselandPlayerController::UpgradeDexterity_Implementation()
+{
+	//here is the real level up function
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr){
+		DieselandPawn->Dexterity += 3;
+		DieselandPawn->CalculateStats();
+		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Dexterity!"));
+	}
+}
+
+bool ADieselandPlayerController::UpgradeDexterity_Validate()
+{
+	return true;
+}
+void ADieselandPlayerController::UpgradeConstitution_Implementation()
+{
+	//here we upgrade the players constitution
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr){
+		DieselandPawn->Constitution += 3;
+		DieselandPawn->CalculateStats();
+		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Constitution!"));
+	}
+}
+
+bool ADieselandPlayerController::UpgradeConstitution_Validate()
+{
+	return true;
+}
+
 
 void ADieselandPlayerController::SwapMelee_Implementation()
 {

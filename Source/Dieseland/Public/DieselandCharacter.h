@@ -50,10 +50,22 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float MoveSpeed;
 
+	// The movement speed of a character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float BaseMoveSpeed;
+
 	// Damage amount for the basic attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	int32 BasicAttackDamage;
 
+
+	// Setting base stats
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		int32 BaseDamage;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		int32 BaseCooldownSpeed;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		int32 BaseHealth;
 	// Current ammo for basic ranged attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	int32 BasicAttackAmmo;
@@ -129,21 +141,10 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		int32 Intelligence;
 
-	///TODO : PARAMETERS MUST MATCH FORMULAS
-	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
-	void CalculateSpeed(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
 
+	//One forumla > many <3
 	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
-	void CalculateAttkSpeed(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
-
-	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
-	void CalculateArmor(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
-
-	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
-	void CalculateDamage(int32 CoreAmt, int32 SecondaryAmt, int32 TertiaryAmt, AActor* Target);
-
-	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
-	void CalculateHealth(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
+	void CalculateStats();
 
 	//CORE ATTRIBUTES ENDS HERE
 

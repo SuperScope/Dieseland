@@ -61,6 +61,9 @@ class DIESELAND_API ADieselandEnemyAI : public AAIController
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerMeleeAttack();
 
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float GameTimer;
+
 	uint8 EnemyKeyID;
 	uint8 EnemyKeyLocationID;
 	uint8 SpawnLocationID;
