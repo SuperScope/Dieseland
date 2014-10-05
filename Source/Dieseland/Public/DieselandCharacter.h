@@ -42,6 +42,14 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
 
+	// Public health value of this character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 MaxHealth;
+
+	// Health Regeneration
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	float HealthRegeneration;
+
 	// Public armor value of this character
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Armor;
@@ -50,10 +58,22 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float MoveSpeed;
 
+	// The movement speed of a character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float BaseMoveSpeed;
+
 	// Damage amount for the basic attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	int32 BasicAttackDamage;
 
+
+	// Setting base stats
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	int32 BaseDamage;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float BaseCooldownSpeed;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	int32 BaseHealth;
 	// Current ammo for basic ranged attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	int32 BasicAttackAmmo;
@@ -66,7 +86,7 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	bool IsMelee;
 
-	// The range of this character's melee attack
+	// The range of this character's Melee Attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float MeleeRange;
 
@@ -93,6 +113,18 @@ public:
 	// The Cooldown for skill 3
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float SkillThreeCooldown;
+
+
+	// The Base Cooldown for skill 1
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		float BaseSkillOneCooldown;
+	// The Base Cooldown for skill 2
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		float BaseSkillTwoCooldown;
+	// The Base Cooldown for skill 3
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		float BaseSkillThreeCooldown;
+
 
 	//FireTrap Damage Timer
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Trap)
@@ -129,39 +161,28 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		int32 Intelligence;
 
-	///TODO : PARAMETERS MUST MATCH FORMULAS
-	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
-	void CalculateSpeed(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
 
+	//One forumla > many <3
 	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
-	void CalculateAttkSpeed(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
-
-	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
-	void CalculateArmor(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
-
-	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
-	void CalculateDamage(int32 CoreAmt, int32 SecondaryAmt, int32 TertiaryAmt, AActor* Target);
-
-	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
-	void CalculateHealth(int32 CoreAmt, int32 SecondaryAmt, AActor* Target);
+	void CalculateStats();
 
 	//CORE ATTRIBUTES ENDS HERE
 
 	// Combat functions
 	UFUNCTION(BlueprintCallable, Category = Combat)
-	void RangedAttack();
+	virtual void RangedAttack();
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
-	void MeleeAttack();
+	virtual void MeleeAttack();
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
-	void SkillOne();
+	virtual void SkillOne();
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
-	void SkillTwo();
+	virtual void SkillTwo();
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
-	void SkillThree();
+	virtual void SkillThree();
 
 	// Called when AimRotation is replicated
 	UFUNCTION()
@@ -201,6 +222,12 @@ public:
 
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
 	UParticleSystem* BasicAttackParticle;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
+	TArray<FString> StatusEffects;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
+	float StunRemaining;
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;
