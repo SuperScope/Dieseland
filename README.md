@@ -27,7 +27,7 @@ Official Documentation for Compiling
 
 Compiling and Building (Windows)
 --------------
-1. Install [Microsoft Visual Studio 2013] (http://www.microsoft.com/en-us/download/details.aspx?id=40787)
+1. Install [Microsoft Visual Studio 2013] (http://www.microsoft.com/en-us/download/details.aspx?id=43729)
 2. Right click on the .uproject file in the main folder
 3. Select "Generate visual studio project files"
 4. Open the generated .sln file in Visual Studio 2013
