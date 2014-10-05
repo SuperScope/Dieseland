@@ -93,7 +93,7 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 		void MeleeAttack();
 
 	//combat functions
-	UFUNCTION(BlueprintCallable, Category = Combat)
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = Combat)
 		void RangedAttack();
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
@@ -119,6 +119,11 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	bool BasicAttackActive;
 
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
+		TArray<FString> StatusEffects;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
+		float StunRemaining;
 
 protected:
 

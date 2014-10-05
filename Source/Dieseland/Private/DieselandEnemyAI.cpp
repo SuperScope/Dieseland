@@ -20,8 +20,9 @@ ADieselandEnemyAI::ADieselandEnemyAI(const class FPostConstructInitializePropert
 
 	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true;
+	GameTimer = 0;
 
-	Tags.Add(FName("Player"));
+	Tags.Add(FName("Enemy"));
 }
 
 //in this function the AI sets its enemy id and detection id, from there
@@ -43,30 +44,28 @@ void ADieselandEnemyAI::Possess(class APawn* InPawn)
 void ADieselandEnemyAI::SearchForSpawnLocation()
 {
 
-
-	ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
-	if (BotPawn->isAggressive == false){
-		EnemyKeyLocationID = BlackboardComp->GetKeyID("Destination");
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
-		BlackboardComp->SetValueAsVector(EnemyKeyLocationID, SpawnLocation);
-	}
-	else{
-		SearchForEnemy();
+	if (Cast<ADieselandEnemyBot>(GetPawn()) != nullptr){
+		ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
+		if (BotPawn->isAggressive == false){
+			EnemyKeyLocationID = BlackboardComp->GetKeyID("Destination");
+			BlackboardComp->SetValueAsVector(EnemyKeyLocationID, SpawnLocation);
+		}
+		else{
+			SearchForEnemy();
+		}
 	}
 }
 //this function runs at the start so that I can get necessary enemy locations
 void ADieselandEnemyAI::BeginPlay()
 {
-	Super::BeginPlay();
-	ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
-	SpawnLocationID = BlackboardComp->GetKeyID("SpawnPoint");
-	SpawnLocation = BotPawn->GetActorLocation();
-	BlackboardComp->SetValueAsVector(SpawnLocationID, BotPawn->GetActorLocation());
+	//Super::BeginPlay();
+
 
 }
 //here the AI searches for an enemy player to attack
 void ADieselandEnemyAI::SearchForEnemy()
 {
+
 	ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
 	APawn* MyBot = GetPawn();
 	if (MyBot == NULL || BotPawn->isAggressive == false)
@@ -128,7 +127,10 @@ bool ADieselandEnemyAI::ServerMeleeAttack_Validate()
 void ADieselandEnemyAI::ServerMeleeAttack_Implementation()
 {
 	ADieselandEnemyBot* DieselandPawn = Cast<ADieselandEnemyBot>(GetPawn());
-	DieselandPawn->MeleeAttack();
+	if (!DieselandPawn->StatusEffects.Contains(FString("Stunned")))
+	{
+		DieselandPawn->MeleeAttack();
+	}
 }
 
 void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
@@ -154,6 +156,28 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 			ADieselandEnemyBot* DieselandPawn = Cast<ADieselandEnemyBot>(GetPawn());
 				DieselandPawn->BasicAttackTimer = DieselandPawn->BasicAttackCooldown;
 		}
+
+		if (DieselandPawn->StunRemaining > 0.0f)
+		{
+			DieselandPawn->StunRemaining -= DeltaSeconds;
+			if (DieselandPawn->StunRemaining <= 0.0f)
+			{
+				DieselandPawn->StunRemaining = 0.0f;
+				DieselandPawn->StatusEffects.Remove(FString("Stunned"));
+
+				//TODO: Replace with calculated speeds based on enemy type/level
+				DieselandPawn->CharacterMovement->MaxWalkSpeed = 400.0f;
+				DieselandPawn->CharacterMovement->RotationRate = FRotator(0.0f, 360.0f, 0.0f);
+			}
+		}
+	}
+	GameTimer += DeltaSeconds;
+	if (GameTimer > 1 && GameTimer < 2)
+	{
+		ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
+		SpawnLocationID = BlackboardComp->GetKeyID("SpawnPoint");
+		SpawnLocation = BotPawn->GetActorLocation();
+		BlackboardComp->SetValueAsVector(SpawnLocationID, BotPawn->GetActorLocation());
 	}
 }
 
@@ -161,7 +185,14 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 void ADieselandEnemyAI::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	UpdateCooldownTimers(DeltaTime);
+	
+}
 
+void ADieselandEnemyAI::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Replicate to everyone
+	DOREPLIFETIME(ADieselandEnemyAI, GameTimer);
 }
