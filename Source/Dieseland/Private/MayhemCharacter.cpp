@@ -32,17 +32,28 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 
 	//here I adjust those base values based on his stats
 	//adjustments for health
-	Health = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
+	MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
+	Health = MaxHealth;
+	HealthRegeneration = 1.0f + (Constitution / 10.0f) + (Strength / 20.0f);
 	//show those adjustments
 	PlayerLabel->SetText(FString::FromInt(Health));
 	//adjustments for damage
 	BasicAttackDamage = BaseDamage + (Strength * 1.5f) + (Dexterity * .5f) + (Intelligence * .5f);
+
+	BaseSkillOneCooldown = 25.0f;
+	BaseSkillTwoCooldown = 16.0f;
+	BaseSkillThreeCooldown = 12.0f;
+
 	//adjusments for attackspeed
 	BasicAttackCooldown = BaseCooldownSpeed / (1 + (Dexterity / 50));
+	SkillOneCooldown = BaseSkillOneCooldown / (1 + Intelligence / 100);
+	SkillTwoCooldown = BaseSkillTwoCooldown / (1 + Intelligence / 100);
+	SkillThreeCooldown = BaseSkillThreeCooldown / (1 + Intelligence / 100);
+
 	//adjustments for movement Speed
 	MoveSpeed = BaseMoveSpeed + (Dexterity * 3);
 	this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
-	//here I set melee to false so that Engleton only uses ranged attacks
+	//here I set melee to true so that Mayhem only uses ranged attacks
 	IsMelee = true;
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> MayhemSkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_MayhemSkullCrusher_WIP.Unreal_Particle_MayhemSkullCrusher_WIP'"));
@@ -65,7 +76,19 @@ void AMayhemCharacter::UpdateDurationTimers_Implementation(float DeltaSeconds)
 		if (IronArmorTimer <= 0.0f)
 		{
 			IronArmorTimer = 0.0f;
+
+			MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
+
 			//reset stats here
+			if (Health > MaxHealth){
+				Health = MaxHealth;
+			}
+
+			HealthRegeneration -= IronArmorRegenBuff;
+
+			IronArmorHealthBuff = 0.0f;
+			IronArmorRegenBuff = 0.0f;
+			
 		}
 	}
 	if (RageTimer > 0.0f)
@@ -75,6 +98,7 @@ void AMayhemCharacter::UpdateDurationTimers_Implementation(float DeltaSeconds)
 		{
 			RageTimer = 0.0f;
 			//reset stats here
+			
 		}
 	}
 }
@@ -154,6 +178,17 @@ void AMayhemCharacter::SkillTwo()
 
 void AMayhemCharacter::SkillThree()
 {
+	//TODO: Replace with scaling based on Const??
+	IronArmorHealthBuff = MaxHealth * 0.25f;
+	IronArmorRegenBuff = HealthRegeneration * 0.25f;
+
+	IronArmorTimer = IronArmorDuration;
+
+	MaxHealth += IronArmorHealthBuff;
+	Health += IronArmorHealthBuff;
+
+	HealthRegeneration += IronArmorRegenBuff;
+
 	
 }
 

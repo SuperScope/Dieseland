@@ -20,8 +20,10 @@ public:
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float IronArmorTimer;
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
-	float IronArmorBuff;
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = Combat)
+	float IronArmorHealthBuff;
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = Combat)
+	float IronArmorRegenBuff;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float IronArmorDuration;
 
