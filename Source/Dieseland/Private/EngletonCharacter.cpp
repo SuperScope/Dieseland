@@ -30,7 +30,7 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	//adjustments for health
 	MaxHealth= BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
 	Health = MaxHealth;
-	HealthRegeneration = 1 + (Constitution / 2.5f) + (Strength / 5.0f);
+	HealthRegeneration = 1.0f + (Constitution / 10.0f) + (Strength / 20.0f);
 	//show those adjustments
 	PlayerLabel->SetText(FString::FromInt(Health));
 	//adjustments for damage

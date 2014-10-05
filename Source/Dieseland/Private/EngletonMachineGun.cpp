@@ -3,6 +3,9 @@
 #include "Dieseland.h"
 #include "EngletonMachineGun.h"
 #include "EngletonCharacter.h"
+#include "ParticleDefinitions.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 
 
 AEngletonMachineGun::AEngletonMachineGun(const class FPostConstructInitializeProperties& PCIP)
@@ -18,9 +21,13 @@ AEngletonMachineGun::AEngletonMachineGun(const class FPostConstructInitializePro
 	//ProjectileDamage = DieselanPawn->BasicAttackDamage;
 
 	//TODO the correct particle effect here
-	/*
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/MovingBulletTest_WIP.MovingBulletTest_WIP'"));
-	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));*/
-}
+	
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonCrazyLaser_WIP.Unreal_Particle_EngletonCrazyLaser_WIP'"));
+	Particle->Template = ParticleSystemAsset.Object;
 
+	//ParticleSystemAsset = (TEXT("ParticleSystem'/Game/Particles/Test/MovingBulletTest_WIP.MovingBulletTest_WIP''"));
+
+
+	
+}
 
