@@ -380,6 +380,9 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandCharacter, Health);
+	DOREPLIFETIME(ADieselandCharacter, MaxHealth);
+	DOREPLIFETIME(ADieselandCharacter, HealthRegeneration);
+
 	DOREPLIFETIME(ADieselandCharacter, AimMesh);
 	DOREPLIFETIME(ADieselandCharacter, AimRotation);
 

@@ -30,7 +30,9 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float RageTimer;
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
-	float RageBuff;
+	float RageAttkSpeedBuff;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float RageMoveSpeedBuff;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float RageDuration;
 

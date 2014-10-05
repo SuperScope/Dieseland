@@ -77,14 +77,13 @@ void AMayhemCharacter::UpdateDurationTimers_Implementation(float DeltaSeconds)
 		{
 			IronArmorTimer = 0.0f;
 
-			MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
-
 			//reset stats here
+			MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
+			HealthRegeneration -= IronArmorRegenBuff;
+
 			if (Health > MaxHealth){
 				Health = MaxHealth;
 			}
-
-			HealthRegeneration -= IronArmorRegenBuff;
 
 			IronArmorHealthBuff = 0.0f;
 			IronArmorRegenBuff = 0.0f;
@@ -97,7 +96,13 @@ void AMayhemCharacter::UpdateDurationTimers_Implementation(float DeltaSeconds)
 		if (RageTimer <= 0.0f)
 		{
 			RageTimer = 0.0f;
+
 			//reset stats here
+			BasicAttackCooldown += RageAttkSpeedBuff;
+			CharacterMovement->MaxWalkSpeed -= RageMoveSpeedBuff;
+
+			RageAttkSpeedBuff = 0.0f;
+			RageMoveSpeedBuff = 0.0f;
 			
 		}
 	}
@@ -173,14 +178,20 @@ void AMayhemCharacter::SkillOne()
 
 void AMayhemCharacter::SkillTwo()
 {
-	
+	RageMoveSpeedBuff = (CharacterMovement->MaxWalkSpeed * .2f) + (Strength * .06f);
+	RageAttkSpeedBuff = (BasicAttackCooldown * .2f) + (Strength * .06f);
+
+	BasicAttackCooldown -= RageAttkSpeedBuff;
+	CharacterMovement->MaxWalkSpeed += RageMoveSpeedBuff;
+
+	RageTimer = RageDuration;
 }
 
 void AMayhemCharacter::SkillThree()
 {
 	//TODO: Replace with scaling based on Const??
-	IronArmorHealthBuff = MaxHealth * 0.25f;
-	IronArmorRegenBuff = HealthRegeneration * 0.25f;
+	IronArmorHealthBuff = (float)MaxHealth * 0.25f;
+	IronArmorRegenBuff = (float)HealthRegeneration * 0.25f;
 
 	IronArmorTimer = IronArmorDuration;
 
