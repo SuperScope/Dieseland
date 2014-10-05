@@ -15,10 +15,13 @@ class DIESELAND_API AScrapBox : public AActor
 
 	// Displayed Mesh
 	UPROPERTY(Category = Combat, BlueprintReadOnly, VisibleAnywhere)
-	TSubobjectPtr<class UStaticMeshComponent> Mesh;
+	TSubobjectPtr<class UDestructibleComponent> Mesh;
 
 	UPROPERTY(Replicated, Category = Visual, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UParticleSystemComponent> Particle;
+
+	UFUNCTION(Reliable, NetMulticast, WithValidation, BlueprintCallable, Category = Gameplay)
+	void DestroyCrate(AActor* Causer);
 
 	virtual void ReceiveActorBeginOverlap(AActor* OtherActor) override;
 

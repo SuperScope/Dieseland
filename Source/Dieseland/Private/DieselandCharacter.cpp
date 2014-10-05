@@ -9,6 +9,7 @@
 #include "ParticleDefinitions.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "ScrapBox.h"
 
 ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
@@ -205,7 +206,10 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 	{
 		ServerDamageEnemy(Amt, Target);
 	}
-
+	else if (Target->ActorHasTag(FName(TEXT("ScrapBox"))))
+	{
+		Cast<AScrapBox>(Target)->DestroyCrate(this);
+	}
 }
 
 void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Target)
