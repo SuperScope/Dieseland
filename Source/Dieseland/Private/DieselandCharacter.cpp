@@ -205,6 +205,7 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 	{
 		ServerDamageEnemy(Amt, Target);
 	}
+
 }
 
 void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Target)
