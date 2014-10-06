@@ -52,7 +52,7 @@ public:
 
 	// Public armor value of this character
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	int32 Armor;
+	int32 Scrap;
 
 	// The movement speed of a character
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
@@ -231,6 +231,7 @@ public:
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;
+	UClass* ScrapClass;
 
 };
 

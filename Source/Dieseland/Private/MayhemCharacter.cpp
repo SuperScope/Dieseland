@@ -124,7 +124,7 @@ void AMayhemCharacter::MeleeAttack()
 	for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)
 	{
 		CurActor = ActorsInMeleeRange[b];
-		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
+		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))) || CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))) continue;
 		if (!CurActor->IsValidLowLevel()) continue;
 
 		if (Role == ROLE_Authority && CurActor != this)
@@ -178,7 +178,7 @@ void AMayhemCharacter::SkillOne()
 
 void AMayhemCharacter::SkillTwo()
 {
-	RageMoveSpeedBuff = (CharacterMovement->MaxWalkSpeed * .2f) + (Strength * .06f);
+	RageMoveSpeedBuff = (CharacterMovement->MaxWalkSpeed * .5f) + (Strength * .06f);
 	RageAttkSpeedBuff = (BasicAttackCooldown * .2f) + (Strength * .06f);
 
 	BasicAttackCooldown -= RageAttkSpeedBuff;
@@ -199,8 +199,6 @@ void AMayhemCharacter::SkillThree()
 	Health += IronArmorHealthBuff;
 
 	HealthRegeneration += IronArmorRegenBuff;
-
-	
 }
 
 void AMayhemCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

@@ -80,6 +80,8 @@ public:
 
 protected:
 
+	UClass* ScrapClass;
+
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
