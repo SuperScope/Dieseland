@@ -59,7 +59,7 @@ void AScrapBox::DestroyCrate_Implementation(AActor* Causer)
 		if (World)
 		{
 			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = Cast<ADieselandCharacter>(Causer);
+			SpawnParams.Owner = Cast<ADieselandCharacter>(Causer); 
 			SpawnParams.Instigator = Instigator;
 			for (int32 x = 0; x < ScrapAmt; x++)
 			{

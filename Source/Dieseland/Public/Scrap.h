@@ -20,8 +20,8 @@ class DIESELAND_API AScrap : public AActor
 	UPROPERTY(Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UCapsuleComponent> ScrapCollision;
 
-	UPROPERTY(Category = Combat, BlueprintReadOnly, VisibleAnywhere)
-	TSubobjectPtr<class UCapsuleComponent> ScrapCollectionArea;
+	/*UPROPERTY(Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	TSubobjectPtr<class UCapsuleComponent> ScrapCollectionArea;*/
 
 	UFUNCTION(BlueprintCallable, Reliable, WithValidation, NetMulticast, Category = Gameplay)
 	void CollectScrap(AActor* OtherActor);
@@ -29,6 +29,8 @@ class DIESELAND_API AScrap : public AActor
 	TArray<AActor*> ActorsInRange;
 
 	AActor* TargetedActor;
+
+	virtual void ReceiveActorBeginOverlap(AActor* OtherActor);
 
 	virtual void ReceiveHit(UPrimitiveComponent * MyComp, 
 		AActor * Other, 

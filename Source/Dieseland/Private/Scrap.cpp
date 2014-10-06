@@ -24,11 +24,11 @@ AScrap::AScrap(const class FPostConstructInitializeProperties& PCIP)
 	ScrapCollision->AttachTo(Mesh);
 	ScrapCollision->SetCollisionProfileName(FName(TEXT("OverlapAll")));
 
-	ScrapCollectionArea = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("ScrapCollectionArea"));
-	ScrapCollectionArea->SetCapsuleHalfHeight(1000.0f);
-	ScrapCollectionArea->SetCapsuleRadius(1000.0f);
-	ScrapCollectionArea->AttachTo(Mesh);
-	ScrapCollectionArea->SetCollisionProfileName(FName(TEXT("OverlapAll")));
+	//ScrapCollectionArea = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("ScrapCollectionArea"));
+	//ScrapCollectionArea->SetCapsuleHalfHeight(1000.0f);
+	//ScrapCollectionArea->SetCapsuleRadius(1000.0f);
+	//ScrapCollectionArea->AttachTo(Mesh);
+	//ScrapCollectionArea->SetCollisionProfileName(FName(TEXT("OverlapAll")));
 
 	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true;
@@ -45,11 +45,11 @@ void AScrap::ReceiveBeginPlay()
 
 void AScrap::Tick(float DeltaSeconds)
 {
-	ScrapCollectionArea->GetOverlappingActors(ActorsInRange);
+	//ScrapCollectionArea->GetOverlappingActors(ActorsInRange);
 
 	if (TargetedActor == nullptr)
 	{
-		for (int32 x = 0; x < ActorsInRange.Num(); x++)
+		/*for (int32 x = 0; x < ActorsInRange.Num(); x++)
 		{
 			if (ActorsInRange[x]->ActorHasTag(FName(TEXT("Player"))))
 			{
@@ -58,7 +58,7 @@ void AScrap::Tick(float DeltaSeconds)
 				break;
 			}
 
-		}
+		}*/
 	}
 	else if (TargetedActor != nullptr)
 	{
@@ -83,12 +83,24 @@ void AScrap::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
+void AScrap::ReceiveActorBeginOverlap(AActor* OtherActor)
+{
+	if (OtherActor->ActorHasTag(FName(TEXT("Player"))))
+	{
+		CollectScrap(OtherActor);
+	}
+
+	Super::ReceiveActorBeginOverlap(OtherActor);
+}
+
 void AScrap::ReceiveHit(UPrimitiveComponent * MyComp, AActor * Other, UPrimitiveComponent * OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult & Hit)
 {
 	if (Other->ActorHasTag(FName(TEXT("Player"))))
 	{
 		CollectScrap(Other);
 	}
+
+	Super::ReceiveHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 }
 
 void AScrap::CollectScrap_Implementation(AActor* OtherActor)
