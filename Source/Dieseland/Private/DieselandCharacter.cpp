@@ -1,6 +1,7 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 
 #include "Dieseland.h"
+#include "DieselandStaticLibrary.h"
 #include "DieselandCharacter.h"
 #include "DieselandPlayerController.h"
 #include "DieselandEnemyBot.h"
@@ -9,6 +10,8 @@
 #include "ParticleDefinitions.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "ScrapBox.h"
+#include "Scrap.h"
 
 ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
@@ -42,13 +45,21 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	TopDownCameraComponent->bUseControllerViewRotation = false; // Camera does not rotate relative to arm
 
 	// Set the starting health value
-	Health = 100;
-	// Armor value
-	Armor = -1;
+	MaxHealth = 700;
+	Health = MaxHealth;
+	BaseHealth = 100;
 
-	// Move Speed
-	MoveSpeed = 500;
+	// Scrap value
+	Scrap = 0;
 
+	// Base Move Speed
+	BaseMoveSpeed = 400;
+	this->CharacterMovement->MaxWalkSpeed = BaseMoveSpeed;
+	//baseDamage
+	BaseDamage = 10;
+
+	//baseCooldownSpeed
+	BaseCooldownSpeed = 2.0f;
 	// Create the text component
 	// TODO: Remove when UI is implemented
 	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
@@ -85,7 +96,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	RangedRange = 1200.0f;
 
 	// Cooldown values
-	BasicAttackCooldown = 0.2f;
+	BasicAttackCooldown = 1.0f;
 	BasicAttackReloadSpeed = 3.0f;
 	SkillOneCooldown = 2.0f;
 	SkillTwoCooldown = 3.5f;
@@ -133,13 +144,19 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	ParticleSystem->SetHiddenInGame(false);
 	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	
+	//Find the scrap blueprint's class
+	static ConstructorHelpers::FObjectFinder<UBlueprint> ScrapBlueprint(TEXT("Blueprint'/Game/Blueprints/Scrap_BP.Scrap_BP'"));
+	if (ScrapBlueprint.Object)
+	{
+		ScrapClass = (UClass*)ScrapBlueprint.Object->GeneratedClass;
+	}
+
 	// Ensure replication
 	bReplicates = true;
 	AimMesh->SetIsReplicated(true);
 	Mesh->SetIsReplicated(true);
 	ParticleSystem->SetIsReplicated(true);
-
+	SetActorTickEnabled(true);
 	this->SetOwner(Controller);
 }
 
@@ -152,99 +169,36 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
-// CORE ATTRIBUTE CALCULATION FUNCTIONS
-
-//CoreAmt = Dexterity	
-void ADieselandCharacter::CalculateSpeed_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+// CORE ATTRIBUTE CALCULATION FUNCTION
+void ADieselandCharacter::CalculateStats_Implementation()
 {
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	if (this->ActorHasTag(FName(TEXT("Player"))))
 	{
-		Cast<ADieselandCharacter>(Target)->MoveSpeed = 400.0f + (CoreAmt*1.5f);
-		if (Role < ROLE_Authority)
-		{
-			//Cast<ADieselandPlayerController>(Controller)->		//ServerEditMoveSpeed?
-			//ServerEditHealth(Amt, Target);
-		}
+		//adjustments for health
+		MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
+		//adjustments for health regeneration
+		HealthRegeneration = 1.0f + (Constitution / 10.0f) + (Strength / 20.0f);
+		//show those adjustments
+		PlayerLabel->SetText(FString::FromInt(Health));
+		//adjustments for damage
+		BasicAttackDamage = BaseDamage + (Strength * 1.5f) + (Dexterity * .5f) + (Intelligence * .5f);
+		//adjusments for attackspeed
+		BasicAttackCooldown = BaseCooldownSpeed / (1 + (Dexterity/50));
+		//adjustments for movement Speed
+		MoveSpeed = BaseMoveSpeed + (Dexterity * 3);
+		this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
+
+		//adjusments for ability cooldown speed
+		SkillOneCooldown = BaseSkillOneCooldown / (1 + Intelligence / 100);
+		SkillTwoCooldown = BaseSkillTwoCooldown / (1 + Intelligence / 100);
+		SkillThreeCooldown = BaseSkillThreeCooldown / (1 + Intelligence / 100);
 	}
 }
 
-bool ADieselandCharacter::CalculateSpeed_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
+bool ADieselandCharacter::CalculateStats_Validate()
 {
 	return true;
 }
-
-// CoreAmt = Dexterity
-void ADieselandCharacter::CalculateAttkSpeed_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-		Cast<ADieselandCharacter>(Target)->BasicAttackCooldown = 2.0f - (CoreAmt / 50.0f);
-		if (Role < ROLE_Authority)
-		{
-
-		}
-	}
-}
-
-bool ADieselandCharacter::CalculateAttkSpeed_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	return true;
-}
-
-// CoreAmt = constitution
-void ADieselandCharacter::CalculateArmor_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-		Cast<ADieselandCharacter>(Target)->Armor = (CoreAmt * 2.0f);
-		if (Role < ROLE_Authority)
-		{
-
-		}
-	}
-}
-
-bool ADieselandCharacter::CalculateArmor_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	return true;
-}
-
-// CoreAmt = Strength		SecondaryAmt = Dexterity		TertiaryAmt = Intelligence
-void ADieselandCharacter::CalculateDamage_Implementation(int32 CoreAmt, int32 SecondaryAmt, int32 TertiaryAmt, AActor* Target)
-{
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-		Cast<ADieselandCharacter>(Target)->BasicAttackDamage = (CoreAmt * 3.0f) + (SecondaryAmt * 0.3f) + (TertiaryAmt * 0.3);
-		if (Role < ROLE_Authority)
-		{
-
-		}
-	}
-}
-
-bool ADieselandCharacter::CalculateDamage_Validate(int32 CoreAmt, int32 SecondaryAmt, int32 TertiaryAmt, AActor* Target)
-{
-	return true;
-}
-
-// Might simply use "EditHealth" function
-void ADieselandCharacter::CalculateHealth_Implementation(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-		Cast<ADieselandCharacter>(Target)->Health = (CoreAmt * 20.0f) + (SecondaryAmt * 3.0f);
-		if (Role < ROLE_Authority)
-		{
-
-		}
-	}
-}
-
-bool ADieselandCharacter::CalculateHealth_Validate(int32 CoreAmt, int32 SecondaryAmt, AActor* Target)
-{
-	return true;
-}
-
 void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 {
 	if (Target->ActorHasTag(FName(TEXT("Player"))))
@@ -262,6 +216,10 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 	{
 		ServerDamageEnemy(Amt, Target);
 	}
+	else if (Target->ActorHasTag(FName(TEXT("ScrapBox"))))
+	{
+		Cast<AScrapBox>(Target)->DestroyCrate(this);
+	}
 }
 
 void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Target)
@@ -269,9 +227,26 @@ void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Ta
 	Cast<ADieselandEnemyBot>(Target)->Health += Amt;
 	if (Cast<ADieselandEnemyBot>(Target)->Health <= 0)
 	{
+		FVector TempEnemyLoc = FVector(Target->GetActorLocation().X, Target->GetActorLocation().Y, Target->GetActorLocation().Z);
 		Target->Destroy();
+
+		//Spawn Scrap pieces here
+		UWorld* const World = GetWorld();
+		if (World)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = Instigator;
+			for (int32 x = 0; x < 5; x++)
+			{
+				UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(TempEnemyLoc.X, TempEnemyLoc.Y, TempEnemyLoc.Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f));
+
+				//Alternatively used to spawn c++ class
+				//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+			}
+		}
 	}
-}
+} 
 
 bool ADieselandCharacter::ServerDamageEnemy_Validate(int32 Amt, AActor* Target)
 {
@@ -300,7 +275,7 @@ void ADieselandCharacter::RangedAttack()
 			Projectile->ServerActivateProjectile();
 
 			// Add the character's velocity to the projectile
-			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 		}
 	}
 }
@@ -412,6 +387,7 @@ void ADieselandCharacter::SkillThree()
 		}
 	}
 }
+
 void ADieselandCharacter::OnRep_AimRotation()
 {
 	
@@ -435,6 +411,11 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandCharacter, Health);
+	DOREPLIFETIME(ADieselandCharacter, MaxHealth);
+	DOREPLIFETIME(ADieselandCharacter, HealthRegeneration);
+
+	DOREPLIFETIME(ADieselandCharacter, Scrap);
+
 	DOREPLIFETIME(ADieselandCharacter, AimMesh);
 	DOREPLIFETIME(ADieselandCharacter, AimRotation);
 
@@ -456,6 +437,13 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackDamage);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackReloadSpeed);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackAmmo);
+
+	DOREPLIFETIME(ADieselandCharacter, BaseDamage);
+	DOREPLIFETIME(ADieselandCharacter, BaseCooldownSpeed);
+	DOREPLIFETIME(ADieselandCharacter, BaseHealth);
+
+	DOREPLIFETIME(ADieselandCharacter, StatusEffects);
+	DOREPLIFETIME(ADieselandCharacter, StunRemaining);
 
 	// Necessary
 	DOREPLIFETIME(ADieselandCharacter, Strength);

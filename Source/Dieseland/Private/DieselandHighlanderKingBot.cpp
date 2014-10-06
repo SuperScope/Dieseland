@@ -5,6 +5,9 @@
 #include "UnrealNetwork.h"
 #include "DieselandEnemyAI.h"
 #include "DieselandHighlanderKingBot.h"
+#include "ParticleDefinitions.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 
 
 
@@ -13,6 +16,7 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 	: Super(PCIP)
 {
 	CannonRange = 800;
+	CannonAttackDamage = 10;
 
 	//all of the variables needed for creating a collider
 	CannonZoneCollision = PCIP.CreateDefaultSubobject<UBoxComponent>(this, TEXT("CannonZone"));
@@ -23,22 +27,28 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 	//CannonZoneCollision->SetCapsuleHalfHeight(CannonRange / 2.0f);
 	//CannonZoneCollision->SetCapsuleRadius(CannonRange / 2.0f);
 	CannonZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// Timer values
+	CannonDamageUpdate = 0.2f;
+
+	AttackPatternTimer = 20.0f;
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> BeamParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/BeamDataDistance_WIP.BeamDataDistance_WIP'"));
+
+	this->BeamParticle = BeamParticleAsset.Object;
+
+
+	//here is what we use to setup our particle system
+	ParticleSystem = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
+	ParticleSystem->Template = BeamParticle;
+	ParticleSystem->AttachTo(RootComponent);
+	ParticleSystem->bAutoActivate = false;
+	ParticleSystem->SetHiddenInGame(false);
+	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ParticleSystem->SetIsReplicated(true);
 
 }
 
-void ADieselandHighlanderKingBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-
-	// Replicate to everyone
-	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonZoneCollision);
-	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonRange);
-	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonDamagePerSecond);
-
-
-}
-
+//the function for it's cannon attack. This happens only once over a period set of time
 void ADieselandHighlanderKingBot::CannonAttack()
 {
 	ADieselandEnemyAI* BotController = Cast<ADieselandEnemyAI>(Controller);
@@ -55,7 +65,41 @@ void ADieselandHighlanderKingBot::CannonAttack()
 		if (!CurActor->IsValidLowLevel()) continue;
 
 		if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player")))){
-			EditHealth(-1 * BasicAttackDamage, CurActor);
+			EditHealth(-1 * CannonAttackDamage, CurActor);
+			//here I check to see if it's hte first time firing for the cannon, if so I activate the particle effect.
+			if (CannonAttackTicks == 0){
+				ServerActivateParticle(BeamParticle);
+			}
+			CannonAttackTicks++;
 		}
 	}
+}
+
+void ADieselandHighlanderKingBot::ServerActivateParticle_Implementation(UParticleSystem* Particle)
+{
+	ParticleSystem->SetTemplate(Particle);
+	ParticleSystem->ActivateSystem();
+}
+
+bool ADieselandHighlanderKingBot::ServerActivateParticle_Validate(UParticleSystem* Particle)
+{
+	return true;
+}
+
+
+void ADieselandHighlanderKingBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+
+	// Replicate to everyone
+	DOREPLIFETIME(ADieselandHighlanderKingBot, ParticleSystem);
+	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonZoneCollision);
+	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonRange);
+	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonDamageUpdate);
+	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonAttackDamage);
+	DOREPLIFETIME(ADieselandHighlanderKingBot, AttackPatternTimer);
+	DOREPLIFETIME(ADieselandHighlanderKingBot, IsFiringCannons);
+	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonAttackTicks);
+
 }

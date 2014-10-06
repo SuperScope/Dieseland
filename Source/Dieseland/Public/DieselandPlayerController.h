@@ -42,6 +42,16 @@ public:
 	void UpgradeStrength();
 
 	UFUNCTION(Reliable, Server, WithValidation)
+	void UpgradeDexterity();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void UpgradeIntelligence();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void UpgradeConstitution();
+
+
+	UFUNCTION(Reliable, Server, WithValidation)
 	void UpdateCooldownTimers(float DeltaSeconds);
 
 	//Damage done to actors from fire traps upon exitting them
@@ -50,6 +60,11 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
 	int32 LingerCount;
+
+	// The health regen of a character
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float HealthRegenTimer;
+
 
 	// Input events
 	UFUNCTION(Reliable, Server, WithValidation)
@@ -64,6 +79,8 @@ public:
 	void RespawnPawn();
 
 protected:
+
+	UClass* ScrapClass;
 
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;

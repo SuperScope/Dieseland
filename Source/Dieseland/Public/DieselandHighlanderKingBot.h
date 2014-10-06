@@ -22,11 +22,42 @@ class DIESELAND_API ADieselandHighlanderKingBot : public ADieselandEnemyBot
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float CannonRange;
 
-	// Damage amount for basic attacks
+	// Update for attack damage on cannon fire
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
-	float CannonDamagePerSecond;
+	float CannonDamageUpdate;
 
+
+	//Attack Pattern variable used to determine when the highlander king is using its special abilities
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float AttackPatternTimer;
+
+	//CannonAttackticks used t o measure how many times the cannons have fire
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float CannonAttackTicks;
+
+
+	//boolean used to determine whether or not the highlander is firing it's cannons
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	bool IsFiringCannons;
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
 		void CannonAttack();
+
+	//this is used t o create the beam particle
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+	UParticleSystem* BeamParticle;
+
+	//this is the function used to activate particles across the server
+	UFUNCTION(Reliable, NetMulticast, WithValidation)
+	void ServerActivateParticle(UParticleSystem* Particle);
+
+	//this grabs the particle system
+	UPROPERTY(Replicated, Category = Visual, BlueprintReadOnly, VisibleAnywhere)
+	TSubobjectPtr<class UParticleSystemComponent> ParticleSystem;
+
+
+	
+	// Damage amount for cannon, important to note this damage is updated once per .2 seconds
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	int32 CannonAttackDamage; 
 };
