@@ -80,7 +80,7 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
         }
     }
     
-	GameTimer = 120.0f;
+	GameTimer = 9999.0f;
 
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -97,9 +97,20 @@ void ADieselandGameMode::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
-void ADieselandGameMode::EndGame()
+void ADieselandGameMode::EndGame_Implementation()
 {
-	GEngine->AddOnScreenDebugMessage(21, 10.0f, FColor::Yellow, Cast<ADieselandGameState>(GameState)->WinningPlayer->GetName());
+	FString WinningName;
+	if (Cast<ADieselandGameState>(GameState)->WinningPlayer != nullptr)
+	{
+		WinningName = Cast<ADieselandGameState>(GameState)->WinningPlayer->GetName();
+	}
+
+	GEngine->AddOnScreenDebugMessage(21, 10.0f, FColor::Yellow, WinningName);
+}
+
+bool ADieselandGameMode::EndGame_Validate()
+{
+	return true;
 }
 
 void ADieselandGameMode::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
