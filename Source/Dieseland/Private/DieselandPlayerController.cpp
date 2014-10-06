@@ -47,6 +47,7 @@ void ADieselandPlayerController::PlayerTick(float DeltaTime)
 		GEngine->AddOnScreenDebugMessage(3, 10.0f, FColor::Green, FString("Skill Two: ") + FString::SanitizeFloat(DieselandPawn->SkillTwoTimer));
 		GEngine->AddOnScreenDebugMessage(4, 10.0f, FColor::Yellow, FString("Skill Three: ") + FString::SanitizeFloat(DieselandPawn->SkillThreeTimer));
 		GEngine->AddOnScreenDebugMessage(5, 10.0f, FColor::Black, FString("Trap Countdown: ") + FString::SanitizeFloat(DieselandPawn->LingerTimer));
+		GEngine->AddOnScreenDebugMessage(20, 10.0f, FColor::Red, FString("Kills: ") + FString::FromInt(DieselandPawn->Kills));
 
 		if (DieselandPawn->BasicAttackReloadTimer > 0.0f){
 			GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor::Yellow, FString("Basic Attack Reload: ") + FString::SanitizeFloat(DieselandPawn->BasicAttackReloadTimer));
