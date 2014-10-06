@@ -9,23 +9,34 @@ ADieselandGameState::ADieselandGameState(const class FPostConstructInitializePro
 	: Super(PCIP)
 {
 	PrimaryActorTick.bCanEverTick = true;
+	WinningScore = 0;
 }
 
 void ADieselandGameState::ReceiveBeginPlay()
 {
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-	{
-		APlayerController* PlayerController = *Iterator;
-		Players.Add(Cast<ADieselandCharacter>(PlayerController->GetPawn()));
-	}
+	
 }
 
 void ADieselandGameState::Tick(float DeltaSeconds)
 {
-	for (int32 x = 0; x < Players.Num; x++)
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
-
+		APlayerController* PlayerController = *Iterator;
+		if (!Players.Contains(Cast<ADieselandCharacter>(PlayerController->GetPawn())))
+		{
+			Players.Add(Cast<ADieselandCharacter>(PlayerController->GetPawn()));
+		}
 	}
 
+	if (Players.Num() > 0)
+	{
+		for (int32 x = 0; x < Players.Num(); x++)
+		{
+			if (Cast<ADieselandCharacter>(Players[x])->Kills > WinningScore)
+			{
+				WinningPlayer = Players[x];
+			}
+		}
+	}
 	Super::Tick(DeltaSeconds);
 }

@@ -18,7 +18,7 @@ class DIESELAND_API ADieselandGameState : public AGameState
 	// Array of all of the players
 	TArray<ADieselandCharacter*> Players;
 
-	int32 WinningScore
+	int32 WinningScore;
 
 	ADieselandCharacter* WinningPlayer;
 	

@@ -99,7 +99,7 @@ void ADieselandGameMode::Tick(float DeltaSeconds)
 
 void ADieselandGameMode::EndGame()
 {
-
+	GEngine->AddOnScreenDebugMessage(21, 10.0f, FColor::Yellow, Cast<ADieselandGameState>(GameState)->WinningPlayer->GetName());
 }
 
 void ADieselandGameMode::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
