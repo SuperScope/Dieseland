@@ -22,10 +22,6 @@ class DIESELAND_API ADeathTile : public AActor
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Death Tile")
     TSubobjectPtr<USceneComponent> DummyComponent;
     
-    /* Volume for collision detection*/
-    UPROPERTY(VisibleAnywhere, Category = "Death Tile")
-    TSubobjectPtr<USphereComponent> SphereComponent;
-    
     //Rotation for Tile
     UPROPERTY(BlueprintReadOnly, Category = "Death Tile")
     FRotator DTRotation;
@@ -33,10 +29,6 @@ class DIESELAND_API ADeathTile : public AActor
     //Scale for Tile
     UPROPERTY(BlueprintReadOnly, Category = "Death Tile")
     FVector DTScale;
-    
-    //Scale for Sphere Collision
-    UPROPERTY(BlueprintReadOnly, Category = "Death Tile")
-    FVector SphereScale;
     
     //Boolean for enemies remaining on tile
     UPROPERTY(BlueprintReadOnly, Category = "Death Tile")
@@ -50,6 +42,9 @@ class DIESELAND_API ADeathTile : public AActor
     UPROPERTY(BlueprintReadWrite, Category = "Death Tile")
     bool ReadyToRise;
     
+    //Boolean to determine if enemy was found
+    UPROPERTY(BlueprintReadWrite, Category = "Death Tile")
+    bool EnemyFound;
     
     //Vectors for location
     UPROPERTY(BlueprintReadWrite, Category = "Death Tile")
@@ -61,6 +56,9 @@ class DIESELAND_API ADeathTile : public AActor
     //Array for the Death Tile Locations
     TArray<FVector> LocationArray;
     
+    UPROPERTY(BlueprintReadWrite, Category = "Death Tile")
+	TArray<AActor*> EnemiesOnTile;
+    
     //Find world
     UWorld* const World = GetWorld();
     
@@ -69,13 +67,19 @@ class DIESELAND_API ADeathTile : public AActor
 protected:
     
     
-	virtual void ReceiveActorBeginOverlap(AActor* OtherActor) override;
+	//virtual void ReceiveActorBeginOverlap(AActor* OtherActor) override;
     
-	virtual void ReceiveActorEndOverlap(AActor* OtherActor) override;
+	//virtual void ReceiveActorEndOverlap(AActor* OtherActor) override;
+    
+    virtual void Tick(float DeltaSeconds) override;
     
     //Function for switching Death Tiles
     UFUNCTION(BlueprintCallable, Category = "Death Tile")
     void SwitchDeathTile();
+    
+    //Function for detecting enemies
+   // UFUNCTION(BlueprintCallable, Category = "Death Tile")
+	//void EnemyDetection();
     
     
 

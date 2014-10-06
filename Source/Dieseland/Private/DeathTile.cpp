@@ -17,9 +17,6 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     //Set Root Component as the Dummy Component
     RootComponent = DummyComponent;
     
-    //Create the Sphere Component to be used for collision
-    SphereComponent = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("SphereComponent"));
-    
     //Find the Octogon mesh
     static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshOctogon(TEXT("StaticMesh'/Game/Level/Maya_Octogon_export.Maya_Octogon_export'"));
     
@@ -31,36 +28,27 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     //Set values for rotation and scale
     DTRotation.Add(0, 22.5, 0);
     DTScale.Set(90, 90, 30);
-    SphereScale.Set(734, 734, 63);
     
     //Set Dummy Component as parent
     DeathTileMesh->AttachParent = DummyComponent;
-    SphereComponent->AttachParent = DummyComponent; 
     
     //Set Mesh rotation and scale
     DeathTileMesh->SetWorldRotation(DTRotation);
     DeathTileMesh->SetWorldScale3D(DTScale);
     
-    //Set Sphere scale
-    SphereComponent->SetWorldScale3D(SphereScale);
-    
     //Set booleans at start
     IsTileDown = false;
     ReadyToRise = false;
-    
-    
-    
-    
 
 }
 
-void ADeathTile::ReceiveActorBeginOverlap(AActor* Enemy)
+/*void ADeathTile::ReceiveActorBeginOverlap(AActor* Enemy)
 {
     Super::ReceiveActorBeginOverlap(Enemy);
     
-    if(Enemy->ActorHasTag(FName(TEXT("Player"))))
+    if(Enemy->ActorHasTag(FName(TEXT("Enemy"))))
     {
-        EnemiesRemaining = true;
+        //EnemiesRemaining = true;
         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an ON screen message!"));    }
     
 }
@@ -69,12 +57,12 @@ void ADeathTile::ReceiveActorEndOverlap(AActor* Enemy)
 {
     Super::ReceiveActorEndOverlap(Enemy);
     
-    if(Enemy->ActorHasTag(FName(TEXT("Player"))))
+    if(Enemy->ActorHasTag(FName(TEXT("Enemy"))))
     {
-        EnemiesRemaining = false;
+        //EnemiesRemaining = false;
         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an OFF screen message!"));    }
     
-}
+}*/
 
 void ADeathTile::SwitchDeathTile()
 {
@@ -86,6 +74,40 @@ void ADeathTile::SwitchDeathTile()
         
         
     }
+}
+
+/*void ADeathTile::EnemyDetection()
+{
+	DeathTileMesh->SetCollisionProfileName(TEXT("OverlapAll"));
+	DeathTileMesh->GetOverlappingActors(EnemiesOnTile);
+    
+	AActor* CurActor = NULL;
+    EnemyFound = false;
+	for (int32 b = 0; b < EnemiesOnTile.Num(); b++)
+	{
+		CurActor = EnemiesOnTile[b];
+		if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+        {
+            EnemyFound = true;
+            EnemiesRemaining = true;
+            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Enemy Found!"));
+        }
+        
+        if(b == EnemiesOnTile.Num()-1 && EnemyFound == false)
+        {
+            EnemiesRemaining = false;
+            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("There are no enemies!"));
+        }
+	}
+
+}*/
+
+void ADeathTile::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+    
+    //EnemyDetection();
+    
 }
 
 

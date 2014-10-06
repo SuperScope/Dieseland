@@ -47,7 +47,6 @@ void ADieselandEnemyAI::SearchForSpawnLocation()
 	ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
 	if (BotPawn->isAggressive == false){
 		EnemyKeyLocationID = BlackboardComp->GetKeyID("Destination");
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
 		BlackboardComp->SetValueAsVector(EnemyKeyLocationID, SpawnLocation);
 	}
 	else{
