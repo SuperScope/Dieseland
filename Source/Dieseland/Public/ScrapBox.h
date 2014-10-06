@@ -20,6 +20,9 @@ class DIESELAND_API AScrapBox : public AActor
 	UPROPERTY(Replicated, Category = Visual, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UParticleSystemComponent> Particle;
 
+	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+	int32 ScrapAmt;
+
 	UFUNCTION(Reliable, NetMulticast, WithValidation, BlueprintCallable, Category = Gameplay)
 	void DestroyCrate(AActor* Causer);
 

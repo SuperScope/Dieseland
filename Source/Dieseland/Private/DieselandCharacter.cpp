@@ -45,8 +45,9 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	// Set the starting health value
 	Health = MaxHealth;
 	BaseHealth = 100;
-	// Armor value
-	Armor = -1;
+
+	// Scrap value
+	Scrap = 0;
 
 	// Base Move Speed
 	BaseMoveSpeed = 400;
@@ -386,6 +387,8 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, Health);
 	DOREPLIFETIME(ADieselandCharacter, MaxHealth);
 	DOREPLIFETIME(ADieselandCharacter, HealthRegeneration);
+
+	DOREPLIFETIME(ADieselandCharacter, Scrap);
 
 	DOREPLIFETIME(ADieselandCharacter, AimMesh);
 	DOREPLIFETIME(ADieselandCharacter, AimRotation);

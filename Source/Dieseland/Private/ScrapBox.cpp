@@ -1,11 +1,15 @@
 
 
 #include "Dieseland.h"
+//#include "DieselandStaticLibrary.h"
 #include "ScrapBox.h"
+#include "Scrap.h"
 #include "UnrealNetwork.h"
+#include "DieselandCharacter.h"
 #include "ParticleDefinitions.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
+
 
 
 AScrapBox::AScrapBox(const class FPostConstructInitializeProperties& PCIP)
@@ -25,6 +29,8 @@ AScrapBox::AScrapBox(const class FPostConstructInitializeProperties& PCIP)
 	Particle->bAutoActivate = false;
 	Particle->SetHiddenInGame(false);
 
+	ScrapAmt = 5;
+
 	Tags.Add(FName(TEXT("ScrapBox")));
 	
 	bReplicates = true;
@@ -39,7 +45,22 @@ void AScrapBox::DestroyCrate_Implementation(AActor* Causer)
 {
 	Mesh->ApplyDamage(100.0, GetActorLocation(), FVector(0.0f, 0.0f, 0.0f), 1000.0f);
 
-	//Spawn Scrap pieces here
+	this->SetLifeSpan(2.0f);
+	if (Role == ROLE_Authority)
+	{
+		//Spawn Scrap pieces here
+		UWorld* const World = GetWorld();
+		if (World)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = Cast<ADieselandCharacter>(Causer);
+			SpawnParams.Instigator = Instigator;
+			for (int32 x = 0; x < ScrapAmt; x++)
+			{
+				AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+			}
+		}
+	}
 }
 
 bool AScrapBox::DestroyCrate_Validate(AActor* Causer)
@@ -53,4 +74,5 @@ void AScrapBox::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLife
 
 	// Replicate to everyone
 	DOREPLIFETIME(AScrapBox, Particle);
+	DOREPLIFETIME(AScrapBox, ScrapAmt);
 }
