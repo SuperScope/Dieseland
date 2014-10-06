@@ -36,7 +36,7 @@ AScrap::AScrap(const class FPostConstructInitializeProperties& PCIP)
 
 void AScrap::ReceiveBeginPlay()
 {
-	float TempZ = FMath::FRandRange(300.0f, 1000.0f);
+	float TempZ = FMath::FRandRange(300.0f, 4000.0f);
 	float TempY = FMath::FRandRange(-300.0f, 300.0f);
 	float TempX = FMath::FRandRange(-300.0f, 300.0f);
 

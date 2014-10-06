@@ -1,6 +1,7 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 
 #include "Dieseland.h"
+#include "DieselandStaticLibrary.h"
 #include "DieselandCharacter.h"
 #include "DieselandPlayerController.h"
 #include "DieselandEnemyBot.h"
@@ -10,6 +11,7 @@
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "ScrapBox.h"
+#include "Scrap.h"
 
 ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
@@ -43,6 +45,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	TopDownCameraComponent->bUseControllerViewRotation = false; // Camera does not rotate relative to arm
 
 	// Set the starting health value
+	MaxHealth = 700;
 	Health = MaxHealth;
 	BaseHealth = 100;
 
@@ -141,7 +144,13 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	ParticleSystem->SetHiddenInGame(false);
 	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	
+	//Find the scrap blueprint's class
+	static ConstructorHelpers::FObjectFinder<UBlueprint> ScrapBlueprint(TEXT("Blueprint'/Game/Blueprints/Scrap_BP.Scrap_BP'"));
+	if (ScrapBlueprint.Object)
+	{
+		ScrapClass = (UClass*)ScrapBlueprint.Object->GeneratedClass;
+	}
+
 	// Ensure replication
 	bReplicates = true;
 	AimMesh->SetIsReplicated(true);
@@ -218,9 +227,26 @@ void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Ta
 	Cast<ADieselandEnemyBot>(Target)->Health += Amt;
 	if (Cast<ADieselandEnemyBot>(Target)->Health <= 0)
 	{
+		FVector TempEnemyLoc = FVector(Target->GetActorLocation().X, Target->GetActorLocation().Y, Target->GetActorLocation().Z);
 		Target->Destroy();
+
+		//Spawn Scrap pieces here
+		UWorld* const World = GetWorld();
+		if (World)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = Instigator;
+			for (int32 x = 0; x < 5; x++)
+			{
+				UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(TempEnemyLoc.X, TempEnemyLoc.Y, TempEnemyLoc.Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f));
+
+				//Alternatively used to spawn c++ class
+				//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+			}
+		}
 	}
-}
+} 
 
 bool ADieselandCharacter::ServerDamageEnemy_Validate(int32 Amt, AActor* Target)
 {

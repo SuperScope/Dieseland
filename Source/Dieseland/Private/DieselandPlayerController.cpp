@@ -54,6 +54,9 @@ void ADieselandPlayerController::PlayerTick(float DeltaTime)
 
 		if (DieselandPawn->Health <= 0)
 		{
+			//Prevents multiple respawns
+			DieselandPawn->Health = 1;
+
 			RespawnPawn();
 			DieselandPawn->LingerTimer = 0;
 
@@ -225,6 +228,12 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 	{
 		if (Role == ROLE_Authority)
 		{
+			FVector TempEnemyLoc = FVector(DieselandPawn->GetActorLocation().X, DieselandPawn->GetActorLocation().Y, DieselandPawn->GetActorLocation().Z);
+
+			DieselandPawn->SetActorLocation(SpawnLocation);
+			DieselandPawn->Health = DieselandPawn->MaxHealth;
+			DieselandPawn->LingerTimer = 0;
+
 			//Spawn Scrap pieces here
 			UWorld* const World = GetWorld();
 			if (World)
@@ -234,17 +243,16 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 				SpawnParams.Instigator = Instigator;
 				for (int32 x = 0; x < 5; x++)
 				{
-					UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(DieselandPawn->GetActorLocation().X, DieselandPawn->GetActorLocation().Y, DieselandPawn->GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f));
+					UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(TempEnemyLoc.X, TempEnemyLoc.Y, TempEnemyLoc.Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f));
 
 					//Alternatively used to spawn c++ class
 					//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
 				}
 			}
+			
 		}
 
-		DieselandPawn->SetActorLocation(SpawnLocation);
-		DieselandPawn->Health = DieselandPawn->MaxHealth;
-		DieselandPawn->LingerTimer = 0;
+		
 	}
 }
 
