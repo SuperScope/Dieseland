@@ -6,6 +6,8 @@
 #include "DieselandCharacter.h"
 #include "UnrealNetwork.h"
 #include "BaseTrap.h"
+#include "Scrap.h"
+#include "DieselandStaticLibrary.h"
 #include "ParticleDefinitions.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -16,6 +18,12 @@ ADieselandPlayerController::ADieselandPlayerController(const class FPostConstruc
 	// Used for showing mouse cursor
 	//bShowMouseCursor = true;
 	//DefaultMouseCursor = EMouseCursor::Crosshairs;
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> ScrapBlueprint(TEXT("Blueprint'/Game/Blueprints/Scrap_BP.Scrap_BP'"));
+	if (ScrapBlueprint.Object)
+	{
+		ScrapClass = (UClass*)ScrapBlueprint.Object->GeneratedClass;
+	}
 
 	HealthRegenTimer = 0;
 	bReplicates = true;
@@ -215,8 +223,27 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 
 	if (DieselandPawn != nullptr)
 	{
+		if (Role == ROLE_Authority)
+		{
+			//Spawn Scrap pieces here
+			UWorld* const World = GetWorld();
+			if (World)
+			{
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = this;
+				SpawnParams.Instigator = Instigator;
+				for (int32 x = 0; x < 5; x++)
+				{
+					UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(DieselandPawn->GetActorLocation().X, DieselandPawn->GetActorLocation().Y, DieselandPawn->GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f));
+
+					//Alternatively used to spawn c++ class
+					//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+				}
+			}
+		}
+
 		DieselandPawn->SetActorLocation(SpawnLocation);
-		DieselandPawn->Health = 100;
+		DieselandPawn->Health = DieselandPawn->MaxHealth;
 		DieselandPawn->LingerTimer = 0;
 	}
 }
