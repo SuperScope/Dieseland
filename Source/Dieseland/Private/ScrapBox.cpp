@@ -1,7 +1,7 @@
 
 
 #include "Dieseland.h"
-//#include "DieselandStaticLibrary.h"
+#include "DieselandStaticLibrary.h"
 #include "ScrapBox.h"
 #include "Scrap.h"
 #include "UnrealNetwork.h"
@@ -28,6 +28,12 @@ AScrapBox::AScrapBox(const class FPostConstructInitializeProperties& PCIP)
 	Particle->AttachTo(Mesh);
 	Particle->bAutoActivate = false;
 	Particle->SetHiddenInGame(false);
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> ScrapBlueprint(TEXT("Blueprint'/Game/Blueprints/Scrap_BP.Scrap_BP'"));
+	if (ScrapBlueprint.Object)
+	{
+		ScrapClass = (UClass*)ScrapBlueprint.Object->GeneratedClass;
+	}
 
 	ScrapAmt = 5;
 
@@ -57,7 +63,10 @@ void AScrapBox::DestroyCrate_Implementation(AActor* Causer)
 			SpawnParams.Instigator = Instigator;
 			for (int32 x = 0; x < ScrapAmt; x++)
 			{
-				AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+				UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f));
+				
+				//Alternatively used to spawn c++ class
+				//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
 			}
 		}
 	}

@@ -26,6 +26,8 @@ class DIESELAND_API AScrapBox : public AActor
 	UFUNCTION(Reliable, NetMulticast, WithValidation, BlueprintCallable, Category = Gameplay)
 	void DestroyCrate(AActor* Causer);
 
+	UClass* ScrapClass;
+
 	virtual void ReceiveActorBeginOverlap(AActor* OtherActor) override;
 
 };
