@@ -12,6 +12,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "ScrapBox.h"
 #include "Scrap.h"
+#include "DieselandGameState.h"
 
 ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
@@ -51,6 +52,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 	// Scrap value
 	Scrap = 0;
+	Kills = 0;
 
 	// Base Move Speed
 	BaseMoveSpeed = 400;
@@ -210,6 +212,11 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 		if (Role < ROLE_Authority)
 		{
 			Cast<ADieselandPlayerController>(Controller)->ServerEditHealth(Amt, Target);
+		}
+
+		if (Role == ROLE_Authority && Cast<ADieselandCharacter>(Target)->Health <= 0)
+		{
+			Kills += 1;
 		}
 	}
 	else if (Target->ActorHasTag(FName(TEXT("Enemy"))))
@@ -415,6 +422,7 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, HealthRegeneration);
 
 	DOREPLIFETIME(ADieselandCharacter, Scrap);
+	DOREPLIFETIME(ADieselandCharacter, Kills);
 
 	DOREPLIFETIME(ADieselandCharacter, AimMesh);
 	DOREPLIFETIME(ADieselandCharacter, AimRotation);
