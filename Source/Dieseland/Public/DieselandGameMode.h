@@ -13,7 +13,13 @@ class ADieselandGameMode : public AGameMode
 
     //Array for the Death Tile Locations
     TArray<FVector> LocationArray;
+
+	// Timer to keep track of the duration of the match
+	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+	float GameTimer;
+
+	UFUNCTION(Reliable, Server, WithValidation, Category = Gameplay)
+	void EndGame();
+
+	virtual void Tick(float DeltaSeconds) override;
 };
-
-
-

@@ -2,9 +2,11 @@
 
 #include "Dieseland.h"
 #include "DieselandGameMode.h"
+#include "DieselandGameState.h"
 #include "DieselandPlayerController.h"
 #include "DieselandCharacter.h"
 #include "DeathTile.h"
+#include "UnrealNetwork.h"
 #include "DieselandStaticLibrary.h"
 
 ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializeProperties& PCIP) : Super(PCIP)
@@ -18,6 +20,8 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	GameStateClass = ADieselandGameState::StaticClass();
     
     static ConstructorHelpers::FObjectFinder<UBlueprint> TileClass1(TEXT("Blueprint'/Game/Level/DeathTiles/DeathTile_v1.DeathTile_v1'"));
     static ConstructorHelpers::FObjectFinder<UBlueprint> TileClass2(TEXT("Blueprint'/Game/Level/DeathTiles/DeathTile_v2.DeathTile_v2'"));
@@ -76,5 +80,43 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
         }
     }
     
-   
+	GameTimer = 9999.0f;
+
+	PrimaryActorTick.bCanEverTick = true;
+}
+
+void ADieselandGameMode::Tick(float DeltaSeconds)
+{
+	GameTimer -= DeltaSeconds;
+
+	if (GameTimer <= 0.0f)
+	{
+		EndGame();
+	}
+
+	Super::Tick(DeltaSeconds);
+}
+
+void ADieselandGameMode::EndGame_Implementation()
+{
+	FString WinningName;
+	if (Cast<ADieselandGameState>(GameState)->WinningPlayer != nullptr)
+	{
+		WinningName = Cast<ADieselandGameState>(GameState)->WinningPlayer->GetName();
+	}
+
+	GEngine->AddOnScreenDebugMessage(21, 10.0f, FColor::Yellow, WinningName);
+}
+
+bool ADieselandGameMode::EndGame_Validate()
+{
+	return true;
+}
+
+void ADieselandGameMode::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Replicate to everyone
+	DOREPLIFETIME(ADieselandGameMode, GameTimer);
 }

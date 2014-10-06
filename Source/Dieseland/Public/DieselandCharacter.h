@@ -38,6 +38,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void EditHealth(int32 Amt, AActor* Target);
 
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 Kills;
+
 	// Public health value of this character
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
