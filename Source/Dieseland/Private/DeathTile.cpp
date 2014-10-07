@@ -3,6 +3,7 @@
 #include "Dieseland.h"
 #include "DeathTile.h"
 #include "DieselandGameMode.h"
+#include "UnrealNetwork.h"
 
 
 ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
@@ -14,12 +15,11 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     //Create the Scene Component
     DummyComponent = PCIP.CreateDefaultSubobject<USceneComponent>(this, TEXT("SceneComponent"));
     
-    //Create the Scene Component
-    SphereCollision = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("SphereCollision"));
-
-    
     //Set Root Component as the Dummy Component
     RootComponent = DummyComponent;
+
+	SphereCollision = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("SphereCollision"));
+	SphereCollision->AttachTo(DeathTileMesh);
     
     //Find the Octogon mesh
     static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshOctogon(TEXT("StaticMesh'/Game/Level/Maya_Octogon_export.Maya_Octogon_export'"));
@@ -28,16 +28,16 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     if(StaticMeshOctogon.Object){
         DeathTileMesh->SetStaticMesh(StaticMeshOctogon.Object);
     }
-    
-	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	PrimaryActorTick.bCanEverTick = true;
     
     //Set values for rotation and scale
     DTRotation.Add(0, 22.5, 0);
     DTScale.Set(90, 90, 30);
     
     //Set Dummy Component as parent
-    DeathTileMesh->AttachParent = RootComponent;
-    SphereCollision->AttachParent = RootComponent;
+    DeathTileMesh->AttachParent = DummyComponent;
+	//SphereCollision->AttachParent = DummyComponent;
     
     //Set Mesh rotation and scale
     DeathTileMesh->SetWorldRotation(DTRotation);
@@ -46,9 +46,9 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     //Set booleans at start
     IsTileDown = false;
     ReadyToRise = false;
-    
-    PrimaryActorTick.bCanEverTick = true;
 
+	EnemyCheckInterval = 1.0f;
+	EnemyCheckTimer = EnemyCheckInterval;
 }
 
 /*void ADeathTile::ReceiveActorBeginOverlap(AActor* Enemy)
@@ -87,10 +87,9 @@ void ADeathTile::SwitchDeathTile()
 
 void ADeathTile::EnemyDetection()
 {
-	
-    SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SphereCollision->SetCollisionProfileName(TEXT("OverlapAll"));
-    SphereCollision->GetOverlappingActors(EnemiesOnTile);
+	SphereCollision->GetOverlappingActors(EnemiesOnTile);
 	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     
 	AActor* CurActor = NULL;
@@ -98,14 +97,14 @@ void ADeathTile::EnemyDetection()
 	for (int32 b = 0; b < EnemiesOnTile.Num(); b++)
 	{
 		CurActor = EnemiesOnTile[b];
-		if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Player"))))
+		if (/*!CurActor &&*/ CurActor->ActorHasTag(FName(TEXT("Player"))))
         {
             EnemyFound = true;
             EnemiesRemaining = true;
             GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Enemy Found!"));
         }
         
-        if(b == EnemiesOnTile.Num() && EnemyFound == false)
+        if(b == EnemiesOnTile.Num()-1 && EnemyFound == false)
         {
             EnemiesRemaining = false;
             GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("There are no enemies!"));
@@ -116,11 +115,20 @@ void ADeathTile::EnemyDetection()
 
 void ADeathTile::Tick(float DeltaSeconds)
 {
+	EnemyCheckTimer -= DeltaSeconds;
+	if (EnemyCheckTimer <= 0.0f)
+	{
+		EnemyDetection();
+		EnemyCheckTimer = EnemyCheckInterval;
+	}
+    
+    
 	Super::Tick(DeltaSeconds);
-    
-    EnemyDetection();
-    
 }
 
+void ADeathTile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-
+	DOREPLIFETIME(ADeathTile, SphereCollision);
+}
