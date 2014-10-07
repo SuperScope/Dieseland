@@ -32,7 +32,7 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 
 	AttackPatternTimer = 20.0f;
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> BeamParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/BeamDataDistance_WIP.BeamDataDistance_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> BeamParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_HighlanderKingBeam_WIP.Unreal_Particle_HighlanderKingBeam_WIP'"));
 
 	this->BeamParticle = BeamParticleAsset.Object;
 

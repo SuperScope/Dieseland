@@ -2,6 +2,7 @@
 
 #include "Dieseland.h"
 #include "EngletonCharacter.h"
+#include "DieselandEnemyBot.h"
 #include "DieselandPlayerController.h"
 #include "EngletonCrazyLaser.h"
 #include "EngletonMachineGun.h"
@@ -38,12 +39,14 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	//adjusments for attackspeed
 	BasicAttackCooldown = BaseCooldownSpeed / (1 + (Dexterity / 50));
 
+
 	//adjustments for movement Speed
 	MoveSpeed = BaseMoveSpeed + (Dexterity * 3);
 	this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
 	//here I set melee to false so that Engleton only uses ranged attacks
 	IsMelee = false;
-
+	//here I set pulse range
+	PulseRange = 450;
 	//here I set the range of Engleton's Bombardment
 	BombardmentRange = 600;
 	//Set our hitcount for bombardment
@@ -51,7 +54,7 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	//here I set the cooldown for player abilities
 	BaseSkillOneCooldown = 25.0f;
 	BaseSkillTwoCooldown = 12.0f;
-	BaseSkillThreeCooldown = 16.0f;
+	BaseSkillThreeCooldown = 1.0f;
 
 	SkillOneCooldown = BaseSkillOneCooldown / (1 + Intelligence / 100);
 	SkillTwoCooldown = BaseSkillTwoCooldown / (1 + Intelligence / 100);
@@ -65,6 +68,14 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	BombardmentCollision->SetCapsuleHalfHeight(BombardmentRange / 2.0f);
 	BombardmentCollision->SetCapsuleRadius(BombardmentRange / 2.0f);
 	BombardmentCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// Set up collision area for the Pulse
+	PulseCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("PulseCollision"));
+	PulseCollision->AttachParent = (Mesh);
+	PulseCollision->AttachSocketName = FName(TEXT("AimSocket"));
+	PulseCollision->SetCapsuleHalfHeight(BombardmentRange / 2.0f);
+	PulseCollision->SetCapsuleRadius(BombardmentRange / 2.0f);
+	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	AOECollision->SetSphereRadius(10.0f);
 
@@ -148,8 +159,79 @@ void AEngletonCharacter::SkillTwo()
 //here we a activate pulse
 void AEngletonCharacter::SkillThree()
 {
+	PulseCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	PulseCollision->SetCollisionProfileName(TEXT("OverlapAll"));
+	PulseCollision->GetOverlappingActors(ActorsInPulseRange);
+	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	PulseActivated = true;
 	ServerActivateParticle(PulseParticle);
+
+	AActor* CurActor = NULL;
+	for (int32 b = 0; b < ActorsInPulseRange.Num(); b++)
+	{
+		
+		CurActor = ActorsInPulseRange[b];
+		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
+		if (!CurActor->IsValidLowLevel()) continue;
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("ATTACK"));
+
+		if (Role == ROLE_Authority && CurActor != this && (CurActor->ActorHasTag(FName(TEXT("Player")))))
+		{	
+			ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(CurActor);
+			//because this damage is applied every half and a second and not every second, the damage is halved. 
+			//I apply the damage every half a second so that damage is more realisticly applied from the ability
+		//	EditHealth(-1 * (50 + (Intelligence * 2)), CurActor);
+			FVector VectorPlayer = this->GetActorLocation();
+			FVector VectorTarget = DieselandPawn->GetActorLocation();
+			float MoveCharacterX = VectorPlayer.X - VectorTarget.X;
+			float MoveCharacterY = VectorPlayer.Y - VectorTarget.Y;
+			if (MoveCharacterX > 0){
+				MoveCharacterX = 1;
+			}
+			if (MoveCharacterX <= 0){
+				MoveCharacterX = -1;
+			}
+			if (MoveCharacterY > 0){
+				MoveCharacterY = 1;
+			}
+			if (MoveCharacterY <= 0){
+				MoveCharacterY = -1;
+			}
+			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 500, -MoveCharacterY * 500, 0);
+			DieselandPawn->CharacterMovement->JumpZVelocity = 350 + (Intelligence * 3);
+			DieselandPawn->CharacterMovement->DoJump();
+		}
+		//here we do it for enemies
+		if (Role == ROLE_Authority && CurActor != this && (CurActor->ActorHasTag(FName(TEXT("Enemy")))))
+		{
+			ADieselandEnemyBot* DieselandPawn = Cast<ADieselandEnemyBot>(CurActor);
+			//because this damage is applied every half and a second and not every second, the damage is halved. 
+			//I apply the damage every half a second so that damage is more realisticly applied from the ability
+			//	EditHealth(-1 * (50 + (Intelligence * 2)), CurActor);
+			FVector VectorPlayer = this->GetActorLocation();
+			FVector VectorTarget = DieselandPawn->GetActorLocation();
+			float MoveCharacterX = VectorPlayer.X - VectorTarget.X;
+			float MoveCharacterY = VectorPlayer.Y - VectorTarget.Y;
+			if (MoveCharacterX > 0){
+				MoveCharacterX = 1;
+			}
+			if (MoveCharacterX <= 0){
+				MoveCharacterX = -1;
+			}
+			if (MoveCharacterY > 0){
+				MoveCharacterY = 1;
+			}
+			if (MoveCharacterY <= 0){
+				MoveCharacterY = -1;
+			}
+			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 500, -MoveCharacterY * 500, 0);
+			DieselandPawn->CharacterMovement->JumpZVelocity = 350 + (Intelligence * 3);
+			DieselandPawn->CharacterMovement->DoJump();
+		}
+		
+	}
+
 }
 
 void AEngletonCharacter::RangedAttack()
