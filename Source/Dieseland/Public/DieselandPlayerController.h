@@ -78,7 +78,7 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void SwapMelee();
 
-	UFUNCTION(Reliable, Server, WithValidation)
+	UFUNCTION(Reliable, Server, WithValidation, BlueprintCallable, Category = Gameplay)
 	void RespawnPawn();
 
 protected:

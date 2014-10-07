@@ -98,7 +98,7 @@ void ADeathTile::EnemyDetection()
 	for (int32 b = 0; b < EnemiesOnTile.Num(); b++)
 	{
 		CurActor = EnemiesOnTile[b];
-		if (/*!CurActor &&*/ CurActor->ActorHasTag(FName(TEXT("Player"))))
+		if (/*!CurActor &&*/ CurActor->ActorHasTag(FName(TEXT("Enemy"))))
         {
             EnemyFound = true;
             EnemiesRemaining = true;
