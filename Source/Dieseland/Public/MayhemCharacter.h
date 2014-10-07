@@ -39,6 +39,15 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void UpdateDurationTimers(float DeltaSeconds);
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+	TSubobjectPtr <UAudioComponent> UltimateSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+	TSubobjectPtr <UAudioComponent> IronArmorSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+	TSubobjectPtr <UAudioComponent> PunchSound;
+
 	virtual void MeleeAttack() override;
 
 	virtual void SkillOne() override;

@@ -9,6 +9,7 @@
 #include "BaseProjectile.h"
 #include "EnemyBaseProjectile.h"
 #include "UnrealNetwork.h"
+#include "EngletonCrazyLaser.h"
 
 
 ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializeProperties& PCIP)
@@ -31,11 +32,13 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	PlayerLabel->Text = FString::FromInt(Health);
 
 	// Find the mesh to use for AimMesh component
-	//static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticAimMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube.Shape_Cube'"));
+	//static ConstructorHelpers::FObjectFinder<UStaticMesh> SkeletalMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube.Shape_Cube'"));
+	SkeletalMesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("SkeletalMesh"));
+	SkeletalMesh->AttachParent = (Mesh);
+//	SkeletalMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	// Setup the AimMesh component
 	AimMesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("AimMesh"));
-	AimMesh->AttachParent = (Mesh);
+	AimMesh->AttachParent = (SkeletalMesh);
 	AimMesh->AttachSocketName = FName(TEXT("AimSocket"));
 	//AimMesh->SetStaticMesh(StaticAimMesh.Object);
 	AimMesh->SetHiddenInGame(true);
@@ -43,8 +46,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	// Tag this character as a player
 	Tags.Add(FName("Enemy"));
 
-
-	BasicAttackDamage = 10;
+	BasicAttackDamage = 25;
 
 	// Set default ranges
 	MeleeRange = 144.0f;
@@ -87,6 +89,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 
 	// Ensure replication
 	bReplicates = true;
+	SkeletalMesh->SetIsReplicated(true);
 	AimMesh->SetIsReplicated(true);
 	Mesh->SetIsReplicated(true);
 	PrimaryActorTick.bCanEverTick = true;
@@ -152,6 +155,7 @@ void ADieselandEnemyBot::MeleeAttack()
 		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
 		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
 		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
+		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Ignore);
 		MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
 		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -181,12 +185,12 @@ void ADieselandEnemyBot::RangedAttack_Implementation()
 			SpawnParams.Owner = Cast<ADieselandEnemyAI>(this->Controller);
 			SpawnParams.Instigator = Instigator;
 
-			FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
+			FRotator ProjectileRotation = SkeletalMesh->GetSocketRotation(FName(TEXT("AimSocket")));
 
 			ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
 
 			// spawn the projectile at the muzzle
-			AEnemyBaseProjectile* const Projectile = World->SpawnActor<AEnemyBaseProjectile>(AEnemyBaseProjectile::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+			ABaseProjectile* const Projectile = World->SpawnActor<ABaseProjectile>(ABaseProjectile::StaticClass(), SkeletalMesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 			if (Projectile)
 			{
 				Projectile->ProjectileDamage = BasicAttackDamage;
@@ -210,6 +214,7 @@ void ADieselandEnemyBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandEnemyBot, Health);
 	DOREPLIFETIME(ADieselandEnemyBot, AimMesh);
+	DOREPLIFETIME(ADieselandEnemyBot, SkeletalMesh);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackTimer);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackActive);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackDamage);
@@ -229,6 +234,7 @@ void ADieselandEnemyBot::OnZoneEnter()
 	AttackZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
 	AttackZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
 	AttackZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
+	AttackZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Ignore);
 	AttackZoneCollision->GetOverlappingActors(ActorsInZoneRange);
 	AttackZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AActor* CurActor = NULL;
@@ -261,6 +267,7 @@ void ADieselandEnemyBot::OnProjectileZoneEnter()
 	ProjectileZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
 	ProjectileZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
 	ProjectileZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
+	ProjectileZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Ignore);
 	ProjectileZoneCollision->GetOverlappingActors(ActorsInZoneRange);
 	ProjectileZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AActor* CurActor = NULL;

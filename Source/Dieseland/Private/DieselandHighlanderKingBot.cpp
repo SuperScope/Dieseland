@@ -16,7 +16,10 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 	: Super(PCIP)
 {
 	CannonRange = 800;
-	CannonAttackDamage = 10;
+	CannonAttackDamage = 40;
+	BasicAttackDamage = 60;
+
+	Health = 1500;
 
 	//all of the variables needed for creating a collider
 	CannonZoneCollision = PCIP.CreateDefaultSubobject<UBoxComponent>(this, TEXT("CannonZone"));
@@ -32,7 +35,7 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 
 	AttackPatternTimer = 20.0f;
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> BeamParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/BeamDataDistance_WIP.BeamDataDistance_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> BeamParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_HighlanderKingBeam_WIP.Unreal_Particle_HighlanderKingBeam_WIP'"));
 
 	this->BeamParticle = BeamParticleAsset.Object;
 

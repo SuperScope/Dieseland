@@ -2,6 +2,7 @@
 
 #include "Dieseland.h"
 #include "EngletonCharacter.h"
+#include "DieselandEnemyBot.h"
 #include "DieselandPlayerController.h"
 #include "EngletonCrazyLaser.h"
 #include "EngletonMachineGun.h"
@@ -38,12 +39,14 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	//adjusments for attackspeed
 	BasicAttackCooldown = BaseCooldownSpeed / (1 + (Dexterity / 50));
 
+
 	//adjustments for movement Speed
 	MoveSpeed = BaseMoveSpeed + (Dexterity * 3);
 	this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
 	//here I set melee to false so that Engleton only uses ranged attacks
 	IsMelee = false;
-
+	//here I set pulse range
+	PulseRange = 450;
 	//here I set the range of Engleton's Bombardment
 	BombardmentRange = 600;
 	//Set our hitcount for bombardment
@@ -51,7 +54,7 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	//here I set the cooldown for player abilities
 	BaseSkillOneCooldown = 25.0f;
 	BaseSkillTwoCooldown = 12.0f;
-	BaseSkillThreeCooldown = 16.0f;
+	BaseSkillThreeCooldown = 1.0f;
 
 	SkillOneCooldown = BaseSkillOneCooldown / (1 + Intelligence / 100);
 	SkillTwoCooldown = BaseSkillTwoCooldown / (1 + Intelligence / 100);
@@ -66,8 +69,17 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	BombardmentCollision->SetCapsuleRadius(BombardmentRange / 2.0f);
 	BombardmentCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	AOECollision->SetSphereRadius(10.0f);
+	// Set up collision area for the Pulse
+	PulseCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("PulseCollision"));
+	PulseCollision->AttachParent = (Mesh);
+	PulseCollision->AttachSocketName = FName(TEXT("AimSocket"));
+	PulseCollision->SetCapsuleHalfHeight(BombardmentRange / 2.0f);
+	PulseCollision->SetCapsuleRadius(BombardmentRange / 2.0f);
+	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	AOECollision->SetSphereRadius(10.0f);
+	
+	
 
 	//here we get and set our particle effects
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> BombardmentParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonBombardment_WIP.Unreal_Particle_EngletonBombardment_WIP'"));
@@ -76,8 +88,41 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	this->BombardmentParticle = BombardmentParticleAsset.Object;
 	this->MachineGunFireParticle = MachineGunFireParticleAsset.Object;
 	this->PulseParticle = PulseParticleAsset.Object;
+	
+	AimMesh2 = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("AimMesh2"));
+	AimMesh2->AttachParent = (Mesh);
+	AimMesh2->AttachSocketName = FName(TEXT("AimSocket2"));
+	//AimMesh->SetStaticMesh(StaticAimMesh.Object);
+	AimMesh2->SetHiddenInGame(true);
+	
+	//for sounds
+	IdleSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Idle Sound"));
+	IdleSound->AttachParent = RootComponent;
+	IdleSound->bAutoActivate = true;
 
+	PulseSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Pulse Sound"));
+	PulseSound->AttachParent = RootComponent;
+	PulseSound->bAutoActivate = false;
 
+	UltimateSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Ultimate Sound"));
+	UltimateSound->AttachParent = RootComponent;
+	UltimateSound->bAutoActivate = false;
+
+	MachineGunSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Machine Gun Sound"));
+	MachineGunSound->AttachParent = RootComponent;
+	MachineGunSound->bAutoActivate = false;
+
+	CrazyLaserSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Crazy Laser Sound"));
+	CrazyLaserSound->AttachParent = RootComponent;
+	CrazyLaserSound->bAutoActivate = false;
+
+	BombardmentSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Bombardment Sound"));
+	BombardmentSound->AttachParent = RootComponent;
+	BombardmentSound->bAutoActivate = false;
+
+	MovementSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Movement Sound"));
+	MovementSound->AttachParent = RootComponent;
+	MovementSound->bAutoActivate = false;
 
 }
 
@@ -87,6 +132,7 @@ void AEngletonCharacter::SkillOne()
 	//here I activate Bombardment if it's not already activated
 	if (BombardmentTimer == 0)
 	{
+		UltimateSound->Play();
 		BombardmentActivated = true;
 	}
 
@@ -117,19 +163,20 @@ void AEngletonCharacter::SkillOne()
 	}
 }
 
-
+//crazy laser
 void AEngletonCharacter::SkillTwo()
 {
 	UWorld* const World = GetWorld();
 	if (World)
 	{
+		CrazyLaserSound->Play();
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
 		SpawnParams.Instigator = Instigator;
 
 		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
 
-		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw, ProjectileRotation.Roll);
 
 		// spawn the projectile at the muzzle
 		AEngletonCrazyLaser* const Projectile = World->SpawnActor<AEngletonCrazyLaser>(AEngletonCrazyLaser::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
@@ -148,8 +195,79 @@ void AEngletonCharacter::SkillTwo()
 //here we a activate pulse
 void AEngletonCharacter::SkillThree()
 {
+	PulseCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	PulseCollision->SetCollisionProfileName(TEXT("OverlapAll"));
+	PulseCollision->GetOverlappingActors(ActorsInPulseRange);
+	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	PulseSound->Play();
 	PulseActivated = true;
 	ServerActivateParticle(PulseParticle);
+
+	AActor* CurActor = NULL;
+	for (int32 b = 0; b < ActorsInPulseRange.Num(); b++)
+	{
+		
+		CurActor = ActorsInPulseRange[b];
+		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
+		if (!CurActor->IsValidLowLevel()) continue;
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("ATTACK"));
+
+		if (Role == ROLE_Authority && CurActor != this && (CurActor->ActorHasTag(FName(TEXT("Player")))))
+		{	
+			ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(CurActor);
+			//because this damage is applied every half and a second and not every second, the damage is halved. 
+			//I apply the damage every half a second so that damage is more realisticly applied from the ability
+		//	EditHealth(-1 * (50 + (Intelligence * 2)), CurActor);
+			FVector VectorPlayer = this->GetActorLocation();
+			FVector VectorTarget = DieselandPawn->GetActorLocation();
+			float MoveCharacterX = VectorPlayer.X - VectorTarget.X;
+			float MoveCharacterY = VectorPlayer.Y - VectorTarget.Y;
+			if (MoveCharacterX > 0){
+				MoveCharacterX = 1;
+			}
+			if (MoveCharacterX <= 0){
+				MoveCharacterX = -1;
+			}
+			if (MoveCharacterY > 0){
+				MoveCharacterY = 1;
+			}
+			if (MoveCharacterY <= 0){
+				MoveCharacterY = -1;
+			}
+			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 600, -MoveCharacterY * 600, 0);
+			DieselandPawn->CharacterMovement->JumpZVelocity = 400 + (Intelligence * 3);
+			DieselandPawn->CharacterMovement->DoJump();
+		}
+		//here we do it for enemies
+		if (Role == ROLE_Authority && CurActor != this && (CurActor->ActorHasTag(FName(TEXT("Enemy")))))
+		{
+			ADieselandEnemyBot* DieselandPawn = Cast<ADieselandEnemyBot>(CurActor);
+			//because this damage is applied every half and a second and not every second, the damage is halved. 
+			//I apply the damage every half a second so that damage is more realisticly applied from the ability
+			//	EditHealth(-1 * (50 + (Intelligence * 2)), CurActor);
+			FVector VectorPlayer = this->GetActorLocation();
+			FVector VectorTarget = DieselandPawn->GetActorLocation();
+			float MoveCharacterX = VectorPlayer.X - VectorTarget.X;
+			float MoveCharacterY = VectorPlayer.Y - VectorTarget.Y;
+			if (MoveCharacterX > 0){
+				MoveCharacterX = 1;
+			}
+			if (MoveCharacterX <= 0){
+				MoveCharacterX = -1;
+			}
+			if (MoveCharacterY > 0){
+				MoveCharacterY = 1;
+			}
+			if (MoveCharacterY <= 0){
+				MoveCharacterY = -1;
+			}
+			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 500, -MoveCharacterY * 500, 0);
+			DieselandPawn->CharacterMovement->JumpZVelocity = 350 + (Intelligence * 3);
+			DieselandPawn->CharacterMovement->DoJump();
+		}
+		
+	}
+
 }
 
 void AEngletonCharacter::RangedAttack()
@@ -163,21 +281,25 @@ void AEngletonCharacter::RangedAttack()
 
 		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
 
-		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw, ProjectileRotation.Roll);
 
 		// spawn the projectile at the muzzle
 		AEngletonMachineGun* const Projectile = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+		AEngletonMachineGun* const Projectile2 = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), ProjectileRotation, SpawnParams);
 		if (Projectile)
 		{
 			//particle base is set into play, just need to adjust it's spawn position to the same point as his hands
 			ServerActivateParticle(MachineGunFireParticle);
 
-			Projectile->ProjectileDamage = BasicAttackDamage;
+			Projectile->ProjectileDamage = BasicAttackDamage/2;
+			Projectile2->ProjectileDamage = BasicAttackDamage/2;
 			// Start the particle effect
 			Projectile->ServerActivateProjectile();
+			Projectile2->ServerActivateProjectile();
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			Projectile2->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 		}
 	}
 }
