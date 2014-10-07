@@ -152,6 +152,7 @@ void ADieselandEnemyBot::MeleeAttack()
 		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
 		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
 		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
+		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Ignore);
 		MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
 		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -229,6 +230,7 @@ void ADieselandEnemyBot::OnZoneEnter()
 	AttackZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
 	AttackZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
 	AttackZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
+	AttackZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Ignore);
 	AttackZoneCollision->GetOverlappingActors(ActorsInZoneRange);
 	AttackZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AActor* CurActor = NULL;
@@ -261,6 +263,7 @@ void ADieselandEnemyBot::OnProjectileZoneEnter()
 	ProjectileZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
 	ProjectileZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
 	ProjectileZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
+	ProjectileZoneCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Ignore);
 	ProjectileZoneCollision->GetOverlappingActors(ActorsInZoneRange);
 	ProjectileZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AActor* CurActor = NULL;

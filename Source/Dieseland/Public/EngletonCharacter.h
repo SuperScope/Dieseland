@@ -23,11 +23,19 @@ class DIESELAND_API AEngletonCharacter : public ADieselandCharacter
 
 	// The range of this character's Bombardment
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
-	float BombardmentRange;
+		float PulseRange;
+
+	// Collider used to detect Bombardment Range
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	TSubobjectPtr<class UCapsuleComponent> BombardmentCollision;
+
+	// The range of this character's Pulse
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		float BombardmentRange;
 
 	// Collider used to detect pulse Range
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
-	TSubobjectPtr<class UCapsuleComponent> BombardmentCollision;
+		TSubobjectPtr<class UCapsuleComponent> PulseCollision;
 
 
 	//here I check to see if Bombardment is active
@@ -41,6 +49,13 @@ class DIESELAND_API AEngletonCharacter : public ADieselandCharacter
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 		TArray<AActor*> ActorsInBombardmentRange;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+		TArray<AActor*> ActorsInPulseRange;
+
+	//pulse actor used for owning players
+	UPROPERTY(EditAnywhere, BlueprintreadWrite, Category = Gameplay)
+		AActor* PulseActor;
 
 	//here I check to see how long bobmarbment has been active
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
@@ -57,9 +72,11 @@ class DIESELAND_API AEngletonCharacter : public ADieselandCharacter
 	//here we get our bombardment particle effect
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
 		UParticleSystem* BombardmentParticle;
+
 	//here we get our pulse particle effect
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
 		UParticleSystem* PulseParticle;
+
 	//here we get our machine gun fire particle effect
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
 		UParticleSystem* MachineGunFireParticle;
