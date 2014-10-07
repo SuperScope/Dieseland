@@ -54,7 +54,7 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	//here I set the cooldown for player abilities
 	BaseSkillOneCooldown = 25.0f;
 	BaseSkillTwoCooldown = 12.0f;
-	BaseSkillThreeCooldown = 1.0f;
+	BaseSkillThreeCooldown = 12.0f;
 
 	SkillOneCooldown = BaseSkillOneCooldown / (1 + Intelligence / 100);
 	SkillTwoCooldown = BaseSkillTwoCooldown / (1 + Intelligence / 100);
@@ -98,7 +98,7 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	//for sounds
 	IdleSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Idle Sound"));
 	IdleSound->AttachParent = RootComponent;
-	IdleSound->bAutoActivate = true;
+	IdleSound->bAutoActivate = false;
 
 	PulseSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Pulse Sound"));
 	PulseSound->AttachParent = RootComponent;
@@ -122,7 +122,7 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 
 	MovementSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Movement Sound"));
 	MovementSound->AttachParent = RootComponent;
-	MovementSound->bAutoActivate = false;
+	MovementSound->bAutoActivate = true;
 
 }
 
@@ -158,7 +158,7 @@ void AEngletonCharacter::SkillOne()
 		{	
 			//because this damage is applied every half and a second and not every second, the damage is halved. 
 			//I apply the damage every half a second so that damage is more realisticly applied from the ability
-			EditHealth(-1 * (50 + (Intelligence * 2)), CurActor);
+			EditHealth(-1 * (30 + (Intelligence * 1.5f)), CurActor);
 		}
 	}
 }
@@ -286,7 +286,7 @@ void AEngletonCharacter::RangedAttack()
 		// spawn the projectile at the muzzle
 		AEngletonMachineGun* const Projectile = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 		AEngletonMachineGun* const Projectile2 = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), ProjectileRotation, SpawnParams);
-		if (Projectile)
+		if (Projectile && Projectile2)
 		{
 			//particle base is set into play, just need to adjust it's spawn position to the same point as his hands
 			ServerActivateParticle(MachineGunFireParticle);
