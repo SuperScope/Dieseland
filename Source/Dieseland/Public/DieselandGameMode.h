@@ -20,6 +20,7 @@ class ADieselandGameMode : public AGameMode
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	float GameTimer;
 
+	UFUNCTION(Reliable, NetMulticast, Category = Gameplay)
 	void StartGame();
 
 	UFUNCTION(Reliable, Server, WithValidation, Category = Gameplay)
@@ -30,6 +31,7 @@ class ADieselandGameMode : public AGameMode
 
 	uint8 PlayersSpawned;
 
+	virtual void ReceiveBeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual APawn* SpawnDefaultPawnFor(AController* NewPlayer, AActor* StartSpot) override;
 };

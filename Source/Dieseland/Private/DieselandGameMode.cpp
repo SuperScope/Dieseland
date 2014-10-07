@@ -73,12 +73,17 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
     LocationArray.Add(FVector(-3902.357666, -4332.289062, -1500.0));
 
     
-	StartGame();
+	
     
 	GameTimer = 9999.0f;
 
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
+}
+
+void ADieselandGameMode::ReceiveBeginPlay()
+{
+	//StartGame();
 }
 
 void ADieselandGameMode::Tick(float DeltaSeconds)
@@ -93,7 +98,7 @@ void ADieselandGameMode::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
-void ADieselandGameMode::StartGame()
+void ADieselandGameMode::StartGame_Implementation()
 {
 	//Find world
 	UWorld* const World = GetWorld();
@@ -152,6 +157,7 @@ APawn* ADieselandGameMode::SpawnDefaultPawnFor(AController* NewPlayer, AActor* S
 		PlayersSpawned++;
 	}
 	return ResultPawn;
+
 }
 
 void ADieselandGameMode::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

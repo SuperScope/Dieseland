@@ -90,6 +90,8 @@ protected:
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
+	virtual void ReceiveBeginPlay() override;
+
 	// Movment input events
 	void OnMoveForward(float Val);
 	void OnMoveRight(float Val);
