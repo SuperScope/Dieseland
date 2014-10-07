@@ -18,6 +18,7 @@ class ADieselandGameMode : public AGameMode
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	float GameTimer;
 
+	UFUNCTION(Reliable, Server, WithValidation, Category = Gameplay)
 	void EndGame();
 
 	virtual void Tick(float DeltaSeconds) override;
