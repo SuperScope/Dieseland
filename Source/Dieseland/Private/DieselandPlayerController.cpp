@@ -28,7 +28,7 @@ ADieselandPlayerController::ADieselandPlayerController(const class FPostConstruc
 	HealthRegenTimer = 0;
 	bReplicates = true;
 	LingerCount = 0;
-	
+	StatPlusCount = 0;
 }
 
 void ADieselandPlayerController::PlayerTick(float DeltaTime)
@@ -426,10 +426,12 @@ void ADieselandPlayerController::UpgradeStrength_Implementation()
 {
 	//here is the real level up function
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned"))){
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3){
+		DieselandPawn->Scrap -= 3;
 		DieselandPawn->Strength += 3;
 		DieselandPawn->CalculateStats();
 		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Strength!"));
+		StatPlusCount++;
 	}
 }
 
@@ -443,10 +445,12 @@ void ADieselandPlayerController::UpgradeIntelligence_Implementation()
 {
 	//here is the real level up function
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned"))){
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3){
+		DieselandPawn->Scrap -= 3;
 		DieselandPawn->Intelligence += 3;
 		DieselandPawn->CalculateStats();
 		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Intelligence!"));
+		StatPlusCount++;
 	}
 }
 
@@ -458,10 +462,12 @@ void ADieselandPlayerController::UpgradeDexterity_Implementation()
 {
 	//here is the real level up function
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned"))){
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3){
+		DieselandPawn->Scrap -= 3;
 		DieselandPawn->Dexterity += 3;
 		DieselandPawn->CalculateStats();
 		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Dexterity!"));
+		StatPlusCount++;
 	}
 }
 
@@ -473,10 +479,12 @@ void ADieselandPlayerController::UpgradeConstitution_Implementation()
 {
 	//here we upgrade the players constitution
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned"))){
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3){
+		DieselandPawn->Scrap -= 3;
 		DieselandPawn->Constitution += 3;
 		DieselandPawn->CalculateStats();
 		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Constitution!"));
+		StatPlusCount++;
 	}
 }
 

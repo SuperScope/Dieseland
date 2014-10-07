@@ -81,6 +81,10 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	int32 BasicAttackAmmo;
 
+	//set the character level
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	int32 CharacterLevel;
+
 	// Max ammo size
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	int32 BasicAttackMag;

@@ -15,7 +15,7 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	: Super(PCIP)
 {
 	//here I set his base values
-	BaseMoveSpeed = 380;
+	BaseMoveSpeed = 375;
 	BaseHealth = 350;
 	BaseDamage = 15;
 	BaseCooldownSpeed = 1.2;

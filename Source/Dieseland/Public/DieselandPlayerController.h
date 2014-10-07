@@ -59,7 +59,10 @@ public:
 	int32 LingerDamage;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
-	int32 LingerCount;
+		int32 LingerCount; 
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	int32 StatPlusCount;
 
 	// The health regen of a character
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)

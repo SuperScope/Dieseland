@@ -45,6 +45,8 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUseControllerViewRotation = false; // Camera does not rotate relative to arm
 
+	CharacterLevel = 1;
+
 	// Set the starting health value
 	MaxHealth = 700;
 	Health = MaxHealth;
@@ -155,6 +157,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 	// Ensure replication
 	bReplicates = true;
+	bReplicateMovement = true;
 	AimMesh->SetIsReplicated(true);
 	Mesh->SetIsReplicated(true);
 	ParticleSystem->SetIsReplicated(true);
@@ -176,6 +179,10 @@ void ADieselandCharacter::CalculateStats_Implementation()
 {
 	if (this->ActorHasTag(FName(TEXT("Player"))))
 	{
+		if (Cast<ADieselandPlayerController>(Controller)->StatPlusCount > 3){
+			CharacterLevel++;
+			Cast<ADieselandPlayerController>(Controller)->StatPlusCount = 0;
+		}
 		//adjustments for health
 		MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
 		//adjustments for health regeneration

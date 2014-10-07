@@ -15,9 +15,9 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 {
 	
 	//here I set his base values
-	BaseMoveSpeed = 400;
+	BaseMoveSpeed = 430;
 	BaseHealth = 400;
-	BaseDamage = 25;
+	BaseDamage = 45;
 	BaseCooldownSpeed = 1.7;
 	//here I set his base stats
 	Strength = 16;

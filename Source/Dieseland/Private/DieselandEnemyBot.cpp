@@ -89,6 +89,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 
 	// Ensure replication
 	bReplicates = true;
+	bReplicateMovement = true;
 	SkeletalMesh->SetIsReplicated(true);
 	AimMesh->SetIsReplicated(true);
 	Mesh->SetIsReplicated(true);
