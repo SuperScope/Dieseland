@@ -49,6 +49,10 @@ class DIESELAND_API ADeathTile : public AActor
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
     bool EnemyFound;
     
+    //Boolean to determine when to check for enemies
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
+    bool CheckForEnemies;
+    
     //Vectors for location
     UPROPERTY(BlueprintReadWrite, Category = "Death Tile")
     FVector CurrentLocation;

@@ -46,6 +46,7 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     //Set booleans at start
     IsTileDown = false;
     ReadyToRise = false;
+    CheckForEnemies = false;
 
 	EnemyCheckInterval = 1.0f;
 	EnemyCheckTimer = EnemyCheckInterval;
