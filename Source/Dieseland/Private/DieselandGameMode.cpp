@@ -73,23 +73,12 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
     LocationArray.Add(FVector(-3902.357666, -4332.289062, -1500.0));
 
     
-    //Find world
-    UWorld* const World = GetWorld();
-    
-    //If world exists spawn tiles and set location of tiles
-    if(World){
-        
-        for(int32 i = 0; i<=6; i++)
-        {
-             int32 RandomIndex = FMath::RandRange(0, 15);
-             UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, DeathTileArray[RandomIndex], LocationArray[i], FRotator(0,0,0));
-            
-        }
-    }
+	StartGame();
     
 	GameTimer = 9999.0f;
 
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 }
 
 void ADieselandGameMode::Tick(float DeltaSeconds)
@@ -102,6 +91,23 @@ void ADieselandGameMode::Tick(float DeltaSeconds)
 	}
 
 	Super::Tick(DeltaSeconds);
+}
+
+void ADieselandGameMode::StartGame()
+{
+	//Find world
+	UWorld* const World = GetWorld();
+
+	//If world exists spawn tiles and set location of tiles
+	if (World){
+
+		for (int32 i = 0; i <= 6; i++)
+		{
+			int32 RandomIndex = FMath::RandRange(0, 15);
+			UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, DeathTileArray[RandomIndex], LocationArray[i], FRotator(0, 0, 0));
+
+		}
+	}
 }
 
 void ADieselandGameMode::EndGame_Implementation()
@@ -154,4 +160,6 @@ void ADieselandGameMode::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandGameMode, GameTimer);
+	DOREPLIFETIME(ADieselandGameMode, DeathTileArray);
+	DOREPLIFETIME(ADieselandGameMode, LocationArray);
 }
