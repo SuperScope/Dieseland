@@ -5,6 +5,7 @@
 #include "DieselandGameState.h"
 #include "DieselandPlayerController.h"
 #include "DieselandCharacter.h"
+#include "MayhemCharacter.h"
 #include "DeathTile.h"
 #include "UnrealNetwork.h"
 #include "DieselandStaticLibrary.h"
@@ -39,8 +40,14 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
     static ConstructorHelpers::FObjectFinder<UBlueprint> TileClass14(TEXT("Blueprint'/Game/Level/DeathTiles/DeathTile_v14.DeathTile_v14'"));
     static ConstructorHelpers::FObjectFinder<UBlueprint> TileClass15(TEXT("Blueprint'/Game/Level/DeathTiles/DeathTile_v15.DeathTile_v15'"));
     static ConstructorHelpers::FObjectFinder<UBlueprint> TileClass16(TEXT("Blueprint'/Game/Level/DeathTiles/DeathTile_v16.DeathTile_v16'"));
+	
+	static ConstructorHelpers::FObjectFinder<UBlueprint> MayhemBPClass(TEXT("Blueprint'/Game/Blueprints/Players/Mayhem_BP.Mayhem_BP'"));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> EngletonBPClass(TEXT("Blueprint'/Game/Blueprints/Engleton.Engleton'"));
+
+	MayhemClass = MayhemBPClass.Object->GeneratedClass;
+	EngletonClass = EngletonBPClass.Object->GeneratedClass;
     
-    DeathTileArray.Add(TileClass1.Object->GeneratedClass);
+	DeathTileArray.Add(TileClass1.Object->GeneratedClass);
     DeathTileArray.Add(TileClass2.Object->GeneratedClass);
     DeathTileArray.Add(TileClass3.Object->GeneratedClass);
     DeathTileArray.Add(TileClass4.Object->GeneratedClass);
@@ -111,6 +118,34 @@ void ADieselandGameMode::EndGame_Implementation()
 bool ADieselandGameMode::EndGame_Validate()
 {
 	return true;
+}
+
+APawn* ADieselandGameMode::SpawnDefaultPawnFor(AController* NewPlayer, AActor* StartSpot)
+{
+	//NewPlayer->PlayerState->PlayerId
+	// don't allow pawn to be spawned with any pitch or roll
+	FRotator StartRotation(ForceInit);
+	StartRotation.Yaw = StartSpot->GetActorRotation().Yaw;
+	FVector StartLocation = StartSpot->GetActorLocation();
+
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Instigator = Instigator;
+	APawn* ResultPawn;
+
+	if (PlayersSpawned % 2 == 0)
+	{
+		ResultPawn = GetWorld()->SpawnActor<APawn>(MayhemClass, StartLocation, StartRotation, SpawnInfo);
+	}
+	else
+	{
+		ResultPawn = GetWorld()->SpawnActor<APawn>(EngletonClass, StartLocation, StartRotation, SpawnInfo);
+	}
+
+	if (ResultPawn != NULL)
+	{
+		PlayersSpawned++;
+	}
+	return ResultPawn;
 }
 
 void ADieselandGameMode::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

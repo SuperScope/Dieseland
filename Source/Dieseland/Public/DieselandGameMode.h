@@ -21,5 +21,11 @@ class ADieselandGameMode : public AGameMode
 	UFUNCTION(Reliable, Server, WithValidation, Category = Gameplay)
 	void EndGame();
 
+	UClass* MayhemClass;
+	UClass* EngletonClass;
+
+	uint8 PlayersSpawned;
+
 	virtual void Tick(float DeltaSeconds) override;
+	virtual APawn* SpawnDefaultPawnFor(AController* NewPlayer, AActor* StartSpot) override;
 };
