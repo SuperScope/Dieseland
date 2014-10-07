@@ -24,7 +24,7 @@ public:
 
 	// Mesh attached to the torso socket which is used to show attack direction - invisible by default
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
-	TSubobjectPtr<class UStaticMeshComponent> AimMesh;
+		TSubobjectPtr<class UStaticMeshComponent> AimMesh;
 
 	// Collider used to detect melee range
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)

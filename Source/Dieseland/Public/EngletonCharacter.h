@@ -81,6 +81,32 @@ class DIESELAND_API AEngletonCharacter : public ADieselandCharacter
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
 		UParticleSystem* MachineGunFireParticle;
 
+	// Mesh attached to the torso socket which is used to show attack direction - invisible by default
+	//UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	//	TSubobjectPtr<class UStaticMeshComponent> AimMesh2;
+
+	//sounds
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> IdleSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> CrazyLaserSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> PulseSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> MachineGunSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> UltimateSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> BombardmentSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> MovementSound;
+
 	//here we update time
 	void UpdateTimers(float DeltaSeconds);
 	

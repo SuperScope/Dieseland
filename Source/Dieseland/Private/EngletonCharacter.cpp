@@ -78,7 +78,8 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	AOECollision->SetSphereRadius(10.0f);
-
+	
+	
 
 	//here we get and set our particle effects
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> BombardmentParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonBombardment_WIP.Unreal_Particle_EngletonBombardment_WIP'"));
@@ -87,8 +88,41 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	this->BombardmentParticle = BombardmentParticleAsset.Object;
 	this->MachineGunFireParticle = MachineGunFireParticleAsset.Object;
 	this->PulseParticle = PulseParticleAsset.Object;
+	/*
+		AimMesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("AimMesh"));
+	AimMesh->AttachParent = (Mesh);
+	AimMesh->AttachSocketName = FName(TEXT("AimSocket"));
+	//AimMesh->SetStaticMesh(StaticAimMesh.Object);
+	AimMesh->SetHiddenInGame(true);
+	*/
+	//for sounds
+	IdleSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Idle Sound"));
+	IdleSound->AttachParent = RootComponent;
+	IdleSound->bAutoActivate = true;
 
+	PulseSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Pulse Sound"));
+	PulseSound->AttachParent = RootComponent;
+	PulseSound->bAutoActivate = false;
 
+	UltimateSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Ultimate Sound"));
+	UltimateSound->AttachParent = RootComponent;
+	UltimateSound->bAutoActivate = false;
+
+	MachineGunSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Machine Gun Sound"));
+	MachineGunSound->AttachParent = RootComponent;
+	MachineGunSound->bAutoActivate = false;
+
+	CrazyLaserSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Crazy Laser Sound"));
+	CrazyLaserSound->AttachParent = RootComponent;
+	CrazyLaserSound->bAutoActivate = false;
+
+	BombardmentSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Bombardment Sound"));
+	BombardmentSound->AttachParent = RootComponent;
+	BombardmentSound->bAutoActivate = false;
+
+	MovementSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Movement Sound"));
+	MovementSound->AttachParent = RootComponent;
+	MovementSound->bAutoActivate = false;
 
 }
 
@@ -98,6 +132,7 @@ void AEngletonCharacter::SkillOne()
 	//here I activate Bombardment if it's not already activated
 	if (BombardmentTimer == 0)
 	{
+		UltimateSound->Play();
 		BombardmentActivated = true;
 	}
 
@@ -128,12 +163,13 @@ void AEngletonCharacter::SkillOne()
 	}
 }
 
-
+//crazy laser
 void AEngletonCharacter::SkillTwo()
 {
 	UWorld* const World = GetWorld();
 	if (World)
 	{
+		CrazyLaserSound->Play();
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
 		SpawnParams.Instigator = Instigator;
@@ -163,7 +199,7 @@ void AEngletonCharacter::SkillThree()
 	PulseCollision->SetCollisionProfileName(TEXT("OverlapAll"));
 	PulseCollision->GetOverlappingActors(ActorsInPulseRange);
 	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
+	PulseSound->Play();
 	PulseActivated = true;
 	ServerActivateParticle(PulseParticle);
 
@@ -198,8 +234,8 @@ void AEngletonCharacter::SkillThree()
 			if (MoveCharacterY <= 0){
 				MoveCharacterY = -1;
 			}
-			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 500, -MoveCharacterY * 500, 0);
-			DieselandPawn->CharacterMovement->JumpZVelocity = 350 + (Intelligence * 3);
+			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 600, -MoveCharacterY * 600, 0);
+			DieselandPawn->CharacterMovement->JumpZVelocity = 400 + (Intelligence * 3);
 			DieselandPawn->CharacterMovement->DoJump();
 		}
 		//here we do it for enemies
