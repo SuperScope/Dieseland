@@ -82,8 +82,8 @@ class DIESELAND_API AEngletonCharacter : public ADieselandCharacter
 		UParticleSystem* MachineGunFireParticle;
 
 	// Mesh attached to the torso socket which is used to show attack direction - invisible by default
-	//UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
-	//	TSubobjectPtr<class UStaticMeshComponent> AimMesh2;
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+		TSubobjectPtr<class UStaticMeshComponent> AimMesh2;
 
 	//sounds
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")

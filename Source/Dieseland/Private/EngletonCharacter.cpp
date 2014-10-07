@@ -88,13 +88,13 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	this->BombardmentParticle = BombardmentParticleAsset.Object;
 	this->MachineGunFireParticle = MachineGunFireParticleAsset.Object;
 	this->PulseParticle = PulseParticleAsset.Object;
-	/*
-		AimMesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("AimMesh"));
-	AimMesh->AttachParent = (Mesh);
-	AimMesh->AttachSocketName = FName(TEXT("AimSocket"));
+	
+	AimMesh2 = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("AimMesh2"));
+	AimMesh2->AttachParent = (Mesh);
+	AimMesh2->AttachSocketName = FName(TEXT("AimSocket2"));
 	//AimMesh->SetStaticMesh(StaticAimMesh.Object);
-	AimMesh->SetHiddenInGame(true);
-	*/
+	AimMesh2->SetHiddenInGame(true);
+	
 	//for sounds
 	IdleSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Idle Sound"));
 	IdleSound->AttachParent = RootComponent;
@@ -176,7 +176,7 @@ void AEngletonCharacter::SkillTwo()
 
 		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
 
-		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw, ProjectileRotation.Roll);
 
 		// spawn the projectile at the muzzle
 		AEngletonCrazyLaser* const Projectile = World->SpawnActor<AEngletonCrazyLaser>(AEngletonCrazyLaser::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
@@ -281,21 +281,25 @@ void AEngletonCharacter::RangedAttack()
 
 		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
 
-		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw, ProjectileRotation.Roll);
 
 		// spawn the projectile at the muzzle
 		AEngletonMachineGun* const Projectile = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+		AEngletonMachineGun* const Projectile2 = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), ProjectileRotation, SpawnParams);
 		if (Projectile)
 		{
 			//particle base is set into play, just need to adjust it's spawn position to the same point as his hands
 			ServerActivateParticle(MachineGunFireParticle);
 
-			Projectile->ProjectileDamage = BasicAttackDamage;
+			Projectile->ProjectileDamage = BasicAttackDamage/2;
+			Projectile2->ProjectileDamage = BasicAttackDamage/2;
 			// Start the particle effect
 			Projectile->ServerActivateProjectile();
+			Projectile2->ServerActivateProjectile();
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			Projectile2->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 		}
 	}
 }
