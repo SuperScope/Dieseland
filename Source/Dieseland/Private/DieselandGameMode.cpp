@@ -132,7 +132,7 @@ APawn* ADieselandGameMode::SpawnDefaultPawnFor(AController* NewPlayer, AActor* S
 	SpawnInfo.Instigator = Instigator;
 	APawn* ResultPawn;
 
-	if (Cast<ADieselandPlayerController>(NewPlayer)->NetPlayerIndex % 2 == 0)
+	if (PlayersSpawned % 2 == 0)
 	{
 		ResultPawn = GetWorld()->SpawnActor<APawn>(MayhemClass, StartLocation, StartRotation, SpawnInfo);
 	}
@@ -141,9 +141,9 @@ APawn* ADieselandGameMode::SpawnDefaultPawnFor(AController* NewPlayer, AActor* S
 		ResultPawn = GetWorld()->SpawnActor<APawn>(EngletonClass, StartLocation, StartRotation, SpawnInfo);
 	}
 
-	if (ResultPawn == NULL)
+	if (ResultPawn != NULL)
 	{
-		GEngine->AddOnScreenDebugMessage(21, 10.0f, FColor::Yellow, NewPlayer->PlayerState->PlayerName);
+		PlayersSpawned++;
 	}
 	return ResultPawn;
 }
