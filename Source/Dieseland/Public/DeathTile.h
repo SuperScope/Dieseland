@@ -21,9 +21,10 @@ class DIESELAND_API ADeathTile : public AActor
     /* Dummy Scene Component to be used as root component*/
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Death Tile")
     TSubobjectPtr<USceneComponent> DummyComponent;
-
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Death Tile")
-	TSubobjectPtr<USphereComponent> SphereCollision;
+    
+    /* Dummy Scene Component to be used as root component*/
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Death Tile")
+    TSubobjectPtr<USphereComponent> SphereCollision;
     
     //Rotation for Tile
     UPROPERTY(BlueprintReadOnly, Category = "Death Tile")
@@ -46,7 +47,7 @@ class DIESELAND_API ADeathTile : public AActor
     bool ReadyToRise;
     
     //Boolean to determine if enemy was found
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
+    UPROPERTY(BlueprintReadWrite, Category = "Death Tile")
     bool EnemyFound;
     
     //Vectors for location
@@ -59,15 +60,13 @@ class DIESELAND_API ADeathTile : public AActor
     //Array for the Death Tile Locations
     TArray<FVector> LocationArray;
     
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
+    UPROPERTY(BlueprintReadWrite, Category = "Death Tile")
 	TArray<AActor*> EnemiesOnTile;
     
     //Find world
     UWorld* const World = GetWorld();
     
-	float EnemyCheckInterval;
-	
-	float EnemyCheckTimer;
+    
     
 protected:
     
@@ -83,8 +82,8 @@ protected:
     void SwitchDeathTile();
     
     //Function for detecting enemies
-    UFUNCTION(BlueprintCallable, Category = "Death Tile")
-	void EnemyDetection();
+      UFUNCTION(BlueprintCallable, Category = "Death Tile")
+	  void EnemyDetection();
     
     
 
