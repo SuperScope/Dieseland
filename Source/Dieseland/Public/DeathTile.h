@@ -21,10 +21,9 @@ class DIESELAND_API ADeathTile : public AActor
     /* Dummy Scene Component to be used as root component*/
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Death Tile")
     TSubobjectPtr<USceneComponent> DummyComponent;
-    
-    /* Volume for collision detection*/
-    UPROPERTY(VisibleAnywhere, Category = "Death Tile")
-    TSubobjectPtr<USphereComponent> SphereComponent;
+
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Death Tile")
+	TSubobjectPtr<USphereComponent> SphereCollision;
     
     //Rotation for Tile
     UPROPERTY(BlueprintReadOnly, Category = "Death Tile")
@@ -33,10 +32,6 @@ class DIESELAND_API ADeathTile : public AActor
     //Scale for Tile
     UPROPERTY(BlueprintReadOnly, Category = "Death Tile")
     FVector DTScale;
-    
-    //Scale for Sphere Collision
-    UPROPERTY(BlueprintReadOnly, Category = "Death Tile")
-    FVector SphereScale;
     
     //Boolean for enemies remaining on tile
     UPROPERTY(BlueprintReadOnly, Category = "Death Tile")
@@ -50,6 +45,13 @@ class DIESELAND_API ADeathTile : public AActor
     UPROPERTY(BlueprintReadWrite, Category = "Death Tile")
     bool ReadyToRise;
     
+    //Boolean to determine if enemy was found
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
+    bool EnemyFound;
+    
+    //Boolean to determine when to check for enemies
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
+    bool CheckForEnemies;
     
     //Vectors for location
     UPROPERTY(BlueprintReadWrite, Category = "Death Tile")
@@ -61,21 +63,32 @@ class DIESELAND_API ADeathTile : public AActor
     //Array for the Death Tile Locations
     TArray<FVector> LocationArray;
     
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
+	TArray<AActor*> EnemiesOnTile;
+    
     //Find world
     UWorld* const World = GetWorld();
     
-    
+	float EnemyCheckInterval;
+	
+	float EnemyCheckTimer;
     
 protected:
     
     
-	virtual void ReceiveActorBeginOverlap(AActor* OtherActor) override;
+	//virtual void ReceiveActorBeginOverlap(AActor* OtherActor) override;
     
-	virtual void ReceiveActorEndOverlap(AActor* OtherActor) override;
+	//virtual void ReceiveActorEndOverlap(AActor* OtherActor) override;
+    
+    virtual void Tick(float DeltaSeconds) override;
     
     //Function for switching Death Tiles
     UFUNCTION(BlueprintCallable, Category = "Death Tile")
     void SwitchDeathTile();
+    
+    //Function for detecting enemies
+    UFUNCTION(BlueprintCallable, Category = "Death Tile")
+	void EnemyDetection();
     
     
 
