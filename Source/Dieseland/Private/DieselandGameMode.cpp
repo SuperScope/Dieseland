@@ -44,25 +44,31 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
 	static ConstructorHelpers::FObjectFinder<UBlueprint> MayhemBPClass(TEXT("Blueprint'/Game/Blueprints/Players/Mayhem_BP.Mayhem_BP'"));
 	static ConstructorHelpers::FObjectFinder<UBlueprint> EngletonBPClass(TEXT("Blueprint'/Game/Blueprints/Engleton.Engleton'"));
 
-	MayhemClass = MayhemBPClass.Object->GeneratedClass;
-	EngletonClass = EngletonBPClass.Object->GeneratedClass;
+	if (MayhemBPClass.Object != nullptr && EngletonBPClass.Object != nullptr)
+	{
+		MayhemClass = MayhemBPClass.Object->GeneratedClass;
+		EngletonClass = EngletonBPClass.Object->GeneratedClass;
+	}
     
-	DeathTileArray.Add(TileClass1.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass2.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass3.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass4.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass5.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass6.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass7.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass8.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass9.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass10.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass11.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass12.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass13.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass14.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass15.Object->GeneratedClass);
-    DeathTileArray.Add(TileClass16.Object->GeneratedClass);
+	if (TileClass1.Object != nullptr && TileClass2.Object != nullptr)
+	{
+		DeathTileArray.Add(TileClass1.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass2.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass3.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass4.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass5.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass6.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass7.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass8.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass9.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass10.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass11.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass12.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass13.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass14.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass15.Object->GeneratedClass);
+		DeathTileArray.Add(TileClass16.Object->GeneratedClass);
+	}
 
     LocationArray.Add(FVector(1193.372559, -4332.289062, -1500.0));
     LocationArray.Add(FVector(1193.372559, -730.476562, -1500.0));
