@@ -9,7 +9,7 @@ public class DieselandEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 	}
-
+   
 	//
 	// TargetRules interface.
 	//
