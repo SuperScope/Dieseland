@@ -28,7 +28,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Overlap);
 	Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Ignore);
 	Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Ignore);
-	Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Overlap);
+	Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	Mesh->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
 	Mesh->SetHiddenInGame(true);
 
@@ -42,7 +42,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	ProjCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Overlap);
 	ProjCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Ignore);
 	ProjCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Ignore);
-	ProjCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Overlap);
+	ProjCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	ProjCollision->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
 
 
@@ -84,7 +84,13 @@ bool ABaseProjectile::ServerActivateProjectile_Validate()
 
 void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
+
 	Super::ReceiveActorBeginOverlap(OtherActor);
+
+	if (OtherActor == NULL || Role == NULL){
+		return;
+	}
+
 	if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 	{
 		if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))

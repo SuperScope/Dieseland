@@ -88,6 +88,10 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 		TSubobjectPtr<class UStaticMeshComponent> AimMesh;
 
+	// Mesh attached to the player
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+		TSubobjectPtr<class UStaticMeshComponent> SkeletalMesh;
+
 	//combat functions
 	UFUNCTION(BlueprintCallable, Category = Combat)
 		void MeleeAttack();

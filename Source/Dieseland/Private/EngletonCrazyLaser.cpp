@@ -11,17 +11,18 @@
 AEngletonCrazyLaser::AEngletonCrazyLaser(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	ProjectileMovement->InitialSpeed = 0.0f;
-	InitialLifeSpan =12.0f;
+	ProjectileMovement->InitialSpeed = 1300.0f;
+	InitialLifeSpan = 1.5f;
 
-	//TODO reset attack damage for engleton machine gun
-
+	//Make the radius larger for this collider
+	ProjCollision->SetCapsuleHalfHeight(100.0f);
+	ProjCollision->SetCapsuleRadius(100.0f);
 	//ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetOwner());
 	//ProjectileDamage = DieselanPawn->BasicAttackDamage;
 
 	//TODO the correct particle effect here
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonCrazyLaser_WIP.Unreal_Particle_EngletonCrazyLaser_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/TempCrazylaser.TempCrazylaser'"));
 	Particle->Template = ParticleSystemAsset.Object;
 }
 
