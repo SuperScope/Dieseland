@@ -22,7 +22,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Overlap);
 
 	// Set the starting health value
-	Health = 550;
+	Health = 175;
 
 	// Create the text component
 	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
@@ -46,7 +46,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	// Tag this character as a player
 	Tags.Add(FName("Enemy"));
 
-	BasicAttackDamage = 25;
+	BasicAttackDamage = 15;
 
 	// Set default ranges
 	MeleeRange = 144.0f;

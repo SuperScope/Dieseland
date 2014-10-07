@@ -30,6 +30,11 @@ AScrap::AScrap(const class FPostConstructInitializeProperties& PCIP)
 	//ScrapCollectionArea->AttachTo(Mesh);
 	//ScrapCollectionArea->SetCollisionProfileName(FName(TEXT("OverlapAll")));
 
+
+	ScrapSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Scrap Collection"));
+	ScrapSound->AttachParent = RootComponent;
+	ScrapSound->bAutoActivate = false;
+
 	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -88,6 +93,7 @@ void AScrap::ReceiveActorBeginOverlap(AActor* OtherActor)
 	if (OtherActor->ActorHasTag(FName(TEXT("Player"))))
 	{
 		CollectScrap(OtherActor);
+		ScrapSound->Play();
 	}
 
 	Super::ReceiveActorBeginOverlap(OtherActor);

@@ -26,6 +26,10 @@ class DIESELAND_API AScrap : public AActor
 	UFUNCTION(BlueprintCallable, Reliable, WithValidation, NetMulticast, Category = Gameplay)
 	void CollectScrap(AActor* OtherActor);
 
+	//sound for scrap
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> ScrapSound;
+
 	TArray<AActor*> ActorsInRange;
 
 	AActor* TargetedActor;

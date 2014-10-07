@@ -59,6 +59,19 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> MayhemSkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_MayhemSkullCrusher_WIP.Unreal_Particle_MayhemSkullCrusher_WIP'"));
 	SkillOneParticle = MayhemSkillOneParticleAsset.Object;
 
+	IronArmorSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Iron Armor Sound"));
+	IronArmorSound->AttachParent = RootComponent;
+	IronArmorSound->bAutoActivate = true;
+
+	PunchSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Punch Sound"));
+	PunchSound->AttachParent = RootComponent;
+	PunchSound->bAutoActivate = false;
+
+	UltimateSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Ultimate Sound"));
+	UltimateSound->AttachParent = RootComponent;
+	UltimateSound->bAutoActivate = false;
+
+
 }
 
 void AMayhemCharacter::Tick(float DeltaSeconds)
@@ -132,6 +145,7 @@ void AMayhemCharacter::MeleeAttack()
 			EditHealth(-1 * BasicAttackDamage, CurActor);
 		}
 	}
+	PunchSound->Play();
 }
 
 void AMayhemCharacter::SkillOne()
@@ -174,6 +188,7 @@ void AMayhemCharacter::SkillOne()
 			}
 		}
 	}
+	UltimateSound->Play();
 }
 
 void AMayhemCharacter::SkillTwo()
@@ -199,6 +214,7 @@ void AMayhemCharacter::SkillThree()
 	Health += IronArmorHealthBuff;
 
 	HealthRegeneration += IronArmorRegenBuff;
+	IronArmorSound->Play();
 }
 
 void AMayhemCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
