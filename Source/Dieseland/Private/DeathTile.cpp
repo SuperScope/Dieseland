@@ -80,7 +80,7 @@ void ADeathTile::ReceiveActorEndOverlap(AActor* Enemy)
 
 void ADeathTile::SwitchDeathTile()
 {
-    if(IsTileDown == true && World)
+    if(IsTileDown == true && World && Role == ROLE_Authority)
     {
         World->DestroyActor(this);
         int32 RandomIndex = FMath::RandRange(0, 15);

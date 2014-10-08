@@ -126,7 +126,7 @@ bool ADieselandGameMode::StartGame_Validate()
 	return true;
 }
 
-void ADieselandGameMode::RespawnTile_Implementation(FVector SpawnLocation)
+void ADieselandGameMode::RespawnTile(FVector SpawnLocation)
 {
 	//Find world
 	UWorld* const World = GetWorld();
@@ -136,11 +136,6 @@ void ADieselandGameMode::RespawnTile_Implementation(FVector SpawnLocation)
 		int32 RandomIndex = FMath::RandRange(0, 15);
 		UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, DeathTileArray[RandomIndex], SpawnLocation, FRotator(0, 0, 0));
 	}
-}
-
-bool ADieselandGameMode::RespawnTile_Validate(FVector SpawnLocation)
-{
-	return true;
 }
 
 void ADieselandGameMode::EndGame_Implementation()

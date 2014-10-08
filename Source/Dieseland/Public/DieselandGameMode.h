@@ -23,7 +23,7 @@ class ADieselandGameMode : public AGameMode
 	UFUNCTION(Reliable, Server, WithValidation, Category = Gameplay)
 	void StartGame();
 
-	UFUNCTION(Reliable, Server, WithValidation, Category = Gameplay)
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void RespawnTile(FVector SpawnLocation);
 
 	UFUNCTION(Reliable, Server, WithValidation, Category = Gameplay)
