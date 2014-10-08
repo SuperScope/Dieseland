@@ -129,6 +129,7 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
 		float StunRemaining;
 
+
 protected:
 
 	//timer for updating UI

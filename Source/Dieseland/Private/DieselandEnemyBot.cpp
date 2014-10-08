@@ -6,8 +6,7 @@
 #include "DieselandCharacter.h"
 #include "DieselandPlayerController.h"
 #include "DieselandEnemyAI.h"
-#include "BaseProjectile.h"
-#include "EnemyBaseProjectile.h"
+#include "BaseWalkerProjectile.h"
 #include "UnrealNetwork.h"
 #include "EngletonCrazyLaser.h"
 
@@ -191,7 +190,7 @@ void ADieselandEnemyBot::RangedAttack_Implementation()
 			ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
 
 			// spawn the projectile at the muzzle
-			ABaseProjectile* const Projectile = World->SpawnActor<ABaseProjectile>(ABaseProjectile::StaticClass(), SkeletalMesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+			ABaseWalkerProjectile* const Projectile = World->SpawnActor<ABaseWalkerProjectile>(ABaseWalkerProjectile::StaticClass(), SkeletalMesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 			if (Projectile)
 			{
 				Projectile->ProjectileDamage = BasicAttackDamage;
@@ -298,3 +297,5 @@ void ADieselandEnemyBot::OnZoneExit()
 	
 
 }
+
+

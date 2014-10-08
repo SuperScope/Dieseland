@@ -1,7 +1,7 @@
 
 
 #include "Dieseland.h"
-#include "BaseProjectile.h"
+#include "BaseWalkerProjectile.h"
 #include "UnrealNetwork.h"
 #include "DieselandEnemyBot.h"
 #include "DieselandEnemyAI.h"
@@ -12,10 +12,11 @@
 #include "Particles/ParticleSystemComponent.h"
 
 
-ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties& PCIP)
-	: Super(PCIP)
-{
 
+ABaseWalkerProjectile::ABaseWalkerProjectile(const class FPostConstructInitializeProperties& PCIP)
+: Super(PCIP)
+{
+	IsAI = true;
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Sphere.Shape_Sphere'"));
 	Mesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("Mesh"));
 	Mesh->SetStaticMesh(StaticMesh.Object);
@@ -45,7 +46,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	ProjCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Ignore);
 	ProjCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	ProjCollision->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
-	
+
 
 	ProjectileMovement = PCIP.CreateDefaultSubobject<UProjectileMovementComponent>(this, TEXT("ProjectileMovement"));
 	ProjectileMovement->SetIsReplicated(true);
@@ -73,47 +74,70 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	Particle->SetIsReplicated(true);
 }
 
-void ABaseProjectile::ServerActivateProjectile_Implementation()
+void ABaseWalkerProjectile::ServerActivateProjectile_Implementation()
 {
 	Particle->ActivateSystem();
 }
 
-bool ABaseProjectile::ServerActivateProjectile_Validate()
+bool ABaseWalkerProjectile::ServerActivateProjectile_Validate()
 {
 	return true;
 }
 
-void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
+void ABaseWalkerProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
 	Super::ReceiveActorBeginOverlap(OtherActor);
 
 	if (OtherActor == nullptr || OtherActor == NULL || Role == NULL){
 		return;
 	}
-
-	if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
+	if (IsAI == false)
 	{
-		if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))
+		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 		{
-			Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
-			if (!Piercing)				{
+			if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))
+			{
+				Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
+				if (!Piercing)
+				{
+					this->Destroy();
+				}
+
+			}
+			else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
+			{
 				this->Destroy();
 			}
 		}
-		else if (!OtherActor->ActorHasTag(TEXT("Projectile")))			
-		{				
-			this->Destroy();
-		}
-	}
+	}//end is AI
 
+	else if (IsAI)
+	{
+		if (Role == ROLE_Authority && Cast<ADieselandEnemyAI>(GetOwner())->GetPawn() != OtherActor)
+		{
+			if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))
+			{
+				Cast<ADieselandEnemyBot>(Cast<ADieselandEnemyAI>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
+				if (!Piercing)
+				{
+					this->Destroy();
+				}
+
+			}
+			else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
+			{
+				this->Destroy();
+			}
+		}
+	}//end is AI*/
 }
 
-void ABaseProjectile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+void ABaseWalkerProjectile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	// Replicate to everyone
-	DOREPLIFETIME(ABaseProjectile, ProjectileMovement);
-	DOREPLIFETIME(ABaseProjectile, Particle);
+	DOREPLIFETIME(ABaseWalkerProjectile, ProjectileMovement);
+	DOREPLIFETIME(ABaseWalkerProjectile, Particle);
 
 }
