@@ -30,6 +30,10 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     }
 
 	PrimaryActorTick.bCanEverTick = true;
+
+	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
+	bReplicates = true;
+	bReplicateMovement = true;
     
     //Set values for rotation and scale
     DTRotation.Add(0, 22.5, 0);
@@ -76,12 +80,12 @@ void ADeathTile::ReceiveActorEndOverlap(AActor* Enemy)
 
 void ADeathTile::SwitchDeathTile()
 {
-    if(IsTileDown == true)
+    if(IsTileDown == true && World)
     {
         World->DestroyActor(this);
         int32 RandomIndex = FMath::RandRange(0, 15);
-        UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, Cast <ADieselandGameMode> (World->GetAuthGameMode())->DeathTileArray[RandomIndex], TargetLocation, FRotator(0,0,0));
-        
+        //UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, Cast <ADieselandGameMode> (World->GetAuthGameMode())->DeathTileArray[RandomIndex], TargetLocation, FRotator(0,0,0));
+		Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->RespawnTile(TargetLocation);
         
     }
 }
