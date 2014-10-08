@@ -49,8 +49,8 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 
 	// Set default ranges
 	MeleeRange = 144.0f;
-	AttackZone = 1600.0f;
-	ProjectileZone = 1000.0f;
+	AttackZone = 1800.0f;
+	ProjectileZone = 1200.0f;
 
 	// Cooldown values
 	BasicAttackCooldown = 0.2f;
@@ -97,6 +97,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	//here we set the dieseland aggresion to true
 	isAggressive = false;
 	LingerCount = 0;
+
 }
 
 void ADieselandEnemyBot::Tick(float DeltaSeconds)
@@ -185,9 +186,9 @@ void ADieselandEnemyBot::RangedAttack_Implementation()
 			SpawnParams.Owner = Cast<ADieselandEnemyAI>(this->Controller);
 			SpawnParams.Instigator = Instigator;
 
-			FRotator ProjectileRotation = SkeletalMesh->GetSocketRotation(FName(TEXT("AimSocket")));
+			FRotator ProjectileRotation = this->GetActorRotation();
 
-			ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+			ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw, ProjectileRotation.Roll);
 
 			// spawn the projectile at the muzzle
 			ABaseWalkerProjectile* const Projectile = World->SpawnActor<ABaseWalkerProjectile>(ABaseWalkerProjectile::StaticClass(), SkeletalMesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
@@ -197,7 +198,7 @@ void ADieselandEnemyBot::RangedAttack_Implementation()
 				Projectile->ServerActivateProjectile();
 
 				// Add the character's velocity to the projectile
-				//Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+				Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 			}
 		}
 	}

@@ -50,7 +50,8 @@ ABaseWalkerProjectile::ABaseWalkerProjectile(const class FPostConstructInitializ
 
 	ProjectileMovement = PCIP.CreateDefaultSubobject<UProjectileMovementComponent>(this, TEXT("ProjectileMovement"));
 	ProjectileMovement->SetIsReplicated(true);
-	ProjectileMovement->InitialSpeed = 800.0f;
+	ProjectileMovement->InitialSpeed = 1200.0f;
+//	ProjectileMovement->Velocity
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 	ProjectileMovement->bInitialVelocityInLocalSpace = false;
 	ProjectileMovement->UpdatedComponent = Mesh;
@@ -58,6 +59,7 @@ ABaseWalkerProjectile::ABaseWalkerProjectile(const class FPostConstructInitializ
 	ProjectileMovement->bShouldBounce = false;
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/MovingBulletTest_WIP.MovingBulletTest_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> LaunchParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/TempCrazylaser.TempCrazylaser'"));
 	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	Particle->Template = ParticleSystemAsset.Object;
 	Particle->AttachTo(Mesh);
