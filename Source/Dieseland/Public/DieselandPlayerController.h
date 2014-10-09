@@ -13,6 +13,11 @@ public:
 	UFUNCTION(reliable, Server, WithValidation)
 	void ServerEditHealth(int32 Amt, AActor* Target);
 
+	// Called by the server to edit client's speed, and damage
+	UFUNCTION(reliable, Server, WithValidation)
+		void ServerEditSpeedDamage(int32 Speed, int32 Damage, AActor* Target);
+
+
 	// Calculated rotation of torso
 	FRotator FacingRotation;
 

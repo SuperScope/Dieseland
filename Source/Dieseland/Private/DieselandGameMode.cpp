@@ -43,9 +43,11 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
 	
 	static ConstructorHelpers::FObjectFinder<UBlueprint> MayhemBPClass(TEXT("Blueprint'/Game/Blueprints/Players/Mayhem_BP.Mayhem_BP'"));
 	static ConstructorHelpers::FObjectFinder<UBlueprint> EngletonBPClass(TEXT("Blueprint'/Game/Blueprints/Engleton.Engleton'"));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> StrykerBPClass(TEXT("Blueprint'/Game/Blueprints/Engleton.Engleton'"));
 
 	MayhemClass = MayhemBPClass.Object->GeneratedClass;
 	EngletonClass = EngletonBPClass.Object->GeneratedClass;
+	StrykerClass = StrykerBPClass.Object->GeneratedClass;
     
 	DeathTileArray.Add(TileClass1.Object->GeneratedClass);
     DeathTileArray.Add(TileClass2.Object->GeneratedClass);

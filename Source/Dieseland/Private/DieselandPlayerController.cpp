@@ -290,6 +290,20 @@ void ADieselandPlayerController::ServerEditHealth_Implementation(int32 Amt, AAct
 	}
 }
 
+bool ADieselandPlayerController::ServerEditSpeedDamage_Validate(int32 Speed, int32 Damage, AActor* Target)
+{
+	return true;
+}
+
+void ADieselandPlayerController::ServerEditSpeedDamage_Implementation(int32 Speed, int32 Damage, AActor* Target)
+{
+	// Edit the health of the specific pawn
+	if (GetPawn() != nullptr)
+	{
+		Cast<ADieselandCharacter>(GetPawn())->EditSpeedDamage(Speed, Damage, Target);
+	}
+}
+
 void ADieselandPlayerController::OnMoveForward(float Val)
 {
 	if (GetPawn() != nullptr && !Cast<ADieselandCharacter>(GetPawn())->StatusEffects.Contains(FString("Stunned"))){

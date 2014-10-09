@@ -10,6 +10,7 @@
 #include "ParticleDefinitions.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "StrykerCharacter.h"
 
 
 ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties& PCIP)
@@ -90,19 +91,38 @@ void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 	if (OtherActor == nullptr || OtherActor == NULL || Role == NULL){
 		return;
 	}
-
-	if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
-	{
-		if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))
+	if (IsPoison == false){
+		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 		{
-			Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
-			if (!Piercing)				{
+			if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))
+			{
+				Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
+				if (!Piercing)				{
+					this->Destroy();
+				}
+			}
+			else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
+			{
 				this->Destroy();
 			}
 		}
-		else if (!OtherActor->ActorHasTag(TEXT("Projectile")))			
-		{				
-			this->Destroy();
+	}
+	//this is for stryker only, ispoisoin is set to true on the poison projectiles
+	else if (IsPoison)
+	{
+		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
+		{
+			if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))
+			{
+				Cast<AStrykerCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditSpeedDamage(-1 * PoisionSlowAmount, PoisionDamageReductionAmount, OtherActor);
+				if (!Piercing)				{
+					this->Destroy();
+				}
+			}
+			else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
+			{
+				this->Destroy();
+			}
 		}
 	}
 

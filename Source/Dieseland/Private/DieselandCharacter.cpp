@@ -236,6 +236,31 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 	}
 }
 
+//function for adjusting speed and health, currently using this for strykers posions, I put the function here so it is extendable to other characters in case
+//we want to use it again in the future
+void ADieselandCharacter::EditSpeedDamage(int32 Speed, int32 Damage, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+		Cast<ADieselandCharacter>(Target)->MoveSpeed = Cast<ADieselandCharacter>(Target)->MoveSpeed * Speed;
+		Cast<ADieselandCharacter>(Target)->BasicAttackDamage = Cast<ADieselandCharacter>(Target)->BasicAttackDamage * Damage;
+		Cast<ADieselandCharacter>(Target)->CalculateStats();
+
+		if (Role < ROLE_Authority)
+		{
+			Cast<ADieselandPlayerController>(Controller)->ServerEditSpeedDamage(Speed, Damage, Target);
+		}
+	}
+	else if (Target->ActorHasTag(FName(TEXT("Enemy"))))
+	{
+		//ServerDamageEnemy(Amt, Target);
+	}
+	else if (Target->ActorHasTag(FName(TEXT("ScrapBox"))))
+	{
+		Cast<AScrapBox>(Target)->DestroyCrate(this);
+	}
+}
+
 void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Target)
 {
 	Cast<ADieselandEnemyBot>(Target)->Health += Amt;
@@ -261,6 +286,17 @@ void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Ta
 		}
 	}
 } 
+
+bool ADieselandCharacter::ServerChangeSpeedDamageEnemy_Validate(int32 Speed, int32 Damage, AActor* Target)
+{
+	return true;
+}
+
+void ADieselandCharacter::ServerChangeSpeedDamageEnemy_Implementation(int32 Speed, int32 Damage, AActor* Target)
+{
+	Cast<ADieselandEnemyBot>(Target)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandEnemyBot>(Target)->CharacterMovement->MaxWalkSpeed * Speed;
+	Cast<ADieselandEnemyBot>(Target)->BasicAttackDamage = Cast<ADieselandCharacter>(Target)->BasicAttackDamage * Damage;
+}
 
 bool ADieselandCharacter::ServerDamageEnemy_Validate(int32 Amt, AActor* Target)
 {

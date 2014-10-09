@@ -38,6 +38,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void EditHealth(int32 Amt, AActor* Target);
 
+
+	// Called to adjust movement speed and damage
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+	void EditSpeedDamage(int32 Speed, int32 Damage, AActor* Target);
+
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Kills;
 
@@ -217,6 +222,9 @@ public:
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerDamageEnemy(int32 Amt, AActor* Target);
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerChangeSpeedDamageEnemy(int32 Speed,int32 Damage, AActor* Target);
 
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
 	UParticleSystem* SkillThreeParticle;
