@@ -281,6 +281,9 @@ void ADieselandEnemyBot::OnZoneEnter()
 
 		if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player")))){
 			isAggressive = true;
+			if (IsMelee == false){
+				this->CharacterMovement->MaxWalkSpeed = 400;
+			}
 		}
 	}
 }
