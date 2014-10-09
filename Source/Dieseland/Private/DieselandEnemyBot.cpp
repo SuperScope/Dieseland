@@ -249,6 +249,7 @@ void ADieselandEnemyBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	DOREPLIFETIME(ADieselandEnemyBot, Health);
 	DOREPLIFETIME(ADieselandEnemyBot, AimMesh);
 	DOREPLIFETIME(ADieselandEnemyBot, SkeletalMesh);
+	DOREPLIFETIME(ADieselandEnemyBot, Mesh);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackTimer);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackActive);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackDamage);

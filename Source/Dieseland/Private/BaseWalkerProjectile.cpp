@@ -118,8 +118,8 @@ void ABaseWalkerProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 	{
 		if (Role == ROLE_Authority && Cast<ADieselandEnemyAI>(GetOwner())->GetPawn() != OtherActor)
 		{
-
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Thasdasdsas an on screen message!"));
+			
+			UE_LOG(LogClass, Log, TEXT("Log text %s"), *OtherActor->GetName());
 			if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))
 			{
 				Cast<ADieselandEnemyBot>(Cast<ADieselandEnemyAI>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
