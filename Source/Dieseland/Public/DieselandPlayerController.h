@@ -78,7 +78,7 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void SwapMelee();
 
-	UFUNCTION(Reliable, Server, WithValidation)
+	UFUNCTION(Reliable, Server, WithValidation, BlueprintCallable, Category = Gameplay)
 	void RespawnPawn();
 
 protected:
@@ -89,6 +89,8 @@ protected:
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
+
+	virtual void ReceiveBeginPlay() override;
 
 	// Movment input events
 	void OnMoveForward(float Val);

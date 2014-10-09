@@ -61,7 +61,7 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 
 	IronArmorSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Iron Armor Sound"));
 	IronArmorSound->AttachParent = RootComponent;
-	IronArmorSound->bAutoActivate = true;
+	IronArmorSound->bAutoActivate = false;
 
 	PunchSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Punch Sound"));
 	PunchSound->AttachParent = RootComponent;
