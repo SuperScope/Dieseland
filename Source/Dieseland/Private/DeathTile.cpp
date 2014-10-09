@@ -22,7 +22,7 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
 	SphereCollision->AttachTo(DeathTileMesh);
     
     //Find the Octogon mesh
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshOctogon(TEXT("StaticMesh'/Game/Level/Maya_Octogon_export.Maya_Octogon_export'"));
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshOctogon(TEXT("StaticMesh'/Game/PropsDLC/Mesh_Environment_DeathTile_WIP.Mesh_Environment_DeathTile_WIP'"));
     
     //If there is an Octogon mesh, set it to the tile mesh component
     if(StaticMeshOctogon.Object){
@@ -34,10 +34,11 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
 	bReplicateMovement = true;
+	
     
     //Set values for rotation and scale
     DTRotation.Add(0, 22.5, 0);
-    DTScale.Set(90, 90, 30);
+    DTScale.Set(1, 1, 1);
     
     //Set Dummy Component as parent
     DeathTileMesh->AttachParent = DummyComponent;
