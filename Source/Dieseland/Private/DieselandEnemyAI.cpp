@@ -201,7 +201,7 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 		}
 	}
 	GameTimer += DeltaSeconds;
-	if (GameTimer > 1 && GameTimer < 2)
+	if (GameTimer > 1 && GameTimer < 2 && Cast<ADieselandEnemyBot>(GetPawn()) != nullptr)
 	{
 		ADieselandEnemyBot* BotPawn = Cast<ADieselandEnemyBot>(GetPawn());
 		SpawnLocationID = BlackboardComp->GetKeyID("SpawnPoint");

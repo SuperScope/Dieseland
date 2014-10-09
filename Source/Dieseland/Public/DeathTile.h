@@ -23,7 +23,7 @@ class DIESELAND_API ADeathTile : public AActor
     TSubobjectPtr<USceneComponent> DummyComponent;
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Death Tile")
-	TSubobjectPtr<USphereComponent> SphereCollision;
+	TSubobjectPtr<UCapsuleComponent> SphereCollision;
     
     //Rotation for Tile
     UPROPERTY(BlueprintReadOnly, Category = "Death Tile")
