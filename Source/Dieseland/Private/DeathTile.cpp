@@ -18,7 +18,9 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     //Set Root Component as the Dummy Component
     RootComponent = DummyComponent;
 
-	SphereCollision = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("SphereCollision"));
+	SphereCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("SphereCollision"));
+	SphereCollision->SetCapsuleHalfHeight(1900.0f);
+	SphereCollision->SetCapsuleRadius(1900.0f);
 	SphereCollision->AttachTo(DeathTileMesh);
     
     //Find the Octogon mesh
@@ -103,7 +105,7 @@ void ADeathTile::EnemyDetection()
 	for (int32 b = 0; b < EnemiesOnTile.Num(); b++)
 	{
 		CurActor = EnemiesOnTile[b];
-		if (/*!CurActor &&*/ CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+		if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Enemy"))))
         {
             EnemyFound = true;
             EnemiesRemaining = true;
