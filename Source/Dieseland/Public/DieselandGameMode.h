@@ -20,8 +20,11 @@ class ADieselandGameMode : public AGameMode
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	float GameTimer;
 
-	UFUNCTION(Reliable, NetMulticast, Category = Gameplay)
+	UFUNCTION(Reliable, Server, WithValidation, Category = Gameplay)
 	void StartGame();
+
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+	void RespawnTile(FVector SpawnLocation);
 
 	UFUNCTION(Reliable, Server, WithValidation, Category = Gameplay)
 	void EndGame();

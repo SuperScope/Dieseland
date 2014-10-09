@@ -18,11 +18,13 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     //Set Root Component as the Dummy Component
     RootComponent = DummyComponent;
 
-	SphereCollision = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("SphereCollision"));
+	SphereCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("SphereCollision"));
+	SphereCollision->SetCapsuleHalfHeight(1900.0f);
+	SphereCollision->SetCapsuleRadius(1900.0f);
 	SphereCollision->AttachTo(DeathTileMesh);
     
     //Find the Octogon mesh
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshOctogon(TEXT("StaticMesh'/Game/Level/Maya_Octogon_export.Maya_Octogon_export'"));
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshOctogon(TEXT("StaticMesh'/Game/PropsDLC/Mesh_Environment_DeathTile_WIP.Mesh_Environment_DeathTile_WIP'"));
     
     //If there is an Octogon mesh, set it to the tile mesh component
     if(StaticMeshOctogon.Object){
@@ -30,10 +32,15 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     }
 
 	PrimaryActorTick.bCanEverTick = true;
+
+	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
+	bReplicates = true;
+	bReplicateMovement = true;
+	
     
     //Set values for rotation and scale
     DTRotation.Add(0, 22.5, 0);
-    DTScale.Set(90, 90, 30);
+    DTScale.Set(1, 1, 1);
     
     //Set Dummy Component as parent
     DeathTileMesh->AttachParent = DummyComponent;
@@ -76,12 +83,12 @@ void ADeathTile::ReceiveActorEndOverlap(AActor* Enemy)
 
 void ADeathTile::SwitchDeathTile()
 {
-    if(IsTileDown == true)
+    if(IsTileDown == true && World && Role == ROLE_Authority)
     {
         World->DestroyActor(this);
         int32 RandomIndex = FMath::RandRange(0, 15);
-        UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, Cast <ADieselandGameMode> (World->GetAuthGameMode())->DeathTileArray[RandomIndex], TargetLocation, FRotator(0,0,0));
-        
+        //UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, Cast <ADieselandGameMode> (World->GetAuthGameMode())->DeathTileArray[RandomIndex], TargetLocation, FRotator(0,0,0));
+		Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->RespawnTile(TargetLocation);
         
     }
 }
@@ -98,7 +105,7 @@ void ADeathTile::EnemyDetection()
 	for (int32 b = 0; b < EnemiesOnTile.Num(); b++)
 	{
 		CurActor = EnemiesOnTile[b];
-		if (/*!CurActor &&*/ CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+		if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Enemy"))))
         {
             EnemyFound = true;
             EnemiesRemaining = true;
