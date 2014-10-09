@@ -17,6 +17,7 @@ AStrykerPoisionProjectile::AStrykerPoisionProjectile(const class FPostConstructI
 {
 	ProjectileMovement->InitialSpeed = 1100.0f;
 	InitialLifeSpan = 1.3f;
+	IsPoison = true;
 
 	//Make the radius larger for this collider
 	ProjCollision->SetCapsuleHalfHeight(100.0f);

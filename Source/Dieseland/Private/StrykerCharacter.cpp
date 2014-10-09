@@ -75,8 +75,8 @@ void AStrykerCharacter::SkillTwo()
 		if (Projectile)
 		{
 			Projectile->ProjectileDamage = 0;
-			Projectile->PoisionSlowAmount = (35 + (Dexterity * 0.35f))/100;
-			Projectile->PoisionDamageReductionAmount = (35 + (Dexterity * 0.35f))/100;
+			Projectile->PoisionSlowAmount = int(75 - Dexterity / 2);
+			Projectile->PoisionDamageReductionAmount = int(75 - Dexterity / 2);
 			// Start the particle effect
 			Projectile->ServerActivateProjectile();
 

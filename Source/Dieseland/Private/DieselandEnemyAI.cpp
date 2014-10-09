@@ -165,6 +165,20 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 				DieselandPawn->BasicAttackTimer = 1.0f;
 			}
 		}
+
+
+		//update actions
+		if (UpdateTimer > 0.0f)
+		{
+			if (UpdateTimer < 0.0f){
+				UpdateTimer -= DeltaSeconds;
+				SearchForSpawnLocation();
+				DieselandPawn->OnZoneEnter();
+				DieselandPawn->OnProjectileZoneEnter();
+				UpdateTimer = 0.2f;
+			}
+		}
+
 		// Basic Attack actions
 		if (DieselandPawn->BasicAttackTimer <= 0.0f && DieselandPawn->BasicAttackActive)
 		{

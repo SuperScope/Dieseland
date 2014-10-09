@@ -290,10 +290,6 @@ void ADieselandPlayerController::ServerEditHealth_Implementation(int32 Amt, AAct
 	}
 }
 
-bool ADieselandPlayerController::ServerEditSpeedDamage_Validate(int32 Speed, int32 Damage, AActor* Target)
-{
-	return true;
-}
 
 void ADieselandPlayerController::ServerEditSpeedDamage_Implementation(int32 Speed, int32 Damage, AActor* Target)
 {
@@ -302,6 +298,11 @@ void ADieselandPlayerController::ServerEditSpeedDamage_Implementation(int32 Spee
 	{
 		Cast<ADieselandCharacter>(GetPawn())->EditSpeedDamage(Speed, Damage, Target);
 	}
+}
+
+bool ADieselandPlayerController::ServerEditSpeedDamage_Validate(int32 Speed, int32 Damage, AActor* Target)
+{
+	return true;
 }
 
 void ADieselandPlayerController::OnMoveForward(float Val)

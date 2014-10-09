@@ -64,6 +64,9 @@ class DIESELAND_API ADieselandEnemyAI : public AAIController
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerRangedAttack();
 
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+		float UpdateTimer;
+
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		float GameTimer;

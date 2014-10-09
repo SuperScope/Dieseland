@@ -20,8 +20,12 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	CapsuleComponent->InitCapsuleSize(42.f, 96.0f);
 	CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Overlap);
 
-	// Set the starting health value
+	// Set the starting values
+	MaxHealth = 175;
 	Health = 175;
+	BaseAttackDamage = 25;
+	BasicAttackDamage = 25;
+	HealthRegeneration = 2;
 
 	// Create the text component
 	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
@@ -45,7 +49,6 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	// Tag this character as a player
 	Tags.Add(FName("Enemy"));
 
-	BasicAttackDamage = 15;
 
 	// Set default ranges
 	MeleeRange = 144.0f;
@@ -100,6 +103,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 
 }
 
+
 void ADieselandEnemyBot::Tick(float DeltaSeconds)
 {
 	// Every frame set the health display
@@ -107,6 +111,28 @@ void ADieselandEnemyBot::Tick(float DeltaSeconds)
 	PlayerLabel->SetText(FString::FromInt(Health));
 
 	Super::Tick(DeltaSeconds);
+
+	//for when a character is poisoned
+	if (IsPoisoned)
+	{
+		PoisonTimer += DeltaSeconds;
+		if (PoisonTimer > 3)
+		{
+			IsPoisoned = false;
+			PoisonTimer = 0;
+			ResetStats();
+		}
+
+	}
+	//here we setup health regeneration for bots
+	if (Health < MaxHealth){
+		HealthRegenTimer += DeltaSeconds;
+		if (HealthRegenTimer > 1)
+		{
+			Health += HealthRegeneration;
+			HealthRegenTimer = 0;
+		}
+	}
 	if (LingerTimer > 0.0f)
 	{
 		LingerTimer -= DeltaSeconds;
@@ -126,6 +152,13 @@ void ADieselandEnemyBot::Tick(float DeltaSeconds)
 			LingerCount = 0;
 		}
 	}
+}
+
+void ADieselandEnemyBot::ResetStats()
+{
+	BasicAttackDamage = BaseAttackDamage;
+	HealthRegeneration = 2;
+	this->CharacterMovement->MaxWalkSpeed = 400;
 }
 
 void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Target)
@@ -247,13 +280,8 @@ void ADieselandEnemyBot::OnZoneEnter()
 		if (!CurActor->IsValidLowLevel()) continue;
 
 		if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player")))){
-			this->CharacterMovement->MaxWalkSpeed = 400;
 			isAggressive = true;
 		}
-	}
-	if (!isAggressive)
-	{
-		this->CharacterMovement->MaxWalkSpeed = 400;
 	}
 }
 
@@ -292,11 +320,5 @@ void ADieselandEnemyBot::OnProjectileZoneEnter()
 
 }
 
-
-void ADieselandEnemyBot::OnZoneExit()
-{
-	
-
-}
 
 

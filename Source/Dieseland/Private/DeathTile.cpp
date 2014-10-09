@@ -102,13 +102,11 @@ void ADeathTile::EnemyDetection()
         {
             EnemyFound = true;
             EnemiesRemaining = true;
-            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Enemy Found!"));
         }
         
         if(b == EnemiesOnTile.Num()-1 && EnemyFound == false)
         {
             EnemiesRemaining = false;
-            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("There are no enemies!"));
         }
 	}
 

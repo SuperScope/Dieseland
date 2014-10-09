@@ -4,6 +4,7 @@
 #include "BaseProjectile.h"
 #include "UnrealNetwork.h"
 #include "DieselandEnemyBot.h"
+#include "DieselandCharacter.h"
 #include "DieselandEnemyAI.h"
 #include "DieselandCharacter.h"
 #include "DieselandPlayerController.h"
@@ -108,13 +109,13 @@ void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 		}
 	}
 	//this is for stryker only, ispoisoin is set to true on the poison projectiles
-	else if (IsPoison)
+	if (IsPoison)
 	{
 		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 		{
 			if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))
 			{
-				Cast<AStrykerCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditSpeedDamage(-1 * PoisionSlowAmount, PoisionDamageReductionAmount, OtherActor);
+				Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditSpeedDamage(PoisionSlowAmount, PoisionDamageReductionAmount, OtherActor);
 				if (!Piercing)				{
 					this->Destroy();
 				}

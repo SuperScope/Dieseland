@@ -50,7 +50,7 @@ ABaseWalkerProjectile::ABaseWalkerProjectile(const class FPostConstructInitializ
 
 	ProjectileMovement = PCIP.CreateDefaultSubobject<UProjectileMovementComponent>(this, TEXT("ProjectileMovement"));
 	ProjectileMovement->SetIsReplicated(true);
-	ProjectileMovement->InitialSpeed = 1200.0f;
+	ProjectileMovement->InitialSpeed = 1600.0f;
 //	ProjectileMovement->Velocity
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 	ProjectileMovement->bInitialVelocityInLocalSpace = false;
