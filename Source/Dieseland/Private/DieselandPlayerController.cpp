@@ -289,6 +289,8 @@ void ADieselandPlayerController::ServerReload_Implementation()
 
 void ADieselandPlayerController::OnEscape()
 {
+	// TODO: Add pause menu rather than exiting to menu, and additional MP cleanup
+
 	if (Role != ROLE_Authority)
 	{
 		APawn* TempPawn = GetPawn();
