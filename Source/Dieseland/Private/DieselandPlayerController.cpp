@@ -20,10 +20,10 @@ ADieselandPlayerController::ADieselandPlayerController(const class FPostConstruc
 	//bShowMouseCursor = true;
 	//DefaultMouseCursor = EMouseCursor::Crosshairs;
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> ScrapBlueprint(TEXT("Blueprint'/Game/Blueprints/Scrap_BP.Scrap_BP'"));
+	static ConstructorHelpers::FObjectFinder<UClass> ScrapBlueprint(TEXT("Class'/Game/Blueprints/Scrap_BP.Scrap_BP_C'"));
 	if (ScrapBlueprint.Object)
 	{
-		ScrapClass = (UClass*)ScrapBlueprint.Object->GeneratedClass;
+		ScrapClass = (UClass*)ScrapBlueprint.Object;
 	}
 
 	HealthRegenTimer = 0;
