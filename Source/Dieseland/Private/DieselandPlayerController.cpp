@@ -214,6 +214,8 @@ void ADieselandPlayerController::SetupInputComponent()
 	InputComponent->BindAction("UpgradeDexterity", IE_Pressed, this, &ADieselandPlayerController::UpgradeDexterity);
 	InputComponent->BindAction("UpgradeConstitution", IE_Pressed, this, &ADieselandPlayerController::UpgradeConstitution);
 
+	InputComponent->BindAction("Escape", IE_Pressed, this, &ADieselandPlayerController::OnEscape);
+
 	InputComponent->BindAction("Debug_MeleeSwap", IE_Released, this, &ADieselandPlayerController::SwapMelee);
 }
 
@@ -283,6 +285,18 @@ void ADieselandPlayerController::ServerReload_Implementation()
 			DieselandPawn->BasicAttackAmmo = 0;
 		}
 	}
+}
+
+void ADieselandPlayerController::OnEscape()
+{
+	if (Role != ROLE_Authority)
+	{
+		APawn* TempPawn = GetPawn();
+		this->UnPossess();
+		TempPawn->Destroy();
+	}
+	GetWorld()->GetGameViewport()->RemoveAllViewportWidgets();
+	ConsoleCommand("open Dieseland_UserInterface");
 }
 
 bool ADieselandPlayerController::ServerEditHealth_Validate(int32 Amt, AActor* Target)

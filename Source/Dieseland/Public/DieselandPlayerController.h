@@ -55,6 +55,7 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void UpgradeConstitution();
 
+	void OnEscape();
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void UpdateCooldownTimers(float DeltaSeconds);
@@ -64,7 +65,7 @@ public:
 	int32 LingerDamage;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
-		int32 LingerCount; 
+	int32 LingerCount; 
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
 	int32 StatPlusCount;
