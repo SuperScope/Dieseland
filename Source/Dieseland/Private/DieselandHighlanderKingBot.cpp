@@ -17,9 +17,11 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 {
 	CannonRange = 800;
 	CannonAttackDamage = 40;
-	BasicAttackDamage = 60;
-
-	Health = 1500;
+	BaseAttackDamage = 60;
+	HealthRegeneration = 6;
+	BasicAttackDamage = BaseAttackDamage;
+	MaxHealth = 1500;
+	Health = MaxHealth;
 
 	//all of the variables needed for creating a collider
 	CannonZoneCollision = PCIP.CreateDefaultSubobject<UBoxComponent>(this, TEXT("CannonZone"));

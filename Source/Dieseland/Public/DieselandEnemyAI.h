@@ -59,7 +59,14 @@ class DIESELAND_API ADieselandEnemyAI : public AAIController
 		void SearchForSpawnLocation();
 
 	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerMeleeAttack();
+		void ServerMeleeAttack(); 
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerRangedAttack();
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+		float UpdateTimer;
+
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		float GameTimer;

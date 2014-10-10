@@ -15,15 +15,15 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	: Super(PCIP)
 {
 	//here I set his base values
-	BaseMoveSpeed = 380;
+	BaseMoveSpeed = 375;
 	BaseHealth = 350;
 	BaseDamage = 15;
 	BaseCooldownSpeed = 1.2;
 	//here I set his base stats
-	Strength = 9;
-	Intelligence = 17;
-	Dexterity = 12;
-	Constitution = 9;
+	Strength = 10;
+	Intelligence = 18;
+	Dexterity = 13;
+	Constitution = 11;
 
 
 

@@ -13,6 +13,11 @@ public:
 	UFUNCTION(reliable, Server, WithValidation)
 	void ServerEditHealth(int32 Amt, AActor* Target);
 
+	// Called by the server to edit client's speed, and damage
+	UFUNCTION(reliable, Server, WithValidation)
+		void ServerEditSpeedDamage(int32 Speed, int32 Damage, AActor* Target);
+
+
 	// Calculated rotation of torso
 	FRotator FacingRotation;
 
@@ -59,7 +64,10 @@ public:
 	int32 LingerDamage;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
-	int32 LingerCount;
+		int32 LingerCount; 
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	int32 StatPlusCount;
 
 	// The health regen of a character
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
@@ -75,7 +83,7 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void SwapMelee();
 
-	UFUNCTION(Reliable, Server, WithValidation)
+	UFUNCTION(Reliable, Server, WithValidation, BlueprintCallable, Category = Gameplay)
 	void RespawnPawn();
 
 protected:
@@ -86,6 +94,8 @@ protected:
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
+
+	virtual void ReceiveBeginPlay() override;
 
 	// Movment input events
 	void OnMoveForward(float Val);

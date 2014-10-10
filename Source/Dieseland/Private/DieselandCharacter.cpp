@@ -45,6 +45,8 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUseControllerViewRotation = false; // Camera does not rotate relative to arm
 
+	CharacterLevel = 1;
+
 	// Set the starting health value
 	MaxHealth = 700;
 	Health = MaxHealth;
@@ -111,6 +113,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	SkillTwoTimer = 0.0f;
 	SkillThreeTimer = 0.0f;
 	LingerTimer = 0.0f;
+	PoisonTimer = 0.0f;
 
 	// Set up collision area for melee attacks
 	MeleeCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("MeleeCollision"));
@@ -155,6 +158,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 	// Ensure replication
 	bReplicates = true;
+	bReplicateMovement = true;
 	AimMesh->SetIsReplicated(true);
 	Mesh->SetIsReplicated(true);
 	ParticleSystem->SetIsReplicated(true);
@@ -169,6 +173,19 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	PlayerLabel->SetText(FString::FromInt(Health));
 
 	Super::Tick(DeltaSeconds);
+
+	//for when a character is poisoned
+	if (IsPoisoned)
+	{
+		PoisonTimer += DeltaSeconds;
+		if (PoisonTimer > 3)
+		{
+			IsPoisoned = false;
+			PoisonTimer = 0;
+			CalculateStats();
+		}
+
+	}
 }
 
 // CORE ATTRIBUTE CALCULATION FUNCTION
@@ -176,24 +193,31 @@ void ADieselandCharacter::CalculateStats_Implementation()
 {
 	if (this->ActorHasTag(FName(TEXT("Player"))))
 	{
-		//adjustments for health
-		MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
-		//adjustments for health regeneration
-		HealthRegeneration = 1.0f + (Constitution / 10.0f) + (Strength / 20.0f);
-		//show those adjustments
-		PlayerLabel->SetText(FString::FromInt(Health));
-		//adjustments for damage
-		BasicAttackDamage = BaseDamage + (Strength * 1.5f) + (Dexterity * .5f) + (Intelligence * .5f);
-		//adjusments for attackspeed
-		BasicAttackCooldown = BaseCooldownSpeed / (1 + (Dexterity/50));
-		//adjustments for movement Speed
-		MoveSpeed = BaseMoveSpeed + (Dexterity * 3);
-		this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
+		if (Cast<ADieselandPlayerController>(Controller)->StatPlusCount > 3){
+			CharacterLevel++;
+			Cast<ADieselandPlayerController>(Controller)->StatPlusCount = 0;
+		}
+		if (IsPoisoned == false){
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Swag"));
+			//adjustments for health
+			MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
+			//adjustments for health regeneration
+			HealthRegeneration = 1.0f + (Constitution / 10.0f) + (Strength / 20.0f);
+			//show those adjustments
+			PlayerLabel->SetText(FString::FromInt(Health));
+			//adjustments for damage
+			BasicAttackDamage = BaseDamage + (Strength * 1.5f) + (Dexterity * .5f) + (Intelligence * .5f);
+			//adjusments for attackspeed
+			BasicAttackCooldown = BaseCooldownSpeed / (1 + (Dexterity / 50));
+			//adjustments for movement Speed
+			MoveSpeed = BaseMoveSpeed + (Dexterity * 3);
+			this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
 
-		//adjusments for ability cooldown speed
-		SkillOneCooldown = BaseSkillOneCooldown / (1 + Intelligence / 100);
-		SkillTwoCooldown = BaseSkillTwoCooldown / (1 + Intelligence / 100);
-		SkillThreeCooldown = BaseSkillThreeCooldown / (1 + Intelligence / 100);
+			//adjusments for ability cooldown speed
+			SkillOneCooldown = BaseSkillOneCooldown / (1 + Intelligence / 100);
+			SkillTwoCooldown = BaseSkillTwoCooldown / (1 + Intelligence / 100);
+			SkillThreeCooldown = BaseSkillThreeCooldown / (1 + Intelligence / 100);
+		}
 	}
 }
 
@@ -229,6 +253,30 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 	}
 }
 
+//function for adjusting speed and health, currently using this for strykers posions, I put the function here so it is extendable to other characters in case
+//we want to use it again in the future
+void ADieselandCharacter::EditSpeedDamage(int32 Speed, int32 Damage, AActor* Target)
+{
+	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	{
+		Cast<ADieselandCharacter>(Target)->IsPoisoned = true;
+		Cast<ADieselandCharacter>(Target)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandCharacter>(Target)->CharacterMovement->MaxWalkSpeed * (Speed/100.0f);
+		Cast<ADieselandCharacter>(Target)->BasicAttackDamage = Cast<ADieselandCharacter>(Target)->BasicAttackDamage * (Damage/100.0f);
+		if (Role < ROLE_Authority)
+		{
+			Cast<ADieselandPlayerController>(Controller)->ServerEditSpeedDamage(Speed, Damage, Target);
+		}
+	}
+	 if (Target->ActorHasTag(FName(TEXT("Enemy"))))
+	{
+		ServerChangeSpeedDamageEnemy(Speed, Damage, Target);
+	}
+	else if (Target->ActorHasTag(FName(TEXT("ScrapBox"))))
+	{
+		Cast<AScrapBox>(Target)->DestroyCrate(this);
+	}
+}
+
 void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Target)
 {
 	Cast<ADieselandEnemyBot>(Target)->Health += Amt;
@@ -254,6 +302,19 @@ void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Ta
 		}
 	}
 } 
+
+void ADieselandCharacter::ServerChangeSpeedDamageEnemy_Implementation(int32 Speed, int32 Damage, AActor* Target)
+{
+	Cast<ADieselandEnemyBot>(Target)->IsPoisoned = true;
+	Cast<ADieselandEnemyBot>(Target)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandEnemyBot>(Target)->CharacterMovement->MaxWalkSpeed * (Speed/100.0f);
+	Cast<ADieselandEnemyBot>(Target)->BasicAttackDamage = Cast<ADieselandEnemyBot>(Target)->BasicAttackDamage * (Damage/100.0f);
+}
+
+bool ADieselandCharacter::ServerChangeSpeedDamageEnemy_Validate(int32 Speed, int32 Damage, AActor* Target)
+{
+	return true;
+}
+
 
 bool ADieselandCharacter::ServerDamageEnemy_Validate(int32 Amt, AActor* Target)
 {

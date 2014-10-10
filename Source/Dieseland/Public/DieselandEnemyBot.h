@@ -66,7 +66,23 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 
 	// Damage amount for basic attacks
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		int32 BaseAttackDamage;
+
+	// Damage amount for basic attacks
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 		int32 BasicAttackDamage;
+
+	// Public health value of this character
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int32 MaxHealth;
+
+	// Health Regeneration
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float HealthRegeneration;
+
+	// Timer for health regen.
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float HealthRegenTimer;
 
 	// The range of this character's melee attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
@@ -106,9 +122,18 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void OnProjectileZoneEnter();
 
+	//One forumla > many <3
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+		void ResetStats();
 
-	UFUNCTION(BlueprintCallable, Category = Combat)
-	void OnZoneExit();
+	// Is this character currently poisoned.
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		bool IsPoisoned;
+
+	// How long has this character been poisoned.
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		float PoisonTimer;
+
 
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	float BasicAttackTimer;
@@ -128,6 +153,7 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
 		float StunRemaining;
+
 
 protected:
 

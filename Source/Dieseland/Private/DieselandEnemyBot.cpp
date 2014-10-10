@@ -6,8 +6,7 @@
 #include "DieselandCharacter.h"
 #include "DieselandPlayerController.h"
 #include "DieselandEnemyAI.h"
-#include "BaseProjectile.h"
-#include "EnemyBaseProjectile.h"
+#include "BaseWalkerProjectile.h"
 #include "UnrealNetwork.h"
 #include "EngletonCrazyLaser.h"
 
@@ -21,8 +20,12 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	CapsuleComponent->InitCapsuleSize(42.f, 96.0f);
 	CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Overlap);
 
-	// Set the starting health value
+	// Set the starting values
+	MaxHealth = 175;
 	Health = 175;
+	BaseAttackDamage = 25;
+	BasicAttackDamage = 25;
+	HealthRegeneration = 2;
 
 	// Create the text component
 	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
@@ -46,12 +49,11 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	// Tag this character as a player
 	Tags.Add(FName("Enemy"));
 
-	BasicAttackDamage = 15;
 
 	// Set default ranges
 	MeleeRange = 144.0f;
-	AttackZone = 1600.0f;
-	ProjectileZone = 1000.0f;
+	AttackZone = 1800.0f;
+	ProjectileZone = 1200.0f;
 
 	// Cooldown values
 	BasicAttackCooldown = 0.2f;
@@ -89,6 +91,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 
 	// Ensure replication
 	bReplicates = true;
+	bReplicateMovement = true;
 	SkeletalMesh->SetIsReplicated(true);
 	AimMesh->SetIsReplicated(true);
 	Mesh->SetIsReplicated(true);
@@ -97,7 +100,9 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	//here we set the dieseland aggresion to true
 	isAggressive = false;
 	LingerCount = 0;
+
 }
+
 
 void ADieselandEnemyBot::Tick(float DeltaSeconds)
 {
@@ -106,6 +111,28 @@ void ADieselandEnemyBot::Tick(float DeltaSeconds)
 	PlayerLabel->SetText(FString::FromInt(Health));
 
 	Super::Tick(DeltaSeconds);
+
+	//for when a character is poisoned
+	if (IsPoisoned)
+	{
+		PoisonTimer += DeltaSeconds;
+		if (PoisonTimer > 3)
+		{
+			IsPoisoned = false;
+			PoisonTimer = 0;
+			ResetStats();
+		}
+
+	}
+	//here we setup health regeneration for bots
+	if (Health < MaxHealth){
+		HealthRegenTimer += DeltaSeconds;
+		if (HealthRegenTimer > 1)
+		{
+			Health += HealthRegeneration;
+			HealthRegenTimer = 0;
+		}
+	}
 	if (LingerTimer > 0.0f)
 	{
 		LingerTimer -= DeltaSeconds;
@@ -125,6 +152,13 @@ void ADieselandEnemyBot::Tick(float DeltaSeconds)
 			LingerCount = 0;
 		}
 	}
+}
+
+void ADieselandEnemyBot::ResetStats()
+{
+	BasicAttackDamage = BaseAttackDamage;
+	HealthRegeneration = 2;
+	this->CharacterMovement->MaxWalkSpeed = 400;
 }
 
 void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Target)
@@ -185,19 +219,19 @@ void ADieselandEnemyBot::RangedAttack_Implementation()
 			SpawnParams.Owner = Cast<ADieselandEnemyAI>(this->Controller);
 			SpawnParams.Instigator = Instigator;
 
-			FRotator ProjectileRotation = SkeletalMesh->GetSocketRotation(FName(TEXT("AimSocket")));
+			FRotator ProjectileRotation = this->GetActorRotation();
 
-			ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+			ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw, ProjectileRotation.Roll);
 
 			// spawn the projectile at the muzzle
-			ABaseProjectile* const Projectile = World->SpawnActor<ABaseProjectile>(ABaseProjectile::StaticClass(), SkeletalMesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+			ABaseWalkerProjectile* const Projectile = World->SpawnActor<ABaseWalkerProjectile>(ABaseWalkerProjectile::StaticClass(), SkeletalMesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 			if (Projectile)
 			{
 				Projectile->ProjectileDamage = BasicAttackDamage;
 				Projectile->ServerActivateProjectile();
 
 				// Add the character's velocity to the projectile
-				//Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+				Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 			}
 		}
 	}
@@ -215,6 +249,7 @@ void ADieselandEnemyBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	DOREPLIFETIME(ADieselandEnemyBot, Health);
 	DOREPLIFETIME(ADieselandEnemyBot, AimMesh);
 	DOREPLIFETIME(ADieselandEnemyBot, SkeletalMesh);
+	DOREPLIFETIME(ADieselandEnemyBot, Mesh);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackTimer);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackActive);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackDamage);
@@ -246,13 +281,11 @@ void ADieselandEnemyBot::OnZoneEnter()
 		if (!CurActor->IsValidLowLevel()) continue;
 
 		if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player")))){
-			this->CharacterMovement->MaxWalkSpeed = 400;
 			isAggressive = true;
+			if (IsMelee == false){
+				this->CharacterMovement->MaxWalkSpeed = 400;
+			}
 		}
-	}
-	if (!isAggressive)
-	{
-		this->CharacterMovement->MaxWalkSpeed = 400;
 	}
 }
 
@@ -292,8 +325,4 @@ void ADieselandEnemyBot::OnProjectileZoneEnter()
 }
 
 
-void ADieselandEnemyBot::OnZoneExit()
-{
-	
 
-}
