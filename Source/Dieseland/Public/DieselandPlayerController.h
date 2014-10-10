@@ -55,6 +55,15 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void UpgradeConstitution();
 
+	UFUNCTION(Category = UserInterface)
+	void OnEscape();
+
+	UFUNCTION(Category = UserInterface)
+	void OnShowScore();
+
+	// Cheat code to change characters
+	UFUNCTION(exec)
+	void ChangeCharacter(FString CharacterName);
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void UpdateCooldownTimers(float DeltaSeconds);
@@ -64,7 +73,7 @@ public:
 	int32 LingerDamage;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
-		int32 LingerCount; 
+	int32 LingerCount; 
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
 	int32 StatPlusCount;

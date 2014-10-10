@@ -214,7 +214,9 @@ void ADieselandPlayerController::SetupInputComponent()
 	InputComponent->BindAction("UpgradeDexterity", IE_Pressed, this, &ADieselandPlayerController::UpgradeDexterity);
 	InputComponent->BindAction("UpgradeConstitution", IE_Pressed, this, &ADieselandPlayerController::UpgradeConstitution);
 
-	InputComponent->BindAction("Debug_MeleeSwap", IE_Released, this, &ADieselandPlayerController::SwapMelee);
+	InputComponent->BindAction("Escape", IE_Pressed, this, &ADieselandPlayerController::OnEscape);
+
+	InputComponent->BindAction("Score", IE_Released, this, &ADieselandPlayerController::OnShowScore);
 }
 
 void ADieselandPlayerController::ReceiveBeginPlay()
@@ -266,6 +268,52 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 	}
 }
 
+void ADieselandPlayerController::ChangeCharacter(FString Character)
+{
+	APawn* TempPawn = GetPawn();
+	APawn* NewPawn;
+	this->UnPossess();
+	
+	//Determine what player is desired and spawn that pawn
+	if (Character == FString(TEXT("Mayhem")))
+	{
+		this->UnPossess();
+		
+		NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(), 
+			Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->MayhemClass, 
+			FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z), 
+			FRotator(0.0f, 0.0f, 0.0f));
+
+		this->Possess(NewPawn);
+
+	}
+	else if (Character == FString(TEXT("Engleton")))
+	{
+		this->UnPossess();
+
+		NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
+			Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->EngletonClass,
+			FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
+			FRotator(0.0f, 0.0f, 0.0f));
+
+		this->Possess(NewPawn);
+
+	}
+	else if (Character == FString(TEXT("Stryker")))
+	{
+		this->UnPossess();
+
+		NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
+			Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->StrykerClass,
+			FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
+			FRotator(0.0f, 0.0f, 0.0f));
+
+		this->Possess(NewPawn);
+
+	}
+	// Destroy previous pawn
+	TempPawn->Destroy();
+}
 bool ADieselandPlayerController::ServerReload_Validate()
 {
 	return true;
@@ -283,6 +331,25 @@ void ADieselandPlayerController::ServerReload_Implementation()
 			DieselandPawn->BasicAttackAmmo = 0;
 		}
 	}
+}
+
+void ADieselandPlayerController::OnEscape()
+{
+	// TODO: Add pause menu rather than exiting to menu, and additional MP cleanup
+
+	if (Role != ROLE_Authority)
+	{
+		APawn* TempPawn = GetPawn();
+		this->UnPossess();
+		TempPawn->Destroy();
+	}
+	GetWorld()->GetGameViewport()->RemoveAllViewportWidgets();
+	ConsoleCommand("open Dieseland_UserInterface");
+}
+
+void ADieselandPlayerController::OnShowScore()
+{
+	// TODO: Add score screen
 }
 
 bool ADieselandPlayerController::ServerEditHealth_Validate(int32 Amt, AActor* Target)
