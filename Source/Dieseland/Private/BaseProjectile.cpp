@@ -3,11 +3,15 @@
 #include "Dieseland.h"
 #include "BaseProjectile.h"
 #include "UnrealNetwork.h"
+#include "DieselandEnemyBot.h"
+#include "DieselandCharacter.h"
+#include "DieselandEnemyAI.h"
 #include "DieselandCharacter.h"
 #include "DieselandPlayerController.h"
 #include "ParticleDefinitions.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "StrykerCharacter.h"
 
 
 ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties& PCIP)
@@ -15,7 +19,6 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 {
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Sphere.Shape_Sphere'"));
-
 	Mesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("Mesh"));
 	Mesh->SetStaticMesh(StaticMesh.Object);
 	RootComponent = Mesh;
@@ -44,7 +47,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	ProjCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Ignore);
 	ProjCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	ProjCollision->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
-
+	
 
 	ProjectileMovement = PCIP.CreateDefaultSubobject<UProjectileMovementComponent>(this, TEXT("ProjectileMovement"));
 	ProjectileMovement->SetIsReplicated(true);
@@ -84,29 +87,46 @@ bool ABaseProjectile::ServerActivateProjectile_Validate()
 
 void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
-
 	Super::ReceiveActorBeginOverlap(OtherActor);
 
-	if (OtherActor == NULL || Role == NULL){
+	if (OtherActor == nullptr || OtherActor == NULL || Role == NULL){
 		return;
 	}
-
-	if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
-	{
-		if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))
+	if (IsPoison == false){
+		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 		{
-			Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
-			if (!Piercing)
+			if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))
+			{
+				Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
+				if (!Piercing)				{
+					this->Destroy();
+				}
+			}
+			else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
 			{
 				this->Destroy();
 			}
-
-		}
-		else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
-		{
-			this->Destroy();
 		}
 	}
+	//this is for stryker only, ispoisoin is set to true on the poison projectiles
+	if (IsPoison)
+	{
+		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
+		{
+			if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))
+			{
+				Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditSpeedDamage(PoisionSlowAmount, PoisionDamageReductionAmount, OtherActor);
+				if (!Piercing)				{
+					this->Destroy();
+				}
+			}
+			else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
+			{
+				this->Destroy();
+			}
+		}
+	}
+
 }
 
 void ABaseProjectile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

@@ -13,6 +13,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TSubobjectPtr<class UCameraComponent> TopDownCameraComponent;
 
+
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TSubobjectPtr<class USpringArmComponent> CameraBoom;
@@ -38,6 +39,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void EditHealth(int32 Amt, AActor* Target);
 
+
+	// Called to adjust movement speed and damage
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+	void EditSpeedDamage(int32 Speed, int32 Damage, AActor* Target);
+
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Kills;
 
@@ -45,9 +51,14 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
 
+
 	// Public health value of this character
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 MaxHealth;
+
+	// Timer for health regen.
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	float HealthRegenTimer;
 
 	// Health Regeneration
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -92,6 +103,14 @@ public:
 	// Does this character use melee for it's basic attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	bool IsMelee;
+
+	// Is this character currently poisoned.
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	bool IsPoisoned;
+
+	// How long has this character been poisoned.
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float PoisonTimer;
 
 	// The range of this character's Melee Attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
@@ -217,6 +236,9 @@ public:
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerDamageEnemy(int32 Amt, AActor* Target);
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerChangeSpeedDamageEnemy(int32 Speed,int32 Damage, AActor* Target);
 
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
 	UParticleSystem* SkillThreeParticle;

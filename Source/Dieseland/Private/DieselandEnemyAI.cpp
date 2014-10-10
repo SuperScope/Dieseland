@@ -115,7 +115,7 @@ void ADieselandEnemyAI::ServerEditHealth_Implementation(int32 Amt, AActor* Targe
 	// Edit the health of the specific pawn
 	if (GetPawn() != nullptr)
 	{
-		Cast<ADieselandCharacter>(GetPawn())->EditHealth(Amt, Target);
+		Cast<ADieselandEnemyBot>(GetPawn())->EditHealth(Amt, Target);
 	}
 }
 
@@ -132,6 +132,21 @@ void ADieselandEnemyAI::ServerMeleeAttack_Implementation()
 		DieselandPawn->MeleeAttack();
 	}
 }
+
+bool ADieselandEnemyAI::ServerRangedAttack_Validate()
+{
+	return true;
+}
+
+void ADieselandEnemyAI::ServerRangedAttack_Implementation()
+{
+	ADieselandEnemyBot* DieselandPawn = Cast<ADieselandEnemyBot>(GetPawn());
+	if (!DieselandPawn->StatusEffects.Contains(FString("Stunned")))
+	{
+		DieselandPawn->RangedAttack();
+	}
+}
+
 
 void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 {
@@ -150,6 +165,20 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 				DieselandPawn->BasicAttackTimer = 1.0f;
 			}
 		}
+
+
+		//update actions
+		if (UpdateTimer > 0.0f)
+		{
+			if (UpdateTimer < 0.0f){
+				UpdateTimer -= DeltaSeconds;
+				SearchForSpawnLocation();
+				DieselandPawn->OnZoneEnter();
+				DieselandPawn->OnProjectileZoneEnter();
+				UpdateTimer = 0.2f;
+			}
+		}
+
 		// Basic Attack actions
 		if (DieselandPawn->BasicAttackTimer <= 0.0f && DieselandPawn->BasicAttackActive)
 		{
@@ -196,3 +225,4 @@ void ADieselandEnemyAI::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > &
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandEnemyAI, GameTimer);
 }
+
