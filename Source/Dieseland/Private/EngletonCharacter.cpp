@@ -84,7 +84,7 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	//here we get and set our particle effects
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> BombardmentParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonBombardment_WIP.Unreal_Particle_EngletonBombardment_WIP'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> MachineGunFireParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonMachineGun_WIP.Unreal_Particle_EngletonMachineGun_WIP'"));
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> PulseParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse_WIP.Unreal_Particle_EngletonPulse_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> PulseParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse2_WIP.Unreal_Particle_EngletonPulse2_WIP'"));
 	this->BombardmentParticle = BombardmentParticleAsset.Object;
 	this->MachineGunFireParticle = MachineGunFireParticleAsset.Object;
 	this->PulseParticle = PulseParticleAsset.Object;

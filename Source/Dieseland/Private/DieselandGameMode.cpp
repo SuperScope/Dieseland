@@ -168,7 +168,7 @@ APawn* ADieselandGameMode::SpawnDefaultPawnFor(AController* NewPlayer, AActor* S
 
 	if (PlayersSpawned % 2 == 0)
 	{
-		ResultPawn = GetWorld()->SpawnActor<APawn>(MayhemClass, StartLocation, StartRotation, SpawnInfo);
+		ResultPawn = GetWorld()->SpawnActor<APawn>(EngletonClass, StartLocation, StartRotation, SpawnInfo);
 	}
 	else
 	{
