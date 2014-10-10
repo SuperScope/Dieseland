@@ -55,7 +55,15 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void UpgradeConstitution();
 
+	UFUNCTION(Category = UserInterface)
 	void OnEscape();
+
+	UFUNCTION(Category = UserInterface)
+	void OnShowScore();
+
+	// Cheat code to change characters
+	UFUNCTION(exec)
+	void ChangeCharacter(FString CharacterName);
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void UpdateCooldownTimers(float DeltaSeconds);
