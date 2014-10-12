@@ -61,7 +61,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 
 	// Timer values
 	BasicAttackTimer = 1.0f;
-
+	this->CharacterMovement->RotationRate = FRotator(360, 0, 0);
 
 	//all of the variables needed for creating a collider
 	MeleeCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("MeleeCollision"));

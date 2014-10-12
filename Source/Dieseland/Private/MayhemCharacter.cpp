@@ -25,7 +25,7 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 	Dexterity = 10;
 	Constitution = 14;
 
-	StunLength = 2.5f;
+	StunLength = 5.0f;
 
 	IronArmorDuration = 4.0f;
 	RageDuration = 3.0f;

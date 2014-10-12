@@ -3,6 +3,7 @@
 #include "Dieseland.h"
 #include "StrykerCharacter.h"
 #include "DieselandCharacter.h"
+#include "DieselandEnemyBot.h"
 #include "DieselandPlayerController.h"
 #include "StrykerPoisionProjectile.h"
 #include "ParticleDefinitions.h"
@@ -40,6 +41,8 @@ AStrykerCharacter::AStrykerCharacter(const class FPostConstructInitializePropert
 	MoveSpeed = BaseMoveSpeed + (Dexterity * 3);
 	this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
 
+	AssassinationColliderRange = 250.0f;
+
 	//base cooldowns
 	BaseSkillOneCooldown = 1.0f;
 	BaseSkillTwoCooldown = 1.0f;
@@ -49,6 +52,17 @@ AStrykerCharacter::AStrykerCharacter(const class FPostConstructInitializePropert
 	SkillOneCooldown = BaseSkillOneCooldown / (1 + Intelligence / 100);
 	SkillTwoCooldown = BaseSkillTwoCooldown / (1 + Intelligence / 100);
 	SkillThreeCooldown = BaseSkillThreeCooldown / (1 + Intelligence / 100);
+
+
+	//all of the variables needed for creating a collider
+	AssassinationCollider = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("AssassinationCollider"));
+	AssassinationCollider->AttachParent = (Mesh);
+	AssassinationCollider->AttachSocketName = FName(TEXT("AimSocket"));
+	AssassinationCollider->SetCapsuleHalfHeight(AssassinationColliderRange / 2.0f);
+	AssassinationCollider->SetCapsuleRadius(AssassinationColliderRange / 2.0f);
+	AssassinationCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AActor* AssassinationTarget = NULL;
+
 
 	bReplicates = true;
 	bReplicateMovement = true;
@@ -69,18 +83,31 @@ void AStrykerCharacter::UpdateDurationTimers_Implementation(float DeltaSeconds)
 	if (IsAttemptingAssassinate)
 	{
 		AssasinationAttemptDuration += DeltaSeconds;
-
+		SearchForAssassinationTarget();
 		//Assasination Failed
-		if (AssasinationAttemptDuration > 1.0f)
+		if (AssasinationAttemptDuration > 0.3f && IsAssassinating == false)
 		{
-		//	if (Cast<ADieselandCharacter>(GetOwner())->GetPawn() != nullptr){
-			//	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-
-		//	DieselandPawn->StatusEffects.Remove(FString("Stunned"));
-			//this->CharacterMovement->Velocity = FVector()
+			this->StatusEffects.Remove(FString("Stunned"));
 			AssasinationAttemptDuration = 0;
 			IsAttemptingAssassinate = false;
 		}
+	}
+	if (IsAssassinating && AssasinationHitCounter < 6)
+	{
+		AssasinationDuration += DeltaSeconds;
+		this->StatusEffects.Remove(FString("Stunned"));
+		SearchForAssassinationTarget();
+		IsAttemptingAssassinate = false;
+		
+	}
+	if (AssasinationHitCounter == 6)
+	{
+		AssasinationDuration = 0;
+		IsAssassinating = false;
+		AssasinationHitCounter = 0;
+		AActor* AssassinationTarget = NULL;
+		this->StatusEffects.Remove(FString("Stunned"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen messag12321321e!"));
 	}
 }
 
@@ -89,6 +116,75 @@ bool AStrykerCharacter::UpdateDurationTimers_Validate(float DeltaSeconds)
 	return true;
 }
 
+void AStrykerCharacter::SearchForAssassinationTarget()
+{
+	AssassinationCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+	AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+	AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
+	AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
+	AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
+	AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Ignore);
+	AssassinationCollider->GetOverlappingActors(ActorsInMeleeRange);
+	AssassinationCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	AActor* CurActor = NULL;
+
+	for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)
+	{
+		CurActor = ActorsInMeleeRange[b];
+		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
+		if (!CurActor->IsValidLowLevel()) continue;
+
+		if (Role == ROLE_Authority && CurActor != this){
+			if (IsAssassinating == false)
+			{
+			
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message! %"), CurActor);
+				FVector AssassinateLocation;
+				this->CharacterMovement->Velocity += FVector(0, 0, 0);
+				if ((CurActor->ActorHasTag(FName(TEXT("Player")))))
+				{
+					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+					this->AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+					this->AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+					this->AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
+					this->AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
+					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
+					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Ignore);
+					UE_LOG(LogTemp, Log, TEXT("Log text %s"), *CurActor->GetName());
+					IsAssassinating = true;
+					ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(CurActor);
+					AssassinateLocation = DieselandPawn->GetActorLocation();
+					AssassinationTarget = CurActor;
+				}
+				else if ((CurActor->ActorHasTag(FName(TEXT("Enemy")))))
+				{
+					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
+					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
+					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
+					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Ignore);
+					UE_LOG(LogTemp, Log, TEXT("Log text %s"), *CurActor->GetName());
+					IsAssassinating = true;
+					ADieselandEnemyBot* DieselandPawn = Cast<ADieselandEnemyBot>(CurActor);
+					AssassinateLocation = DieselandPawn->GetActorLocation();
+					AssassinationTarget = CurActor;
+				}
+			}
+		}
+	}
+	if (AssassinationTarget != NULL){
+		if (AssasinationDuration > 0.5f){
+			EditHealth(-1 * (BasicAttackDamage + Dexterity), AssassinationTarget);
+			AssasinationDuration = 0;
+			AssasinationHitCounter++;
+		}
+	}
+}
 
 // Stryker Assasinate
 void AStrykerCharacter::SkillOne()
@@ -122,9 +218,11 @@ void AStrykerCharacter::SkillOne()
 		FRotator CharacterRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
 		CharacterRotation = FRotator(CharacterRotation.Pitch, CharacterRotation.Yaw + 90.0f, CharacterRotation.Roll);
 		this->SetActorRotation(CharacterRotation);
-		//this->StatusEffects.Add(FString("Stunned"));
-		//this->CharacterMovement->Velocity = FVector()
+		FVector Direction = CharacterRotation.Vector();
+		this->StatusEffects.Add(FString("Stunned"));
+		this->CharacterMovement->Velocity += FVector(Direction.X * 15000, Direction.Y * 15000,0);
 		IsAttemptingAssassinate = true;
+
 	}
 	/* some sample movement i'm usng to reference
 	DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 600 + (Intelligence * 1.5f), -MoveCharacterY * 600 + (Intelligence * 1.5f), 0); */
@@ -163,34 +261,15 @@ void AStrykerCharacter::SkillTwo()
 //Stryker Blink
 void AStrykerCharacter::SkillThree()
 {
-	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
-	RV_TraceParams.bTraceComplex = true;
-	RV_TraceParams.bTraceAsyncScene = true;
-	RV_TraceParams.bReturnPhysicalMaterial = false;
-
-	//Re-initialize hit info
-	FHitResult RV_Hit(ForceInit);
-
-	//call GetWorld() from within an actor extending class
-	GetWorld()->LineTraceSingle(
-		RV_Hit,        //result
-		Mesh->GetSocketLocation(FName(TEXT("AimSocket"))),    //start
-		(Mesh->GetSocketLocation(FName(TEXT("AimSocket"))) + (AimRotation.GetNormalized().Vector() * 500.0f)), //end
-		ECC_Pawn, //collision channel
-		RV_TraceParams
-		);
-	FVector TargetLocation;
-	if (RV_Hit.IsValidBlockingHit())
-	{
-		TargetLocation = RV_Hit.Location;
+	UWorld* const World = GetWorld();
+	if (World){
+		FRotator CharacterRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
+		CharacterRotation = FRotator(CharacterRotation.Pitch, CharacterRotation.Yaw + 90.0f, CharacterRotation.Roll);
+		this->SetActorRotation(CharacterRotation);
+		FVector Direction = CharacterRotation.Vector();
+		//this->StatusEffects.Add(FString("Stunned"));
+		this->CharacterMovement->Velocity += FVector(Direction.X * 15000, Direction.Y * 15000, 0);
 	}
-	else
-	{
-		TargetLocation = Mesh->GetSocketLocation(FName(TEXT("AimSocket"))) + (AimRotation.GetNormalized().Vector() * 500.0f);
-	}
-	// Make sure the player doesn't fall through the bottom of the map
-	TargetLocation.Z = Mesh->GetSocketLocation(FName(TEXT("AimSocket"))).Z;
-	SetActorLocation(TargetLocation);
 }
 
 void AStrykerCharacter::RangedAttack()

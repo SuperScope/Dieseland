@@ -23,14 +23,31 @@ class DIESELAND_API AStrykerCharacter : public ADieselandCharacter
 	virtual void MeleeAttack() override;
 	virtual void RangedAttack() override;
 
+	// Collider used to detect melee range
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+		TSubobjectPtr<class UCapsuleComponent> AssassinationCollider;
+
+	// The range of this character's melee attack
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		float AssassinationColliderRange;
+
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = Combat)
 		float AssasinationAttemptDuration;
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = Combat)
 		bool IsAttemptingAssassinate;
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
-		bool IsAssasinating;
+		bool IsAssassinating;
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 		float AssasinationDuration;
+
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = Combat)
+		int32 AssasinationHitCounter;
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = Combat)
+		AActor* AssassinationTarget;
+
+	//combat functions
+	UFUNCTION(BlueprintCallable, Category = Combat)
+		void SearchForAssassinationTarget();
 
 
 
