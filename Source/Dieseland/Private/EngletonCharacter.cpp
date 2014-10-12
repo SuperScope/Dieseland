@@ -236,7 +236,7 @@ void AEngletonCharacter::SkillThree()
 			}
 			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 600 + (Intelligence * 1.5f), -MoveCharacterY * 600 + (Intelligence * 1.5f), 0);
 			DieselandPawn->CharacterMovement->JumpZVelocity = 400 + (Intelligence * 1);
-			DieselandPawn->CharacterMovement->DoJump();
+			DieselandPawn->CharacterMovement->DoJump(false);
 		}
 		//here we do it for enemies
 		if (Role == ROLE_Authority && CurActor != this && (CurActor->ActorHasTag(FName(TEXT("Enemy")))))
@@ -263,7 +263,7 @@ void AEngletonCharacter::SkillThree()
 			}
 			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 500, -MoveCharacterY * 500, 0);
 			DieselandPawn->CharacterMovement->JumpZVelocity = 350 + (Intelligence * 3);
-			DieselandPawn->CharacterMovement->DoJump();
+			DieselandPawn->CharacterMovement->DoJump(false);
 		}
 		
 	}

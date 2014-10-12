@@ -43,7 +43,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	// Create a camera...
 	TopDownCameraComponent = PCIP.CreateDefaultSubobject<UCameraComponent>(this, TEXT("TopDownCamera"));
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
-	TopDownCameraComponent->bUseControllerViewRotation = false; // Camera does not rotate relative to arm
+	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	CharacterLevel = 1;
 
@@ -150,10 +150,10 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 	//Find the scrap blueprint's class
-	static ConstructorHelpers::FObjectFinder<UBlueprint> ScrapBlueprint(TEXT("Blueprint'/Game/Blueprints/Scrap_BP.Scrap_BP'"));
+	static ConstructorHelpers::FObjectFinder<UClass> ScrapBlueprint(TEXT("Class'/Game/Blueprints/Scrap_BP.Scrap_BP_C'"));
 	if (ScrapBlueprint.Object)
 	{
-		ScrapClass = (UClass*)ScrapBlueprint.Object->GeneratedClass;
+		ScrapClass = (UClass*)ScrapBlueprint.Object;
 	}
 
 	// Ensure replication
