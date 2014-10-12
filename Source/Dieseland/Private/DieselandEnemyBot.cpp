@@ -94,7 +94,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	bReplicateMovement = true;
 	SkeletalMesh->SetIsReplicated(true);
 	AimMesh->SetIsReplicated(true);
-	Mesh->SetIsReplicated(true);
+	//Mesh->SetIsReplicated(true);
 	PrimaryActorTick.bCanEverTick = true;
 
 	//here we set the dieseland aggresion to true
@@ -249,7 +249,7 @@ void ADieselandEnemyBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	DOREPLIFETIME(ADieselandEnemyBot, Health);
 	DOREPLIFETIME(ADieselandEnemyBot, AimMesh);
 	DOREPLIFETIME(ADieselandEnemyBot, SkeletalMesh);
-	DOREPLIFETIME(ADieselandEnemyBot, Mesh);
+	//DOREPLIFETIME(ADieselandEnemyBot, Mesh);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackTimer);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackActive);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackDamage);

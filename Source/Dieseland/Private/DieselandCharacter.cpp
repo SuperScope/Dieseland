@@ -160,7 +160,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	bReplicates = true;
 	bReplicateMovement = true;
 	AimMesh->SetIsReplicated(true);
-	Mesh->SetIsReplicated(true);
+	//Mesh->SetIsReplicated(true);
 	ParticleSystem->SetIsReplicated(true);
 	SetActorTickEnabled(true);
 	this->SetOwner(Controller);
