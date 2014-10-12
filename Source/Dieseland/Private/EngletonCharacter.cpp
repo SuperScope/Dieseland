@@ -234,8 +234,8 @@ void AEngletonCharacter::SkillThree()
 			if (MoveCharacterY <= 0){
 				MoveCharacterY = -1;
 			}
-			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 600, -MoveCharacterY * 600, 0);
-			DieselandPawn->CharacterMovement->JumpZVelocity = 400 + (Intelligence * 3);
+			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 600 + (Intelligence * 1.5f), -MoveCharacterY * 600 + (Intelligence * 1.5f), 0);
+			DieselandPawn->CharacterMovement->JumpZVelocity = 400 + (Intelligence * 1);
 			DieselandPawn->CharacterMovement->DoJump();
 		}
 		//here we do it for enemies

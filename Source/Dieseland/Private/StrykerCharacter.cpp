@@ -2,8 +2,13 @@
 
 #include "Dieseland.h"
 #include "StrykerCharacter.h"
+#include "DieselandCharacter.h"
 #include "DieselandPlayerController.h"
 #include "StrykerPoisionProjectile.h"
+#include "ParticleDefinitions.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
+
 
 
 AStrykerCharacter::AStrykerCharacter(const class FPostConstructInitializeProperties& PCIP)
@@ -45,15 +50,84 @@ AStrykerCharacter::AStrykerCharacter(const class FPostConstructInitializePropert
 	SkillTwoCooldown = BaseSkillTwoCooldown / (1 + Intelligence / 100);
 	SkillThreeCooldown = BaseSkillThreeCooldown / (1 + Intelligence / 100);
 
+	bReplicates = true;
+	bReplicateMovement = true;
+
 	//here I set melee to false so that Stryker only uses ranged attacks
 	IsMelee = true;
+}
+
+void AStrykerCharacter::Tick(float DeltaSeconds)
+{
+	UpdateDurationTimers(DeltaSeconds);
+
+	Super::Tick(DeltaSeconds);
+}
+
+void AStrykerCharacter::UpdateDurationTimers_Implementation(float DeltaSeconds)
+{
+	if (IsAttemptingAssassinate)
+	{
+		AssasinationAttemptDuration += DeltaSeconds;
+
+		//Assasination Failed
+		if (AssasinationAttemptDuration > 1.0f)
+		{
+		//	if (Cast<ADieselandCharacter>(GetOwner())->GetPawn() != nullptr){
+			//	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+
+		//	DieselandPawn->StatusEffects.Remove(FString("Stunned"));
+			//this->CharacterMovement->Velocity = FVector()
+			AssasinationAttemptDuration = 0;
+			IsAttemptingAssassinate = false;
+		}
+	}
+}
+
+bool AStrykerCharacter::UpdateDurationTimers_Validate(float DeltaSeconds)
+{
+	return true;
 }
 
 
 // Stryker Assasinate
 void AStrykerCharacter::SkillOne()
 {
+	/*	UWorld* const World = GetWorld();
+	if (World)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
+		SpawnParams.Instigator = Instigator;
 
+		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
+
+		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+
+		// spawn the projectile at the muzzle
+		ABaseProjectile* const Projectile = World->SpawnActor<ABaseProjectile>(ABaseProjectile::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+		if (Projectile)
+		{
+			Projectile->ProjectileDamage = BasicAttackDamage;
+			// Start the particle effect
+			Projectile->ServerActivateProjectile();
+
+			// Add the character's velocity to the projectile
+			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+		}
+	}*/
+
+	UWorld* const World = GetWorld();
+	if (World){
+		FRotator CharacterRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
+		CharacterRotation = FRotator(CharacterRotation.Pitch, CharacterRotation.Yaw + 90.0f, CharacterRotation.Roll);
+		this->SetActorRotation(CharacterRotation);
+		//this->StatusEffects.Add(FString("Stunned"));
+		//this->CharacterMovement->Velocity = FVector()
+		IsAttemptingAssassinate = true;
+	}
+	/* some sample movement i'm usng to reference
+	DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 600 + (Intelligence * 1.5f), -MoveCharacterY * 600 + (Intelligence * 1.5f), 0); */
 }
 
 //Stryker Poison
@@ -145,3 +219,11 @@ void AStrykerCharacter::MeleeAttack()
 		}
 	}
 }
+
+void AStrykerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+}
+
+

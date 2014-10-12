@@ -12,7 +12,7 @@ AEngletonCrazyLaser::AEngletonCrazyLaser(const class FPostConstructInitializePro
 	: Super(PCIP)
 {
 	ProjectileMovement->InitialSpeed = 1300.0f;
-	InitialLifeSpan = 4f;
+	InitialLifeSpan = 4.0f;
 
 	//Make the radius larger for this collider
 	ProjCollision->SetCapsuleHalfHeight(100.0f);
