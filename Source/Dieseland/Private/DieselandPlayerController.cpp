@@ -154,6 +154,35 @@ void ADieselandPlayerController::UpdateCooldownTimers_Implementation(float Delta
 			}
 		}
 
+		if (DieselandPawn->LaughTimer > 0.0f)
+		{
+			DieselandPawn->LaughTimer -= DeltaSeconds;
+			if (DieselandPawn->LaughTimer < 0.0f)
+			{
+				DieselandPawn->LaughTimer = 0.0f;
+			}
+		}
+
+		if (DieselandPawn->CommentTimer > 0.0f)
+		{
+			DieselandPawn->CommentTimer -= DeltaSeconds;
+			if (DieselandPawn->CommentTimer < 0.0f)
+			{
+				DieselandPawn->CommentTimer = 0.0f;
+			}
+		}
+
+
+		if (DieselandPawn->TauntTimer > 0.0f)
+		{
+			DieselandPawn->TauntTimer -= DeltaSeconds;
+			if (DieselandPawn->TauntTimer < 0.0f)
+			{
+				DieselandPawn->TauntTimer = 0.0f;
+			}
+		}
+
+
 		// Basic Attack actions
 		if (DieselandPawn->BasicAttackTimer <= 0.0f && DieselandPawn->BasicAttackReloadTimer <= 0.0f && DieselandPawn->BasicAttackActive)
 		{
@@ -213,6 +242,10 @@ void ADieselandPlayerController::SetupInputComponent()
 	InputComponent->BindAction("UpgradeIntelligence", IE_Pressed, this, &ADieselandPlayerController::UpgradeIntelligence);
 	InputComponent->BindAction("UpgradeDexterity", IE_Pressed, this, &ADieselandPlayerController::UpgradeDexterity);
 	InputComponent->BindAction("UpgradeConstitution", IE_Pressed, this, &ADieselandPlayerController::UpgradeConstitution);
+
+	InputComponent->BindAction("Taunt", IE_Pressed, this, &ADieselandPlayerController::OnTaunt);
+	InputComponent->BindAction("Laugh", IE_Pressed, this, &ADieselandPlayerController::OnLaugh);
+	InputComponent->BindAction("Comment", IE_Pressed, this, &ADieselandPlayerController::OnComment);
 
 	InputComponent->BindAction("Escape", IE_Pressed, this, &ADieselandPlayerController::OnEscape);
 
@@ -513,6 +546,65 @@ bool ADieselandPlayerController::ServerSkillThree_Validate()
 	return true;
 }
 
+void ADieselandPlayerController::OnTaunt_Implementation()
+{
+	//here is the real level up function
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")))
+	{
+		if (DieselandPawn->TauntTimer <= 0.0f)
+		{
+			DieselandPawn->Taunt();
+			//DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
+		}
+	}
+}
+
+
+
+bool ADieselandPlayerController::OnTaunt_Validate()
+{
+	return true;
+}
+
+void ADieselandPlayerController::OnLaugh_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")))
+	{
+		if (DieselandPawn->LaughTimer <= 0.0f)
+		{
+			DieselandPawn->Laugh();
+			//DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
+		}
+	}
+}
+
+bool ADieselandPlayerController::OnLaugh_Validate()
+{
+	return true;
+}
+
+void ADieselandPlayerController::OnComment_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")))
+	{
+		if (DieselandPawn->CommentTimer <= 0.0f)
+		{
+			DieselandPawn->Comment();
+			//DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
+		}
+	}
+
+}
+
+bool ADieselandPlayerController::OnComment_Validate()
+{
+	return true;
+}
+
+
 void ADieselandPlayerController::UpgradeStrength_Implementation()
 {
 	//here is the real level up function
@@ -525,6 +617,7 @@ void ADieselandPlayerController::UpgradeStrength_Implementation()
 		StatPlusCount++;
 	}
 }
+ 
 
 
 bool ADieselandPlayerController::UpgradeStrength_Validate()

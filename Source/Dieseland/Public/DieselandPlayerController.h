@@ -55,6 +55,15 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void UpgradeConstitution();
 
+	UFUNCTION(Reliable, Server, WithValidation)
+	void OnTaunt();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void OnLaugh();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void OnComment();
+
 	UFUNCTION(Category = UserInterface)
 	void OnEscape();
 

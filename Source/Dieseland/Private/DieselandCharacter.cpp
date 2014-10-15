@@ -99,6 +99,11 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	MeleeRange = 144.0f;
 	RangedRange = 1200.0f;
 
+	//set default laugh, comment and taunt timers
+	LaughCooldown= 5.0f;
+	CommentCooldown = 5.0f;
+	TauntCooldown = 5.0f;
+
 	// Cooldown values
 	BasicAttackCooldown = 1.0f;
 	BasicAttackReloadSpeed = 3.0f;
@@ -114,6 +119,9 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	SkillThreeTimer = 0.0f;
 	LingerTimer = 0.0f;
 	PoisonTimer = 0.0f;
+	LaughTimer = 0.0f;
+	CommentTimer = 0.0f;
+	TauntTimer = -.0f;
 
 	// Set up collision area for melee attacks
 	MeleeCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("MeleeCollision"));
@@ -148,6 +156,18 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	ParticleSystem->bAutoActivate = false;
 	ParticleSystem->SetHiddenInGame(false);
 	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	TauntSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Taunt Sound"));
+	TauntSound->AttachParent = RootComponent;
+	TauntSound->bAutoActivate = false;
+
+	CommentSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Laugh Sound"));
+	CommentSound->AttachParent = RootComponent;
+	CommentSound->bAutoActivate = false;
+
+	LaughSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Comment Sound"));
+	LaughSound->AttachParent = RootComponent;
+	LaughSound->bAutoActivate = false;
 	
 	//Find the scrap blueprint's class
 	static ConstructorHelpers::FObjectFinder<UClass> ScrapBlueprint(TEXT("Class'/Game/Blueprints/Scrap_BP.Scrap_BP_C'"));
@@ -198,7 +218,6 @@ void ADieselandCharacter::CalculateStats_Implementation()
 			Cast<ADieselandPlayerController>(Controller)->StatPlusCount = 0;
 		}
 		if (IsPoisoned == false){
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Swag"));
 			//adjustments for health
 			MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
 			//adjustments for health regeneration
@@ -456,6 +475,21 @@ void ADieselandCharacter::SkillThree()
 	}
 }
 
+//all necessary audio functions
+void ADieselandCharacter::Taunt()
+{
+	TauntSound->Play();
+}
+
+void ADieselandCharacter::Laugh()
+{
+	LaughSound->Play();
+}
+void ADieselandCharacter::Comment()
+{
+	CommentSound->Play();
+}
+
 void ADieselandCharacter::OnRep_AimRotation()
 {
 	
@@ -501,6 +535,9 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, SkillOneTimer);
 	DOREPLIFETIME(ADieselandCharacter, SkillTwoTimer);
 	DOREPLIFETIME(ADieselandCharacter, SkillThreeTimer);
+	DOREPLIFETIME(ADieselandCharacter, TauntTimer);
+	DOREPLIFETIME(ADieselandCharacter, LaughTimer);
+	DOREPLIFETIME(ADieselandCharacter, CommentTimer);
 
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackActive);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackDamage);

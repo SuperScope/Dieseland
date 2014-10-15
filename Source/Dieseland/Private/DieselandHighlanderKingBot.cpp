@@ -39,6 +39,7 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> BeamParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_HighlanderKingBeam_WIP.Unreal_Particle_HighlanderKingBeam_WIP'"));
 
+
 	this->BeamParticle = BeamParticleAsset.Object;
 
 

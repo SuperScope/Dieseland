@@ -39,11 +39,14 @@ class DIESELAND_API AStrykerCharacter : public ADieselandCharacter
 		bool IsAssassinating;
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 		float AssasinationDuration;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		float AssasinationDuration2;
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = Combat)
 		int32 AssasinationHitCounter;
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = Combat)
 		AActor* AssassinationTarget;
+
 
 	//combat functions
 	UFUNCTION(BlueprintCallable, Category = Combat)

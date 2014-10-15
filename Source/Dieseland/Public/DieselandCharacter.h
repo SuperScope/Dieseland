@@ -151,6 +151,26 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 		float BaseSkillThreeCooldown;
 
+	// The Base Cooldown for taunt
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		float TauntCooldown;
+	// The Base Cooldown for comment
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		float CommentCooldown;
+	// The Base Cooldown for laugh
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		float LaughCooldown;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+	TSubobjectPtr <UAudioComponent> TauntSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+	TSubobjectPtr <UAudioComponent> CommentSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+	TSubobjectPtr <UAudioComponent> LaughSound;
+
+
 
 	//FireTrap Damage Timer
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Trap)
@@ -193,6 +213,16 @@ public:
 	void CalculateStats();
 
 	//CORE ATTRIBUTES ENDS HERE
+	
+	//Audio Functions
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+	void Taunt();
+
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+	void Comment();
+
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+	void Laugh();
 
 	// Combat functions
 	UFUNCTION(BlueprintCallable, Category = Combat)
@@ -224,6 +254,12 @@ public:
 	float SkillTwoTimer;
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	float SkillThreeTimer;
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	float TauntTimer;
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	float CommentTimer;
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	float LaughTimer;
 
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	bool BasicAttackActive;
