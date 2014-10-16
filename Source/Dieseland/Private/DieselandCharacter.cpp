@@ -205,7 +205,7 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 			CalculateStats();
 		}
 
-	}
+	}f
 }
 
 // CORE ATTRIBUTE CALCULATION FUNCTION
