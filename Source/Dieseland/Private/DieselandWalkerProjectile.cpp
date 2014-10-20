@@ -31,9 +31,9 @@ void ADieselandWalkerProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
 	Super::ReceiveActorBeginOverlap(OtherActor);
 
-	if (OtherActor == nullptr || OtherActor == NULL || Role == NULL){
-		return;
-	}
+	//if (OtherActor == nullptr || OtherActor == NULL || Role == NULL){
+		//return;
+	//}
 
 
 	if (Role == ROLE_Authority && Cast<ADieselandEnemyAI>(GetOwner())->GetPawn() != OtherActor)

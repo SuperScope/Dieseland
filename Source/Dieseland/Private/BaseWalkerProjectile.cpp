@@ -91,9 +91,9 @@ void ABaseWalkerProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
 	Super::ReceiveActorBeginOverlap(OtherActor);
 
-	if (OtherActor == nullptr || OtherActor == NULL || Role == NULL){
-		return;
-	}
+	//if (OtherActor == nullptr || OtherActor == NULL || Role == NULL){
+		//return;
+	//}
 	if (IsAI == false)
 	{
 		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
