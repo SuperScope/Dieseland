@@ -11,13 +11,13 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
 {
     // Create the Static Mesh Component(Octogon)
     DeathTileMesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("DeathTileMesh"));
-    
+
     //Create the Scene Component
     DummyComponent = PCIP.CreateDefaultSubobject<USceneComponent>(this, TEXT("SceneComponent"));
-    
-    //Set Root Component as the Dummy Component
-    RootComponent = DummyComponent;
 
+	//Set Root Component as the Dummy Component
+	RootComponent = DummyComponent;
+    
 	SphereCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("SphereCollision"));
 	SphereCollision->SetCapsuleHalfHeight(1900.0f);
 	SphereCollision->SetCapsuleRadius(1900.0f);
@@ -38,7 +38,7 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     
     //If there is an Octogon mesh, set it to the tile mesh component
     if(StaticMeshOctogon.Object){
-        DeathTileMesh->SetStaticMesh(StaticMeshOctogon.Object);
+		DeathTileMesh->SetStaticMesh(StaticMeshOctogon.Object);
     }
 
 	PrimaryActorTick.bCanEverTick = true;
@@ -52,12 +52,12 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     DTScale.Set(1, 1, 1);
     
     //Set Dummy Component as parent
-    DeathTileMesh->AttachParent = DummyComponent;
+	DeathTileMesh->AttachParent = RootComponent;
 	//SphereCollision->AttachParent = DummyComponent;
     
     //Set Mesh rotation and scale
-    DeathTileMesh->SetWorldRotation(DTRotation);
-    DeathTileMesh->SetWorldScale3D(DTScale);
+	DeathTileMesh->SetWorldRotation(DTRotation);
+	DeathTileMesh->SetWorldScale3D(DTScale);
     
     //Set booleans at start
     IsTileDown = false;
