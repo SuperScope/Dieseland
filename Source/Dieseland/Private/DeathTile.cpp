@@ -6,6 +6,7 @@
 #include "UnrealNetwork.h"
 
 
+
 ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
@@ -59,7 +60,7 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
     //Set Mesh rotation and scale
     DeathTileMesh->SetWorldRotation(DTRotation);
     DeathTileMesh->SetWorldScale3D(DTScale);
-    
+
     //Set booleans at start
     IsTileDown = false;
     ReadyToRise = false;

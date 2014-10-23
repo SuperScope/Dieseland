@@ -31,7 +31,7 @@ void ADieselandWalkerProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
 	Super::ReceiveActorBeginOverlap(OtherActor);
 
-	if (OtherActor == nullptr || OtherActor == NULL || Role == NULL){
+	if (OtherActor == nullptr || OtherActor == NULL){
 		return;
 	}
 

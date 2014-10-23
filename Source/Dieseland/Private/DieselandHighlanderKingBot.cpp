@@ -39,18 +39,10 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> BeamParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_HighlanderKingBeam_WIP.Unreal_Particle_HighlanderKingBeam_WIP'"));
 
-
+	ParticleSystem->Template = BeamParticle;
 	this->BeamParticle = BeamParticleAsset.Object;
 
-
-	//here is what we use to setup our particle system
-	ParticleSystem = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
-	ParticleSystem->Template = BeamParticle;
-	ParticleSystem->AttachTo(RootComponent);
-	ParticleSystem->bAutoActivate = false;
-	ParticleSystem->SetHiddenInGame(false);
-	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	ParticleSystem->SetIsReplicated(true);
+	
 
 }
 
@@ -81,17 +73,6 @@ void ADieselandHighlanderKingBot::CannonAttack()
 	}
 }
 
-void ADieselandHighlanderKingBot::ServerActivateParticle_Implementation(UParticleSystem* Particle)
-{
-	ParticleSystem->SetTemplate(Particle);
-	ParticleSystem->ActivateSystem();
-}
-
-bool ADieselandHighlanderKingBot::ServerActivateParticle_Validate(UParticleSystem* Particle)
-{
-	return true;
-}
-
 
 void ADieselandHighlanderKingBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
@@ -99,7 +80,6 @@ void ADieselandHighlanderKingBot::GetLifetimeReplicatedProps(TArray< FLifetimePr
 
 
 	// Replicate to everyone
-	DOREPLIFETIME(ADieselandHighlanderKingBot, ParticleSystem);
 	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonZoneCollision);
 	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonRange);
 	DOREPLIFETIME(ADieselandHighlanderKingBot, CannonDamageUpdate);

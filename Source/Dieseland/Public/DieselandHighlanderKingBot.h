@@ -47,15 +47,6 @@ class DIESELAND_API ADieselandHighlanderKingBot : public ADieselandEnemyBot
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
 	UParticleSystem* BeamParticle;
 
-	//this is the function used to activate particles across the server
-	UFUNCTION(Reliable, NetMulticast, WithValidation)
-	void ServerActivateParticle(UParticleSystem* Particle);
-
-	//this grabs the particle system
-	UPROPERTY(Replicated, Category = Visual, BlueprintReadOnly, VisibleAnywhere)
-	TSubobjectPtr<class UParticleSystemComponent> ParticleSystem;
-
-
 	
 	// Damage amount for cannon, important to note this damage is updated once per .2 seconds
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)

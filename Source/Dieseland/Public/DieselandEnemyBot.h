@@ -155,6 +155,16 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 		float StunRemaining;
 
 
+	//this is the function used to activate particles across the server
+	UFUNCTION(Reliable, NetMulticast, WithValidation)
+		void ServerActivateParticle(UParticleSystem* Particle);
+
+	//this grabs the particle system
+	UPROPERTY(Replicated, Category = Visual, BlueprintReadOnly, VisibleAnywhere)
+		TSubobjectPtr<class UParticleSystemComponent> ParticleSystem;
+
+
+
 protected:
 
 	//timer for updating UI

@@ -94,12 +94,24 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	bReplicateMovement = true;
 	SkeletalMesh->SetIsReplicated(true);
 	AimMesh->SetIsReplicated(true);
+	SetActorTickEnabled(true);
 	//Mesh->SetIsReplicated(true);
 	PrimaryActorTick.bCanEverTick = true;
 
-	//here we set the dieseland aggresion to true
+	//here we set the dieseland aggresion to false
 	isAggressive = false;
 	LingerCount = 0;
+
+	//here is what we use to setup our particle system
+	ParticleSystem = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
+	ParticleSystem->AttachTo(RootComponent);
+	ParticleSystem->bAutoActivate = false;
+	ParticleSystem->SetHiddenInGame(false);
+	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ParticleSystem->SetIsReplicated(true);
+
+	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
+	
 
 }
 
@@ -248,12 +260,14 @@ void ADieselandEnemyBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandEnemyBot, Health);
 	DOREPLIFETIME(ADieselandEnemyBot, AimMesh);
-	DOREPLIFETIME(ADieselandEnemyBot, SkeletalMesh);
+	if (!IsMelee){
+		DOREPLIFETIME(ADieselandEnemyBot, SkeletalMesh);
+	}
 	//DOREPLIFETIME(ADieselandEnemyBot, Mesh);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackTimer);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackActive);
 	DOREPLIFETIME(ADieselandEnemyBot, BasicAttackDamage);
-
+	DOREPLIFETIME(ADieselandEnemyBot, ParticleSystem);
 	DOREPLIFETIME(ADieselandEnemyBot, StatusEffects);
 	DOREPLIFETIME(ADieselandEnemyBot, StunRemaining);
 }
@@ -324,5 +338,15 @@ void ADieselandEnemyBot::OnProjectileZoneEnter()
 
 }
 
+void ADieselandEnemyBot::ServerActivateParticle_Implementation(UParticleSystem* Particle)
+{
+	ParticleSystem->SetTemplate(Particle);
+	ParticleSystem->ActivateSystem();
+}
+
+bool ADieselandEnemyBot::ServerActivateParticle_Validate(UParticleSystem* Particle)
+{
+	return true;
+}
 
 

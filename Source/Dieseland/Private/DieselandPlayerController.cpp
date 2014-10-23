@@ -385,10 +385,6 @@ void ADieselandPlayerController::OnShowScore()
 	// TODO: Add score screen
 }
 
-bool ADieselandPlayerController::ServerEditHealth_Validate(int32 Amt, AActor* Target)
-{
-	return true;
-}
 
 void ADieselandPlayerController::ServerEditHealth_Implementation(int32 Amt, AActor* Target)
 {
@@ -398,6 +394,11 @@ void ADieselandPlayerController::ServerEditHealth_Implementation(int32 Amt, AAct
 		Cast<ADieselandCharacter>(GetPawn())->EditHealth(Amt, Target);
 	}
 }
+bool ADieselandPlayerController::ServerEditHealth_Validate(int32 Amt, AActor* Target)
+{
+	return true;
+}
+
 
 
 void ADieselandPlayerController::ServerEditSpeedDamage_Implementation(int32 Speed, int32 Damage, AActor* Target)

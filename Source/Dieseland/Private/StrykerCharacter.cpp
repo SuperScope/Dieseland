@@ -4,6 +4,7 @@
 #include "StrykerCharacter.h"
 #include "DieselandCharacter.h"
 #include "DieselandEnemyBot.h"
+#include "UnrealNetwork.h"
 #include "DieselandPlayerController.h"
 #include "StrykerPoisionProjectile.h"
 #include "ParticleDefinitions.h"
@@ -128,7 +129,7 @@ bool AStrykerCharacter::UpdateDurationTimers_Validate(float DeltaSeconds)
 	return true;
 }
 
-void AStrykerCharacter::SearchForAssassinationTarget()
+void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 {
 	AssassinationCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
@@ -188,6 +189,21 @@ void AStrykerCharacter::SearchForAssassinationTarget()
 	}
 	//used for figuring out the distanec the player must move to strike with assassinate
 	if (AssassinationTarget != NULL){
+		//here we test to see if the target is dead, if so we stop attacking
+		if (AssassinationTarget->ActorHasTag(FName(TEXT("Enemy")))){
+			ADieselandEnemyBot* DieselandPawn = Cast<ADieselandEnemyBot>(AssassinationTarget);
+			if (DieselandPawn->Health <= 0){
+				AssasinationHitCounter = 6;
+				return;
+			}
+		}
+		else if (AssassinationTarget->ActorHasTag(FName(TEXT("Player")))){
+			ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(AssassinationTarget);
+			if (DieselandPawn->Health <= 0){
+				AssasinationHitCounter = 6;
+				return;
+			}
+		}
 		//here we move around the player
 		if (AssasinationDuration2 > 0.25f && AssasinationDuration > 0.3f)
 		{
@@ -275,6 +291,10 @@ void AStrykerCharacter::SearchForAssassinationTarget()
 	}
 }
 
+bool AStrykerCharacter::SearchForAssassinationTarget_Validate()
+{
+	return true;
+}
 // Stryker Assasinate
 void AStrykerCharacter::SkillOne()
 {

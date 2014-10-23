@@ -49,7 +49,7 @@ class DIESELAND_API AStrykerCharacter : public ADieselandCharacter
 
 
 	//combat functions
-	UFUNCTION(BlueprintCallable, Category = Combat)
+	UFUNCTION(Reliable, Server, WithValidation)
 		void SearchForAssassinationTarget();
 
 
