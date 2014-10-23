@@ -140,6 +140,22 @@ void ADieselandGameMode::RespawnTile(FVector SpawnLocation)
 	}
 }
 
+AActor* ADieselandGameMode::SpawnLightArray(UClass* ArrayClass, FVector SpawnLocation)
+{
+	//Find world
+	UWorld* const World = GetWorld();
+
+	if (World)
+	{
+		AActor* tempArray = UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ArrayClass, SpawnLocation, FRotator(0, 0, 0));
+		return tempArray;
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
 void ADieselandGameMode::EndGame_Implementation()
 {
 	FString WinningName;
