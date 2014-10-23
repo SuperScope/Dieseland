@@ -37,49 +37,42 @@ class DIESELAND_API ADeathTile : public AActor
     UPROPERTY(BlueprintReadOnly, Category = "Death Tile")
     bool EnemiesRemaining;
     
-    //Boolean for if the tile is down
-    UPROPERTY(BlueprintReadWrite, Category = "Death Tile")
-    bool IsTileDown;
-    
-    //Boolean for when the tile is ready to rise
-    UPROPERTY(BlueprintReadWrite, Category = "Death Tile")
-    bool ReadyToRise;
-    
     //Boolean to determine if enemy was found
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
     bool EnemyFound;
     
-    //Boolean to determine when to check for enemies
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
-    bool CheckForEnemies;
-    
-    //Vectors for location
-    UPROPERTY(BlueprintReadWrite, Category = "Death Tile")
-    FVector CurrentLocation;
-    
-    UPROPERTY(BlueprintReadWrite, Category = "Death Tile")
-    FVector TargetLocation;
-    
     //Array for the Death Tile Locations
     TArray<FVector> LocationArray;
-    
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
+	bool EnemyDetectionActive;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
 	TArray<AActor*> EnemiesOnTile;
     
+	UFUNCTION(BlueprintImplementableEvent, Category = "Death Tile")
+	void OnShouldDrop();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Death Tile")
+	void OnSpawnLights();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Death Tile")
+	void OnDestroyLights();
+
     //Find world
     UWorld* const World = GetWorld();
-    
-	float EnemyCheckInterval;
-	
-	float EnemyCheckTimer;
+
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Death Tile")
+	AActor* SpotlightArray;
     
 protected:
     
-    
-	//virtual void ReceiveActorBeginOverlap(AActor* OtherActor) override;
-    
-	//virtual void ReceiveActorEndOverlap(AActor* OtherActor) override;
-    
+	float EnemyCheckInterval;
+
+	float EnemyCheckTimer;
+	
+	UClass* SpotlightArrayClass;
+
     virtual void Tick(float DeltaSeconds) override;
     
     //Function for switching Death Tiles
@@ -89,7 +82,5 @@ protected:
     //Function for detecting enemies
     UFUNCTION(BlueprintCallable, Category = "Death Tile")
 	void EnemyDetection();
-    
-    
 
 };

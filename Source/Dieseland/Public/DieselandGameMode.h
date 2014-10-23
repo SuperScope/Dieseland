@@ -26,6 +26,9 @@ class ADieselandGameMode : public AGameMode
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void RespawnTile(FVector SpawnLocation);
 
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+	AActor* SpawnLightArray(UClass* ArrayClass, FVector SpawnLocation);
+
 	UFUNCTION(Reliable, Server, WithValidation, Category = Gameplay)
 	void EndGame();
 
