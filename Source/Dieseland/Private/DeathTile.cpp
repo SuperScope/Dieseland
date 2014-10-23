@@ -44,23 +44,22 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
 
 	PrimaryActorTick.bCanEverTick = true;
 
-	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
+	SetRemoteRoleForBackwardsCompat(ENetRole::ROLE_SimulatedProxy);
 	bReplicates = true;
 	bReplicateMovement = true;
 	
-    
     //Set values for rotation and scale
     DTRotation.Add(0, 22.5, 0);
     DTScale.Set(1, 1, 1);
     
     //Set Dummy Component as parent
-    DeathTileMesh->AttachParent = DummyComponent;
+	DeathTileMesh->AttachParent = RootComponent;
 	//SphereCollision->AttachParent = DummyComponent;
     
     //Set Mesh rotation and scale
     DeathTileMesh->SetWorldRotation(DTRotation);
     DeathTileMesh->SetWorldScale3D(DTScale);
-
+    
     //Set booleans at start
     IsTileDown = false;
     ReadyToRise = false;
@@ -156,4 +155,5 @@ void ADeathTile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ADeathTile, SphereCollision);
+	DOREPLIFETIME(ADeathTile, DeathTileMesh);
 }

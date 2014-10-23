@@ -15,7 +15,7 @@ class DIESELAND_API ADeathTile : public AActor
 	GENERATED_UCLASS_BODY()
     
     /* Static Mesh */
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category= "Death Tile")
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Death Tile")
     TSubobjectPtr<UStaticMeshComponent> DeathTileMesh;
     
     /* Dummy Scene Component to be used as root component*/
