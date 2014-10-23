@@ -71,6 +71,17 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 	UltimateSound->AttachParent = RootComponent;
 	UltimateSound->bAutoActivate = false;
 
+	RageVoiceOver = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Rage Voice Over"));
+	RageVoiceOver->AttachParent = RootComponent;
+	RageVoiceOver->bAutoActivate = false;
+
+	RageSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Rage Sound"));
+	RageSound->AttachParent = RootComponent;
+	RageSound->bAutoActivate = false;
+
+	LaughCooldown = 2.0f;
+	TauntCooldown = 2.0f;
+	CommentCooldown = 4.0f;
 
 }
 
@@ -148,6 +159,7 @@ void AMayhemCharacter::MeleeAttack()
 	PunchSound->Play();
 }
 
+//Smash
 void AMayhemCharacter::SkillOne()
 {
 	ServerActivateParticle(SkillOneParticle);
@@ -191,8 +203,11 @@ void AMayhemCharacter::SkillOne()
 	UltimateSound->Play();
 }
 
+//rage
 void AMayhemCharacter::SkillTwo()
 {
+	RageSound->Play();
+	RageVoiceOver->Play();
 	RageMoveSpeedBuff = (CharacterMovement->MaxWalkSpeed * .5f) + (Strength * .06f);
 	RageAttkSpeedBuff = (BasicAttackCooldown * .2f) + (Strength * .06f);
 
@@ -202,11 +217,11 @@ void AMayhemCharacter::SkillTwo()
 	RageTimer = RageDuration;
 }
 
+//Mayhem Iron Armor
 void AMayhemCharacter::SkillThree()
 {
-	//TODO: Replace with scaling based on Const??
-	IronArmorHealthBuff = (float)MaxHealth * 0.25f;
-	IronArmorRegenBuff = (float)HealthRegeneration * 0.25f;
+	IronArmorHealthBuff = (float)MaxHealth * 0.25f + Strength * 0.75f;
+	IronArmorRegenBuff = (float)HealthRegeneration * 0.25f + Strength + 0.03f;
 
 	IronArmorTimer = IronArmorDuration;
 

@@ -52,6 +52,23 @@ class DIESELAND_API AStrykerCharacter : public ADieselandCharacter
 	UFUNCTION(Reliable, Server, WithValidation)
 		void SearchForAssassinationTarget();
 
+	//audio assets
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> SlashSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> UltimateVoice;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> BlinkSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> PoisonSound;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> AssassinationSound;
+
+
 
 
 protected:

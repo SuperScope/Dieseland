@@ -553,9 +553,10 @@ void ADieselandPlayerController::OnTaunt_Implementation()
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")))
 	{
-		if (DieselandPawn->TauntTimer <= 0.0f)
+		if (DieselandPawn->TauntTimer <= 0.0f && DieselandPawn->CommentTimer <= 0.0f && DieselandPawn->LaughTimer <= 0.0f)
 		{
 			DieselandPawn->Taunt();
+			DieselandPawn->TauntTimer = DieselandPawn->TauntCooldown;
 			//DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
 		}
 	}
@@ -573,9 +574,10 @@ void ADieselandPlayerController::OnLaugh_Implementation()
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")))
 	{
-		if (DieselandPawn->LaughTimer <= 0.0f)
+		if (DieselandPawn->TauntTimer <= 0.0f && DieselandPawn->CommentTimer <= 0.0f && DieselandPawn->LaughTimer <= 0.0f)
 		{
 			DieselandPawn->Laugh();
+			DieselandPawn->LaughTimer = DieselandPawn->LaughCooldown;
 			//DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
 		}
 	}
@@ -591,9 +593,10 @@ void ADieselandPlayerController::OnComment_Implementation()
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")))
 	{
-		if (DieselandPawn->CommentTimer <= 0.0f)
+		if (DieselandPawn->TauntTimer <= 0.0f && DieselandPawn->CommentTimer <= 0.0f && DieselandPawn->LaughTimer <= 0.0f)
 		{
 			DieselandPawn->Comment();
+			DieselandPawn->CommentTimer = DieselandPawn->CommentCooldown;
 			//DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
 		}
 	}

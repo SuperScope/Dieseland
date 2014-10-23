@@ -124,6 +124,11 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	MovementSound->AttachParent = RootComponent;
 	MovementSound->bAutoActivate = true;
 
+
+	TauntCooldown = 3.0f;
+	LaughCooldown = 2.0f;
+	CommentCooldown = 4.0f;
+
 }
 
 //Engleton Bombardment
@@ -132,6 +137,7 @@ void AEngletonCharacter::SkillOne()
 	//here I activate Bombardment if it's not already activated
 	if (BombardmentTimer == 0)
 	{
+		BombardmentSound->Play();
 		UltimateSound->Play();
 		BombardmentActivated = true;
 	}
@@ -275,6 +281,7 @@ void AEngletonCharacter::RangedAttack()
 	UWorld* const World = GetWorld();
 	if (World)
 	{
+		 MachineGunSound->Play();
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
 		SpawnParams.Instigator = Instigator;

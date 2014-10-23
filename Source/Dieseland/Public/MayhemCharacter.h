@@ -48,6 +48,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
 	TSubobjectPtr <UAudioComponent> PunchSound;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+	TSubobjectPtr <UAudioComponent> RageVoiceOver;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+	TSubobjectPtr <UAudioComponent> RageSound;
+
 	virtual void MeleeAttack() override;
 
 	virtual void SkillOne() override;

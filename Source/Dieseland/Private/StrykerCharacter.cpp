@@ -72,6 +72,32 @@ AStrykerCharacter::AStrykerCharacter(const class FPostConstructInitializePropert
 
 	bReplicates = true;
 	bReplicateMovement = true;
+	
+	TauntCooldown = 4.0f;
+	LaughCooldown = 2.0f;
+	CommentCooldown = 2.0f;
+
+	//setting all sounds
+	SlashSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Slash Sound"));
+	SlashSound->AttachParent = RootComponent;
+	SlashSound->bAutoActivate = false;
+
+	UltimateVoice = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Ultimate Voice Over"));
+	UltimateVoice->AttachParent = RootComponent;
+	UltimateVoice->bAutoActivate = false;
+
+	BlinkSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Blink Sound"));
+	BlinkSound->AttachParent = RootComponent;
+	BlinkSound->bAutoActivate = false;
+
+	PoisonSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Poison Sound"));
+	PoisonSound->AttachParent = RootComponent;
+	PoisonSound->bAutoActivate = false;
+
+	AssassinationSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Assassination Sound"));
+	AssassinationSound->AttachParent = RootComponent;
+	AssassinationSound->bAutoActivate = false;
+
 
 	//here I set melee to false so that Stryker only uses ranged attacks
 	IsMelee = true;
@@ -159,7 +185,7 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 				if ((CurActor->ActorHasTag(FName(TEXT("Player")))))
 				{
 					//this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
-					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+					//this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
 					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
 					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
@@ -173,7 +199,7 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 				else if ((CurActor->ActorHasTag(FName(TEXT("Enemy")))))
 				{
 					//this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
-					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+					//this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
 					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
 					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
@@ -305,6 +331,7 @@ void AStrykerCharacter::SkillOne()
 	}
 	UWorld* const World = GetWorld();
 	if (World){
+		UltimateVoice->Play();
 		FRotator CharacterRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
 		CharacterRotation = FRotator(CharacterRotation.Pitch, CharacterRotation.Yaw + 90.0f, CharacterRotation.Roll);
 		this->SetActorRotation(CharacterRotation);
