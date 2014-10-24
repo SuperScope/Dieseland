@@ -38,13 +38,17 @@ class DIESELAND_API ADeathTile : public AActor
     bool EnemiesRemaining;
     
     //Boolean to determine if enemy was found
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
     bool EnemyFound;
+
+	// Hard limit on tile active state
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
+	float TimeLimit;
     
     //Array for the Death Tile Locations
     TArray<FVector> LocationArray;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
 	bool EnemyDetectionActive;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
@@ -64,8 +68,9 @@ class DIESELAND_API ADeathTile : public AActor
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Death Tile")
 	AActor* SpotlightArray;
-    
-protected:
+
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Death Tile")
+	int32 DeathTileIndex;
     
 	float EnemyCheckInterval;
 
@@ -80,7 +85,7 @@ protected:
     void SwitchDeathTile();
     
     //Function for detecting enemies
-    UFUNCTION(BlueprintCallable, Category = "Death Tile")
+    UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Death Tile")
 	void EnemyDetection();
 
 };

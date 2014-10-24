@@ -54,22 +54,22 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
     
 	if (TileClass1.Object)
 	{
-		DeathTileArray.Add(TileClass1.Object);
-		DeathTileArray.Add(TileClass2.Object);
-		DeathTileArray.Add(TileClass3.Object);
-		DeathTileArray.Add(TileClass4.Object);
-		DeathTileArray.Add(TileClass5.Object);
-		DeathTileArray.Add(TileClass6.Object);
-		DeathTileArray.Add(TileClass7.Object);
-		DeathTileArray.Add(TileClass8.Object);
-		DeathTileArray.Add(TileClass9.Object);
-		DeathTileArray.Add(TileClass10.Object);
-		DeathTileArray.Add(TileClass11.Object);
-		DeathTileArray.Add(TileClass12.Object);
-		DeathTileArray.Add(TileClass13.Object);
-		DeathTileArray.Add(TileClass14.Object);
-		DeathTileArray.Add(TileClass15.Object);
-		DeathTileArray.Add(TileClass16.Object);
+		DeathTileClassArray.Add(TileClass1.Object);
+		DeathTileClassArray.Add(TileClass2.Object);
+		DeathTileClassArray.Add(TileClass3.Object);
+		DeathTileClassArray.Add(TileClass4.Object);
+		DeathTileClassArray.Add(TileClass5.Object);
+		DeathTileClassArray.Add(TileClass6.Object);
+		DeathTileClassArray.Add(TileClass7.Object);
+		DeathTileClassArray.Add(TileClass8.Object);
+		DeathTileClassArray.Add(TileClass9.Object);
+		DeathTileClassArray.Add(TileClass10.Object);
+		DeathTileClassArray.Add(TileClass11.Object);
+		DeathTileClassArray.Add(TileClass12.Object);
+		DeathTileClassArray.Add(TileClass13.Object);
+		DeathTileClassArray.Add(TileClass14.Object);
+		DeathTileClassArray.Add(TileClass15.Object);
+		DeathTileClassArray.Add(TileClass16.Object);
 	}
 
     LocationArray.Add(FVector(1193.372559, -4332.289062, -1500.0));
@@ -91,7 +91,7 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
 
 void ADieselandGameMode::ReceiveBeginPlay()
 {
-	//StartGame();
+	StartGame();
 }
 
 void ADieselandGameMode::Tick(float DeltaSeconds)
@@ -117,8 +117,8 @@ void ADieselandGameMode::StartGame_Implementation()
 		for (int32 i = 0; i <= 6; i++)
 		{
 			int32 RandomIndex = FMath::RandRange(0, 15);
-			UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, DeathTileArray[RandomIndex], LocationArray[i], FRotator(0, 0, 0));
-
+			DeathTileArray.Add(UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, DeathTileClassArray[RandomIndex], LocationArray[i], FRotator(0, 0, 0)));
+			Cast<ADeathTile>(DeathTileArray[i])->DeathTileIndex = i;
 		}
 	}
 }
@@ -136,7 +136,7 @@ void ADieselandGameMode::RespawnTile(FVector SpawnLocation)
 	if (World)
 	{
 		int32 RandomIndex = FMath::RandRange(0, 15);
-		UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, DeathTileArray[RandomIndex], SpawnLocation, FRotator(0, 0, 0));
+		UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, DeathTileClassArray[RandomIndex], SpawnLocation, FRotator(0, 0, 0));
 	}
 }
 
@@ -207,6 +207,6 @@ void ADieselandGameMode::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandGameMode, GameTimer);
-	DOREPLIFETIME(ADieselandGameMode, DeathTileArray);
+	DOREPLIFETIME(ADieselandGameMode, DeathTileClassArray);
 	DOREPLIFETIME(ADieselandGameMode, LocationArray);
 }

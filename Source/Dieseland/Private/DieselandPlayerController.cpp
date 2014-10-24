@@ -256,7 +256,7 @@ void ADieselandPlayerController::ReceiveBeginPlay()
 {
 	if (Role == ROLE_Authority)
 	{
-		Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->StartGame();
+//		Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->StartGame();
 	}
 }
 
