@@ -10,11 +10,15 @@ class ADieselandGameMode : public AGameMode
     
     //Array for the Death Tiles
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
-    TArray<UClass*> DeathTileArray;
+    TArray<UClass*> DeathTileClassArray;
 
     //Array for the Death Tile Locations
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
     TArray<FVector> LocationArray;
+
+	//Array for the Death Tiles
+	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+	TArray<AActor*> DeathTileArray;
 
 	// Timer to keep track of the duration of the match
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)

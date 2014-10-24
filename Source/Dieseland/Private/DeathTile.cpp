@@ -71,48 +71,28 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
 
 	EnemyCheckInterval = 1.0f;
 	EnemyCheckTimer = EnemyCheckInterval;
-}
 
-/*void ADeathTile::ReceiveActorBeginOverlap(AActor* Enemy)
-{
-    Super::ReceiveActorBeginOverlap(Enemy);
-    
-    if(Enemy->ActorHasTag(FName(TEXT("Enemy"))))
-    {
-        //EnemiesRemaining = true;
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an ON screen message!"));    }
-    
+	TimeLimit = 300.0f;
 }
-
-void ADeathTile::ReceiveActorEndOverlap(AActor* Enemy)
-{
-    Super::ReceiveActorEndOverlap(Enemy);
-    
-    if(Enemy->ActorHasTag(FName(TEXT("Enemy"))))
-    {
-        //EnemiesRemaining = false;
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an OFF screen message!"));    }
-    
-}*/
 
 void ADeathTile::SwitchDeathTile()
 {
     if(World && Role == ROLE_Authority)
     {
-        World->DestroyActor(this);
-        int32 RandomIndex = FMath::RandRange(0, 15);
+       // World->DestroyActor(this);
+       // int32 RandomIndex = FMath::RandRange(0, 15);
         //UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, Cast <ADieselandGameMode> (World->GetAuthGameMode())->DeathTileArray[RandomIndex], TargetLocation, FRotator(0,0,0));
 		Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->RespawnTile(this->GetActorLocation());
-		if (SpotlightArray != nullptr)
-		{ 
+		//if (SpotlightArray != nullptr)
+		//{ 
 			//OnDestroyLights();
-			SpotlightArray->Destroy();
-		}
+		//	SpotlightArray->Destroy();
+		//}
 		Destroy();
     }
 }
 
-void ADeathTile::EnemyDetection()
+void ADeathTile::EnemyDetection_Implementation()
 {
 	SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SphereCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
@@ -137,16 +117,16 @@ void ADeathTile::EnemyDetection()
 		}
 	}
 
-	if (!EnemyFound)
+	if (!EnemyFound && EnemyDetectionActive)
 	{
 		EnemyDetectionActive = false;
-		//if (Role == ROLE_Authority && !SpotlightArray)
-		//{
-			//SpotlightArray = Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->SpawnLightArray(SpotlightArrayClass, FVector(this->GetActorLocation().X, this->GetActorLocation().Y, this->GetActorLocation().Z + 1000.0f));
-			//SpotlightArray = UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, SpotlightArrayClass, FVector(this->GetActorLocation().X, this->GetActorLocation().Y, this->GetActorLocation().Z + 1000.0f), FRotator(0, 0, 0));
-		//}
-		//OnShouldDrop();
+		OnShouldDrop();
 	}
+}
+
+bool ADeathTile::EnemyDetection_Validate()
+{
+	return true;
 }
 
 void ADeathTile::Tick(float DeltaSeconds)
@@ -163,6 +143,16 @@ void ADeathTile::Tick(float DeltaSeconds)
 			EnemyCheckTimer = EnemyCheckInterval;
 		}
 	}
+
+	if (TimeLimit > 0.0f){
+		TimeLimit -= DeltaSeconds;
+	}
+	else
+	{
+		OnShouldDrop();
+		EnemyDetectionActive = false;
+	}
+
 	Super::Tick(DeltaSeconds);
 }
 
@@ -173,4 +163,7 @@ void ADeathTile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLif
 	DOREPLIFETIME(ADeathTile, SphereCollision);
 	DOREPLIFETIME(ADeathTile, DeathTileMesh);
 	DOREPLIFETIME(ADeathTile, SpotlightArray);
+	DOREPLIFETIME(ADeathTile, DeathTileIndex);
+	DOREPLIFETIME(ADeathTile, EnemyFound);
+	DOREPLIFETIME(ADeathTile, EnemyDetectionActive);
 }

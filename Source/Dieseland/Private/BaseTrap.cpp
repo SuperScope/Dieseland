@@ -35,10 +35,11 @@ void ABaseTrap::ReceiveActorBeginOverlap(AActor* OtherActor)
 		if (OtherActor->ActorHasTag(TEXT("Player")))
 		{
 			Cast<ADieselandCharacter>(OtherActor)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandCharacter>(OtherActor)->CharacterMovement->MaxWalkSpeed / TrapSlow;
-			Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * TrapDamage, OtherActor);
+			// TODO: Replace with better damage handling
+			Cast<ADieselandCharacter>(OtherActor)->Health -= TrapDamage;
 
 		}
-		if (OtherActor->ActorHasTag(FName(TEXT("Enemy"))))
+		/*if (OtherActor->ActorHasTag(FName(TEXT("Enemy"))))
 		{
 			Cast<ADieselandEnemyBot>(OtherActor)->Health -= TrapDamage;
 			Cast<ADieselandEnemyBot>(OtherActor)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandEnemyBot>(OtherActor)->CharacterMovement->MaxWalkSpeed / TrapSlow;
@@ -47,7 +48,7 @@ void ABaseTrap::ReceiveActorBeginOverlap(AActor* OtherActor)
 			{
 				OtherActor->Destroy();
 			}
-		}
+		}*/
 	}
 
 }
@@ -63,12 +64,12 @@ void ABaseTrap::ReceiveActorEndOverlap(AActor* OtherActor)
 			Cast<ADieselandCharacter>(OtherActor)->LingerDamage = LingerDamage;
 			Cast<ADieselandCharacter>(OtherActor)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandCharacter>(OtherActor)->CharacterMovement->MaxWalkSpeed * TrapSlow;
 		}
-		if (OtherActor->ActorHasTag(FName(TEXT("Enemy"))))
+		/*if (OtherActor->ActorHasTag(FName(TEXT("Enemy"))))
 		{
 			Cast<ADieselandEnemyBot>(OtherActor)->LingerTimer = LingerCoolDown;
 			Cast<ADieselandEnemyBot>(OtherActor)->LingerDamage = LingerDamage;
 			Cast<ADieselandEnemyBot>(OtherActor)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandEnemyBot>(OtherActor)->CharacterMovement->MaxWalkSpeed * TrapSlow;
-		}
+		}*/
 	}
 
 }
