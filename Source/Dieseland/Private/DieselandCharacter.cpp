@@ -121,7 +121,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	PoisonTimer = 0.0f;
 	LaughTimer = 0.0f;
 	CommentTimer = 0.0f;
-	TauntTimer = -.0f;
+	TauntTimer = 0.0f;
 
 	// Set up collision area for melee attacks
 	MeleeCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("MeleeCollision"));

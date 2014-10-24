@@ -46,9 +46,9 @@ AStrykerCharacter::AStrykerCharacter(const class FPostConstructInitializePropert
 	AssassinationColliderRange = 250.0f;
 
 	//base cooldowns
-	BaseSkillOneCooldown = 1.0f;
-	BaseSkillTwoCooldown = 1.0f;
-	BaseSkillThreeCooldown = 1.0f;
+	BaseSkillOneCooldown = 22.0f;
+	BaseSkillTwoCooldown = 9.0f;
+	BaseSkillThreeCooldown = 9.0f;
 
 	//adjustments for cooldowns
 	SkillOneCooldown = BaseSkillOneCooldown / (1 + Intelligence / 100);
@@ -99,7 +99,7 @@ AStrykerCharacter::AStrykerCharacter(const class FPostConstructInitializePropert
 	AssassinationSound->bAutoActivate = false;
 
 
-	//here I set melee to false so that Stryker only uses ranged attacks
+	//here I set melee to true so that Stryker only uses melee attacks
 	IsMelee = true;
 }
 
