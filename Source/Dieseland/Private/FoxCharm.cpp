@@ -12,8 +12,8 @@ AFoxCharm::AFoxCharm(const class FPostConstructInitializeProperties& PCIP)
 
 	//the penetration round is meant to be large and move very quickly
 	ProjectileMovement->InitialSpeed = 1600.0f;
-	ProjCollision->SetCapsuleHalfHeight(100.0f);
-	ProjCollision->SetCapsuleRadius(100.0f);
+	ProjCollision->SetCapsuleHalfHeight(150.0f);
+	ProjCollision->SetCapsuleRadius(150.0f);
 
 	//temp meshscale
 	FVector MeshScale;

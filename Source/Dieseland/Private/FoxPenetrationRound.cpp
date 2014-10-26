@@ -12,8 +12,8 @@ AFoxPenetrationRound::AFoxPenetrationRound(const class FPostConstructInitializeP
 
 	//the penetration round is meant to be large and move very quickly
 	ProjectileMovement->InitialSpeed = 2500.0f;
-	ProjCollision->SetCapsuleHalfHeight(100.0f);
-	ProjCollision->SetCapsuleRadius(100.0f);
+	ProjCollision->SetCapsuleHalfHeight(150.0f);
+	ProjCollision->SetCapsuleRadius(150.0f);
 
 	//temp meshscale
 	FVector MeshScale;
