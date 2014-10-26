@@ -162,7 +162,7 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 				DieselandPawn->OnProjectileZoneEnter();
 				ServerMeleeAttack();
 				SearchForSpawnLocation();
-				DieselandPawn->BasicAttackTimer = 1.0f;
+				DieselandPawn->BasicAttackTimer = FMath::FRandRange(0.8f, 1.2f);
 			}
 		}
 
@@ -175,7 +175,7 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 				SearchForSpawnLocation();
 				DieselandPawn->OnZoneEnter();
 				DieselandPawn->OnProjectileZoneEnter();
-				UpdateTimer = FMath::FRandRange(0.0f, 0.03f);
+				UpdateTimer = FMath::FRandRange(0.1f, 0.3f);
 			}
 		}
 

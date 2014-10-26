@@ -142,7 +142,7 @@ void ADieselandEnemyBot::Tick(float DeltaSeconds)
 		if (HealthRegenTimer > 1)
 		{
 			Health += HealthRegeneration;
-			HealthRegenTimer = 0;
+			HealthRegenTimer = FMath::FRandRange(-0.2f, 0.2f);
 		}
 	}
 	if (LingerTimer > 0.0f)
