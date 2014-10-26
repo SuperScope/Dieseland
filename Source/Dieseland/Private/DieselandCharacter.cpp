@@ -82,6 +82,13 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	//AimMesh->SetStaticMesh(StaticAimMesh.Object);
 	AimMesh->SetHiddenInGame(true);
 	
+	CharacterLightSource = PCIP.CreateDefaultSubobject<UPointLightComponent>(this, TEXT("LightSource"));
+	CharacterLightSource->AttachParent = RootComponent;
+	CharacterLightSource->AddRelativeLocation(FVector(0.0f, 10.0f, 460.0f));
+	CharacterLightSource->SetIntensity(10000.0f);
+	CharacterLightSource->SetLightColor(FColor::FromHex(FString("C2A171FF")));
+	CharacterLightSource->SetCastShadows(false);
+
 	// Tag this character as a player
 	Tags.Add(FName("Player"));
 
