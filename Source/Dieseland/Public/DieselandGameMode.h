@@ -39,6 +39,7 @@ class ADieselandGameMode : public AGameMode
 	UClass* MayhemClass;
 	UClass* EngletonClass;
 	UClass* StrykerClass;
+	UClass* FoxClass;
 
 	uint8 PlayersSpawned;
 

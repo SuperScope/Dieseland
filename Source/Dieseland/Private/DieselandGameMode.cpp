@@ -44,12 +44,15 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
 	static ConstructorHelpers::FObjectFinder<UClass> MayhemBPClass(TEXT("Class'/Game/Blueprints/Players/Mayhem_BP.Mayhem_BP_C'"));
 	static ConstructorHelpers::FObjectFinder<UClass> EngletonBPClass(TEXT("Class'/Game/Blueprints/Engleton.Engleton_C'"));
 	static ConstructorHelpers::FObjectFinder<UClass> StrykerBPClass(TEXT("Class'/Game/Blueprints/Players/Stryker_BP.Stryker_BP_C'"));
+	static ConstructorHelpers::FObjectFinder<UClass> FoxBPClass(TEXT("Class'/Game/Blueprints/Players/Fox_BP.Fox_BP_C'"));
+
 
 	if (MayhemBPClass.Object)
 	{
 		MayhemClass = MayhemBPClass.Object;
 		EngletonClass = EngletonBPClass.Object;
 		StrykerClass = StrykerBPClass.Object;
+		FoxClass = FoxBPClass.Object;
 	}
     
 	if (TileClass1.Object)
@@ -186,7 +189,7 @@ APawn* ADieselandGameMode::SpawnDefaultPawnFor(AController* NewPlayer, AActor* S
 
 	if (PlayersSpawned % 2 == 0)
 	{
-		ResultPawn = GetWorld()->SpawnActor<APawn>(StrykerClass, StartLocation, StartRotation, SpawnInfo);
+		ResultPawn = GetWorld()->SpawnActor<APawn>(FoxClass, StartLocation, StartRotation, SpawnInfo);
 	}
 	else
 	{

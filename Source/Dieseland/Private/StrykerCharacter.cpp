@@ -233,7 +233,6 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 		//here we move around the player
 		if (AssasinationDuration2 > 0.25f && AssasinationDuration > 0.3f)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Swag"));
 			FVector VectorPlayer = this->GetActorLocation();
 			FVector VectorTarget = AssassinationTarget->GetActorLocation();
 			float MoveCharacterX = VectorPlayer.X - VectorTarget.X;
@@ -266,7 +265,6 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 		//	FRotator NewRot = (this->GetActorLocation() - AssassinationTarget->GetActorLocation()).Rotation();
 			//this->SetActorRotation(NewRot);
 	
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Surf"));
 			FVector VectorPlayer = this->GetActorLocation();
 			FVector VectorTarget = AssassinationTarget->GetActorLocation();
 			float MoveCharacterX = VectorPlayer.X - VectorTarget.X;

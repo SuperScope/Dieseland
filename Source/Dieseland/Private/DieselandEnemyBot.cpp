@@ -170,7 +170,7 @@ void ADieselandEnemyBot::ResetStats()
 {
 	BasicAttackDamage = BaseAttackDamage;
 	HealthRegeneration = 2;
-	this->CharacterMovement->MaxWalkSpeed = 400;
+	this->CharacterMovement->MaxWalkSpeed = 300;
 }
 
 void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Target)
@@ -297,7 +297,7 @@ void ADieselandEnemyBot::OnZoneEnter()
 		if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player")))){
 			isAggressive = true;
 			if (IsMelee == false){
-				this->CharacterMovement->MaxWalkSpeed = 400;
+				this->CharacterMovement->MaxWalkSpeed = 300;
 			}
 		}
 	}
