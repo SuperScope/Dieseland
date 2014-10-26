@@ -3,6 +3,8 @@
 #include "Dieseland.h"
 #include "FoxCharacter.h"
 #include "FoxPenetrationRound.h"
+#include "FoxCharm.h"
+#include "FoxBasicAttack.h"
 #include "DieselandCharacter.h"
 #include "DieselandPlayerController.h"
 #include "UnrealNetwork.h"
@@ -56,11 +58,32 @@ AFoxCharacter::AFoxCharacter(const class FPostConstructInitializeProperties& PCI
 	LaughCooldown = 1.0f;
 	CommentCooldown = 1.0f;
 
+	//setting all sounds
+	PenetrationRound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Penetration Round Sound"));
+	PenetrationRound->AttachParent = RootComponent;
+	PenetrationRound->bAutoActivate = false;
+
+	UltimateVoice = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Ultimate Voice Over"));
+	UltimateVoice->AttachParent = RootComponent;
+	UltimateVoice->bAutoActivate = false;
+
+	RifleRound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Rifle Round Sound"));
+	RifleRound->AttachParent = RootComponent;
+	RifleRound->bAutoActivate = false;
+
+	CharmSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Charm Sound"));
+	CharmSound->AttachParent = RootComponent;
+	CharmSound->bAutoActivate = false;
+
+
 	bReplicates = true;
 	bReplicateMovement = true;
 
 	//here I set melee to false so that Fox only uses ranged attacks
 	IsMelee = false;
+
+
+
 }
 
 // To do fox penetration round
@@ -78,7 +101,7 @@ void AFoxCharacter::SkillOne()
 		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
 
 		// spawn the projectile at the muzzle
-		ABaseProjectile* const Projectile = World->SpawnActor<AFoxPenetrationRound>(AFoxPenetrationRound::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+		AFoxPenetrationRound* const Projectile = World->SpawnActor<AFoxPenetrationRound>(AFoxPenetrationRound::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 		if (Projectile)
 		{
 			Projectile->ProjectileDamage = 175 + (Dexterity * 6);
@@ -94,6 +117,29 @@ void AFoxCharacter::SkillOne()
 //To do fox charm
 void AFoxCharacter::SkillTwo()
 {
+	UWorld* const World = GetWorld();
+	if (World)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
+		SpawnParams.Instigator = Instigator;
+
+		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
+
+		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+
+		// spawn the projectile at the muzzle
+		AFoxCharm* const Projectile = World->SpawnActor<AFoxCharm>(AFoxCharm::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+		if (Projectile)
+		{
+			Projectile->ProjectileDamage = 0;
+			// Start the particle effect
+			Projectile->ServerActivateProjectile();
+
+			// Add the character's velocity to the projectile
+			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+		}
+	}
 
 }
 
@@ -105,7 +151,29 @@ void AFoxCharacter::SkillThree()
 
 void AFoxCharacter::RangedAttack()
 {
-	//TODO
+	UWorld* const World = GetWorld();
+	if (World)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
+		SpawnParams.Instigator = Instigator;
+
+		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
+
+		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+
+		// spawn the projectile at the muzzle
+		AFoxBasicAttack* const Projectile = World->SpawnActor<AFoxBasicAttack>(AFoxBasicAttack::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+		if (Projectile)
+		{
+			Projectile->ProjectileDamage = BasicAttackDamage;
+			// Start the particle effect
+			Projectile->ServerActivateProjectile();
+
+			// Add the character's velocity to the projectile
+			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+		}
+	}
 }
 
 //Fox basic attack

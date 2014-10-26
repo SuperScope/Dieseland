@@ -703,11 +703,6 @@ bool ADieselandPlayerController::SwapMelee_Validate()
 	return true;
 }
 
-bool ADieselandPlayerController::ServerMeleeAttack_Validate()
-{
-	return true;
-}
-
 void ADieselandPlayerController::ServerMeleeAttack_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
@@ -716,10 +711,11 @@ void ADieselandPlayerController::ServerMeleeAttack_Implementation()
 	}
 }
 
-bool ADieselandPlayerController::ServerRangedAttack_Validate()
+bool ADieselandPlayerController::ServerMeleeAttack_Validate()
 {
 	return true;
 }
+
 
 void ADieselandPlayerController::ServerRangedAttack_Implementation()
 {
@@ -727,6 +723,11 @@ void ADieselandPlayerController::ServerRangedAttack_Implementation()
 	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned"))){
 		DieselandPawn->RangedAttack();
 	}
+}
+
+bool ADieselandPlayerController::ServerRangedAttack_Validate()
+{
+	return true;
 }
 
 bool ADieselandPlayerController::ServerOnAim_Validate(FRotator Rotation)
