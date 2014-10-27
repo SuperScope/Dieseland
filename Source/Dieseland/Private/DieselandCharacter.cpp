@@ -75,6 +75,8 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	// Find the mesh to use for AimMesh component
 	//static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticAimMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube.Shape_Cube'"));
 
+	
+
 	// Setup the AimMesh component
 	AimMesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("AimMesh"));
 	AimMesh->AttachParent = (Mesh);
@@ -88,6 +90,16 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	CharacterLightSource->SetIntensity(10000.0f);
 	CharacterLightSource->SetLightColor(FColor::FromHex(FString("C2A171FF")));
 	CharacterLightSource->SetCastShadows(false);
+
+	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarMatRef(TEXT("Material'/Game/UserInterfaceAssets/HUD/Materials/M_HUD_Health_Bar.M_HUD_Health_Bar'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarBackMatRef(TEXT("Material'/Game/MaterialsDLC/Material_BasicDarkGrey.Material_BasicDarkGrey'"));
+
+	HealthBar = PCIP.CreateDefaultSubobject<UMaterialBillboardComponent>(this, TEXT("HealthBar"));
+	HealthBar->AttachParent = RootComponent;
+	HealthBar->AddRelativeLocation(FVector(0.0f, 0.0f, 175.0f));
+	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
+	HealthBar->AddElement(HealthBarMaterial, NULL, false, 10.0f, 75.0f, NULL);
+	HealthBar->AddElement(HealthBarBackMatRef.Object, NULL, false, 10.0f, 75.0f, NULL);
 
 	// Tag this character as a player
 	Tags.Add(FName("Player"));
@@ -198,6 +210,13 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	// Every frame set the health display
 	// TODO: Remove when UI is completed
 	PlayerLabel->SetText(FString::FromInt(Health));
+
+	if (HealthBarMaterial != nullptr)
+	{
+		HealthPercentage = ((float)Health / (float)MaxHealth);
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
+		//HealthBar->Elements[0].Material = HealthBarMaterial;
+	}
 
 	Super::Tick(DeltaSeconds);
 
