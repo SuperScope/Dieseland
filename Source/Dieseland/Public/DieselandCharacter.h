@@ -20,11 +20,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
-	// Temporary display of health value
-	// TODO: Remove when UI is ready
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
-	TSubobjectPtr<class UTextRenderComponent> PlayerLabel;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
 	TSubobjectPtr<class UMaterialBillboardComponent> HealthBar;
 

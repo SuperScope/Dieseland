@@ -64,18 +64,9 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 	//baseCooldownSpeed
 	BaseCooldownSpeed = 2.0f;
-	// Create the text component
-	// TODO: Remove when UI is implemented
-	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
-	PlayerLabel->AttachTo(RootComponent);
-	PlayerLabel->AddRelativeLocation(FVector(-80.0f, 0.0f, 0.0f), false);
-	PlayerLabel->AddLocalRotation(FRotator(90.0f, 0.0f, -180.0f));
-	PlayerLabel->Text = FString::FromInt(Health);
 
 	// Find the mesh to use for AimMesh component
 	//static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticAimMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube.Shape_Cube'"));
-
-	
 
 	// Setup the AimMesh component
 	AimMesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("AimMesh"));
