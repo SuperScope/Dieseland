@@ -198,9 +198,6 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 void ADieselandCharacter::Tick(float DeltaSeconds)
 {
-	// Every frame set the health display
-	// TODO: Remove when UI is completed
-	PlayerLabel->SetText(FString::FromInt(Health));
 
 	if (HealthBarMaterial != nullptr)
 	{
@@ -239,8 +236,7 @@ void ADieselandCharacter::CalculateStats_Implementation()
 			MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
 			//adjustments for health regeneration
 			HealthRegeneration = 1.0f + (Constitution / 10.0f) + (Strength / 20.0f);
-			//show those adjustments
-			PlayerLabel->SetText(FString::FromInt(Health));
+
 			//adjustments for damage
 			BasicAttackDamage = BaseDamage + (Strength * 1.5f) + (Dexterity * .5f) + (Intelligence * .5f);
 			//adjusments for attackspeed
@@ -266,8 +262,6 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 	if (Target->ActorHasTag(FName(TEXT("Player"))))
 	{
 		Cast<ADieselandCharacter>(Target)->Health += Amt;
-
-		PlayerLabel->SetText(FString::FromInt(Health));
 
 		if (Role < ROLE_Authority)
 		{

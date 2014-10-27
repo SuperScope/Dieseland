@@ -32,8 +32,7 @@ AFoxCharacter::AFoxCharacter(const class FPostConstructInitializeProperties& PCI
 	MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
 	Health = MaxHealth;
 	HealthRegeneration = 1.0f + (Constitution / 10.0f) + (Strength / 20.0f);
-	//show those adjustments
-	PlayerLabel->SetText(FString::FromInt(Health));
+
 	//adjustments for damage
 	BasicAttackDamage = BaseDamage + (Strength * 1.5f) + (Dexterity * .5f) + (Intelligence * .5f);
 	//adjusments for attackspeed
