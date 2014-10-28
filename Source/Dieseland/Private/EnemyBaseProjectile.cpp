@@ -15,7 +15,7 @@ AEnemyBaseProjectile::AEnemyBaseProjectile(const class FPostConstructInitializeP
 void AEnemyBaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
 	AActor::ReceiveActorBeginOverlap(OtherActor);
-	if (Role == ROLE_Authority)
+	if (Role == ROLE_Authority && Cast<ADieselandEnemyAI>(GetOwner())->GetPawn() != OtherActor)
 	{
 		if (Cast<ADieselandEnemyAI>(GetOwner())->GetPawn() != OtherActor && (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(FName(TEXT("Enemy")))))
 		{

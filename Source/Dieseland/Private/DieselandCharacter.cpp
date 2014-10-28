@@ -64,13 +64,6 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 	//baseCooldownSpeed
 	BaseCooldownSpeed = 2.0f;
-	// Create the text component
-	// TODO: Remove when UI is implemented
-	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
-	PlayerLabel->AttachTo(RootComponent);
-	PlayerLabel->AddRelativeLocation(FVector(-80.0f, 0.0f, 0.0f), false);
-	PlayerLabel->AddLocalRotation(FRotator(90.0f, 0.0f, -180.0f));
-	PlayerLabel->Text = FString::FromInt(Health);
 
 	// Find the mesh to use for AimMesh component
 	//static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticAimMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube.Shape_Cube'"));
@@ -82,6 +75,23 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	//AimMesh->SetStaticMesh(StaticAimMesh.Object);
 	AimMesh->SetHiddenInGame(true);
 	
+	CharacterLightSource = PCIP.CreateDefaultSubobject<UPointLightComponent>(this, TEXT("LightSource"));
+	CharacterLightSource->AttachParent = RootComponent;
+	CharacterLightSource->AddRelativeLocation(FVector(0.0f, 10.0f, 460.0f));
+	CharacterLightSource->SetIntensity(10000.0f);
+	CharacterLightSource->SetLightColor(FColor::FromHex(FString("C2A171FF")));
+	CharacterLightSource->SetCastShadows(false);
+
+	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarMatRef(TEXT("Material'/Game/UserInterfaceAssets/HUD/Materials/M_HUD_Health_Bar.M_HUD_Health_Bar'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarBackMatRef(TEXT("Material'/Game/MaterialsDLC/Material_BasicDarkGrey.Material_BasicDarkGrey'"));
+
+	HealthBar = PCIP.CreateDefaultSubobject<UMaterialBillboardComponent>(this, TEXT("HealthBar"));
+	HealthBar->AttachParent = RootComponent;
+	HealthBar->AddRelativeLocation(FVector(0.0f, 0.0f, 175.0f));
+	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
+	HealthBar->AddElement(HealthBarMaterial, NULL, false, 10.0f, 75.0f, NULL);
+	HealthBar->AddElement(HealthBarBackMatRef.Object, NULL, false, 10.0f, 75.0f, NULL);
+
 	// Tag this character as a player
 	Tags.Add(FName("Player"));
 
@@ -188,9 +198,13 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 void ADieselandCharacter::Tick(float DeltaSeconds)
 {
-	// Every frame set the health display
-	// TODO: Remove when UI is completed
-	PlayerLabel->SetText(FString::FromInt(Health));
+
+	if (HealthBarMaterial != nullptr)
+	{
+		HealthPercentage = ((float)Health / (float)MaxHealth);
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
+		//HealthBar->Elements[0].Material = HealthBarMaterial;
+	}
 
 	Super::Tick(DeltaSeconds);
 
@@ -222,8 +236,7 @@ void ADieselandCharacter::CalculateStats_Implementation()
 			MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
 			//adjustments for health regeneration
 			HealthRegeneration = 1.0f + (Constitution / 10.0f) + (Strength / 20.0f);
-			//show those adjustments
-			PlayerLabel->SetText(FString::FromInt(Health));
+
 			//adjustments for damage
 			BasicAttackDamage = BaseDamage + (Strength * 1.5f) + (Dexterity * .5f) + (Intelligence * .5f);
 			//adjusments for attackspeed
@@ -249,8 +262,6 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
 	if (Target->ActorHasTag(FName(TEXT("Player"))))
 	{
 		Cast<ADieselandCharacter>(Target)->Health += Amt;
-
-		PlayerLabel->SetText(FString::FromInt(Health));
 
 		if (Role < ROLE_Authority)
 		{

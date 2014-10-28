@@ -13,19 +13,19 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TSubobjectPtr<class UCameraComponent> TopDownCameraComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	TSubobjectPtr<class UPointLightComponent> CharacterLightSource;
 
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
-	// Temporary display of health value
-	// TODO: Remove when UI is ready
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
-	TSubobjectPtr<class UTextRenderComponent> PlayerLabel;
+	TSubobjectPtr<class UMaterialBillboardComponent> HealthBar;
 
 	// Mesh attached to the torso socket which is used to show attack direction - invisible by default
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
-		TSubobjectPtr<class UStaticMeshComponent> AimMesh;
+	TSubobjectPtr<class UStaticMeshComponent> AimMesh;
 
 	// Collider used to detect melee range
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
@@ -50,6 +50,9 @@ public:
 	// Public health value of this character
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
+
+	// Value 0.0f - 1.0f used for health bar display
+	float HealthPercentage;
 
 
 	// Public health value of this character
@@ -170,7 +173,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
 	TSubobjectPtr <UAudioComponent> LaughSound;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
+	UMaterialInstanceDynamic* HealthBarMaterial;
 
 	//FireTrap Damage Timer
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Trap)
@@ -260,8 +264,6 @@ public:
 	float CommentTimer;
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	float LaughTimer;
-
-
 
 
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)

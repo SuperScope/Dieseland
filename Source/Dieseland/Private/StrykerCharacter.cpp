@@ -32,8 +32,7 @@ AStrykerCharacter::AStrykerCharacter(const class FPostConstructInitializePropert
 	MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
 	Health = MaxHealth;
 	HealthRegeneration = 1.0f + (Constitution / 10.0f) + (Strength / 20.0f);
-	//show those adjustments
-	PlayerLabel->SetText(FString::FromInt(Health));
+
 	//adjustments for damage
 	BasicAttackDamage = BaseDamage + (Strength * 1.5f) + (Dexterity * .5f) + (Intelligence * .5f);
 	//adjusments for attackspeed
@@ -233,7 +232,6 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 		//here we move around the player
 		if (AssasinationDuration2 > 0.25f && AssasinationDuration > 0.3f)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Swag"));
 			FVector VectorPlayer = this->GetActorLocation();
 			FVector VectorTarget = AssassinationTarget->GetActorLocation();
 			float MoveCharacterX = VectorPlayer.X - VectorTarget.X;
@@ -266,7 +264,6 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 		//	FRotator NewRot = (this->GetActorLocation() - AssassinationTarget->GetActorLocation()).Rotation();
 			//this->SetActorRotation(NewRot);
 	
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Surf"));
 			FVector VectorPlayer = this->GetActorLocation();
 			FVector VectorTarget = AssassinationTarget->GetActorLocation();
 			float MoveCharacterX = VectorPlayer.X - VectorTarget.X;
