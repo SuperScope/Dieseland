@@ -7,7 +7,6 @@
 #include "DieselandCharacter.h"
 #include "MayhemCharacter.h"
 #include "DeathTile.h"
-#include "BossGates.h"
 #include "UnrealNetwork.h"
 #include "DieselandStaticLibrary.h"
 
