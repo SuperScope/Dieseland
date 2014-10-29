@@ -22,7 +22,7 @@ AEngletonMachineGun::AEngletonMachineGun(const class FPostConstructInitializePro
 
 	//TODO the correct particle effect here
 	
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/LargerMachineGunFire.LargerMachineGunFire'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
 	Particle->Template = ParticleSystemAsset.Object;
 
 	//ParticleSystemAsset = (TEXT("ParticleSystem'/Game/Particles/Test/MovingBulletTest_WIP.MovingBulletTest_WIP''"));
