@@ -10,13 +10,6 @@ UCLASS()
 class DIESELAND_API ABaseTrap : public AActor
 {
 	GENERATED_UCLASS_BODY()
-	//Static Mesh for traps
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = Trap)
-	TSubobjectPtr<class UStaticMeshComponent> TrapMesh;
-
-	//Collision Box for traps
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = Trap)
-	TSubobjectPtr<class UBoxComponent> TrapCollider;
 
 	//Damage done to actors from traps
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
