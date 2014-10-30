@@ -49,6 +49,13 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
 	float LingerTimer;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+		float StunTimer;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
+	float StunLength;
+
+
 	//Damage done to actors from fire traps upon exitting them
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
 	int32 LingerDamage;
@@ -63,6 +70,10 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	//set for the AIs attack type
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	bool IsMelee;
+
+	//set for the AIs attack type
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		bool IsWalker;
 
 	// Damage amount for basic attacks
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
@@ -153,6 +164,9 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
 		float StunRemaining;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
+		float SlowRemaining;
 
 
 	//this is the function used to activate particles across the server

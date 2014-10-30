@@ -13,6 +13,6 @@ class DIESELAND_API AFoxCharm : public ABaseProjectile
 {
 	GENERATED_UCLASS_BODY()
 
-	
+	virtual void ReceiveActorBeginOverlap(AActor* OtherActor) override;
 	
 };

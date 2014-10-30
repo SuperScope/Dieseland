@@ -18,7 +18,7 @@ public:
 		bool IsAI;
 
 
-	// Displayed Mesh
+	// Displayed MeshFp
 	UPROPERTY(Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UStaticMeshComponent> Mesh;
 

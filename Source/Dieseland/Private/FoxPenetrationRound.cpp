@@ -20,7 +20,8 @@ AFoxPenetrationRound::AFoxPenetrationRound(const class FPostConstructInitializeP
 	MeshScale = FVector(3, 3, 3);
 	
 	this->Mesh->SetWorldScale3D(MeshScale);
-
+	///ReplicatedMovement.LinearVelocity.Z = 1000.0f;
+	//ReplicatedMovement.
 	Piercing = true;
 }
 

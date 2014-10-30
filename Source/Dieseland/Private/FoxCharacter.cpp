@@ -4,6 +4,7 @@
 #include "FoxCharacter.h"
 #include "FoxPenetrationRound.h"
 #include "FoxCharm.h"
+#include "FoxSmokeGrenadeProjectile.h"
 #include "FoxBasicAttack.h"
 #include "DieselandCharacter.h"
 #include "DieselandPlayerController.h"
@@ -53,9 +54,9 @@ AFoxCharacter::AFoxCharacter(const class FPostConstructInitializeProperties& PCI
 	SkillThreeCooldown = BaseSkillThreeCooldown / (1 + Intelligence / 100);
 
 
-	TauntCooldown = 1.0f;
-	LaughCooldown = 1.0f;
-	CommentCooldown = 1.0f;
+	TauntCooldown = 4.5f;
+	LaughCooldown = 2.5f;
+	CommentCooldown = 4.0f;
 
 	//setting all sounds
 	PenetrationRound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Penetration Round Sound"));
@@ -91,6 +92,8 @@ void AFoxCharacter::SkillOne()
 	UWorld* const World = GetWorld();
 	if (World)
 	{
+		UltimateVoice->Play();
+		PenetrationRound->Play();
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
 		SpawnParams.Instigator = Instigator;
@@ -145,7 +148,29 @@ void AFoxCharacter::SkillTwo()
 //To do fox smoke bomb
 void AFoxCharacter::SkillThree()
 {
-	
+	UWorld* const World = GetWorld();
+	if (World)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
+		SpawnParams.Instigator = Instigator;
+
+		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
+
+		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+
+		// spawn the projectile at the muzzle
+		AFoxSmokeGrenadeProjectile* const Projectile = World->SpawnActor<AFoxSmokeGrenadeProjectile>(AFoxSmokeGrenadeProjectile::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+		if (Projectile)
+		{
+			Projectile->ProjectileDamage = 0;
+			// Start the particle effect
+			Projectile->ServerActivateProjectile();
+
+			// Add the character's velocity to the projectile
+			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+		}
+	}
 }
 
 void AFoxCharacter::RangedAttack()
@@ -153,6 +178,7 @@ void AFoxCharacter::RangedAttack()
 	UWorld* const World = GetWorld();
 	if (World)
 	{
+		RifleRound->Play();
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
 		SpawnParams.Instigator = Instigator;

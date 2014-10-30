@@ -35,6 +35,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Overlap);
 	Mesh->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
 	Mesh->SetHiddenInGame(true);
+	Mesh->SetIsReplicated(true);
 
 	ProjCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("ProjectileCollision"));
 	ProjCollision->SetCapsuleHalfHeight(50.0f);
@@ -75,6 +76,8 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	bReplicates = true;
 	bReplicateMovement = true;
 	Particle->SetIsReplicated(true);
+	//ReplicatedMovement.LinearVelocity.Z ;
+	
 }
 
 void ABaseProjectile::ServerActivateProjectile_Implementation()
