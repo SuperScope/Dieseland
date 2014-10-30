@@ -12,8 +12,8 @@ AEngletonMachineGun::AEngletonMachineGun(const class FPostConstructInitializePro
 	: Super(PCIP)
 {
 	//Engleton's Projectiles are meant to move very quickly.
-	ProjectileMovement->InitialSpeed = 1800.0f;
-	InitialLifeSpan = 0.5f;
+	ProjectileMovement->InitialSpeed = 900.0f;
+	InitialLifeSpan = 1.0f;
 
 	//TODO reset attack damage for engleton machine gun
 
@@ -22,7 +22,7 @@ AEngletonMachineGun::AEngletonMachineGun(const class FPostConstructInitializePro
 
 	//TODO the correct particle effect here
 	
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/LargerMachineGunFire.LargerMachineGunFire'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/MovingBulletTest_WIP.MovingBulletTest_WIP'"));
 	Particle->Template = ParticleSystemAsset.Object;
 
 	//ParticleSystemAsset = (TEXT("ParticleSystem'/Game/Particles/Test/MovingBulletTest_WIP.MovingBulletTest_WIP''"));
