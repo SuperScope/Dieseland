@@ -208,6 +208,25 @@ void ADieselandPlayerController::UpdateCooldownTimers_Implementation(float Delta
 			{
 				DieselandPawn->StunRemaining = 0.0f;
 				DieselandPawn->StatusEffects.Remove(FString("Stunned"));
+				//here we check and see if the play is also charmed, if so I then remove charm from the player
+				if (DieselandPawn->StatusEffects.Contains(FString("Charmed")))
+				{
+					DieselandPawn->StatusEffects.Remove(FString("Charmed"));
+				}
+			}
+			if (DieselandPawn->StatusEffects.Contains(FString("Charmed")))
+			{
+				DieselandPawn->CharacterMovement->Velocity += DieselandPawn->VectorDirection * 300;
+			}
+		}
+		if (DieselandPawn->SlowRemaining > 0.0f)
+		{
+			DieselandPawn->SlowRemaining -= DeltaSeconds;
+			if (DieselandPawn->SlowRemaining <= 0.0f)
+			{
+				DieselandPawn->SlowRemaining = 0.0f;
+				DieselandPawn->StatusEffects.Remove(FString("Slowed"));
+				DieselandPawn->CharacterMovement->MaxWalkSpeed = DieselandPawn->MoveSpeed;
 			}
 		}
 	}

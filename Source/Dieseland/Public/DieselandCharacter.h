@@ -63,6 +63,10 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	float HealthRegenTimer;
 
+	// Vector for vector direction
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		FVector VectorDirection;
+
 	// Health Regeneration
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	float HealthRegeneration;
@@ -298,6 +302,9 @@ public:
 
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
 	float StunRemaining;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
+	float SlowRemaining;
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;

@@ -3,13 +3,13 @@
 #pragma once
 
 #include "BaseProjectile.h"
-#include "FoxCharm.generated.h"
+#include "FoxSmokeGrenadeProjectile.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DIESELAND_API AFoxCharm : public ABaseProjectile
+class DIESELAND_API AFoxSmokeGrenadeProjectile : public ABaseProjectile
 {
 	GENERATED_UCLASS_BODY()
 
