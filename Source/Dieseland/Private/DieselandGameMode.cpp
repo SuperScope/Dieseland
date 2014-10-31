@@ -45,7 +45,7 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
 	static ConstructorHelpers::FObjectFinder<UClass> EngletonBPClass(TEXT("Class'/Game/Blueprints/Engleton.Engleton_C'"));
 	static ConstructorHelpers::FObjectFinder<UClass> StrykerBPClass(TEXT("Class'/Game/Blueprints/Players/Stryker_BP.Stryker_BP_C'"));
     static ConstructorHelpers::FObjectFinder<UClass> HighlanderBPClass(TEXT("Class'/Game/Blueprints/Enemies/DieselandHighLanderKingBP.DieselandHighLanderKingBP_C'"));
-    
+	static ConstructorHelpers::FObjectFinder<UClass> FoxBPClass(TEXT("Class'/Game/Blueprints/Players/Fox_BP.Fox_BP_C'"));
     
     if(HighlanderBPClass.Object)
     {
@@ -57,6 +57,7 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
 		MayhemClass = MayhemBPClass.Object;
 		EngletonClass = EngletonBPClass.Object;
 		StrykerClass = StrykerBPClass.Object;
+		FoxClass = FoxBPClass.Object;
 	}
     
 	if (TileClass1.Object)
