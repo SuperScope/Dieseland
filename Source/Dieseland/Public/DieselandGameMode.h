@@ -62,6 +62,7 @@ class ADieselandGameMode : public AGameMode
 	UClass* MayhemClass;
 	UClass* EngletonClass;
 	UClass* StrykerClass;
+	UClass* FoxClass;
     UClass* HighlanderKing;
     
     bool canSpawn;

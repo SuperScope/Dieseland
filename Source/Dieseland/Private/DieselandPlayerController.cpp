@@ -363,6 +363,19 @@ void ADieselandPlayerController::ChangeCharacter(FString Character)
 		this->Possess(NewPawn);
 
 	}
+	else if (Character == FString(TEXT("Fox")))
+	{
+		this->UnPossess();
+
+		NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
+			Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->FoxClass,
+			FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
+			FRotator(0.0f, 0.0f, 0.0f));
+
+		this->Possess(NewPawn);
+
+	}
+
 	// Destroy previous pawn
 	TempPawn->Destroy();
 }
