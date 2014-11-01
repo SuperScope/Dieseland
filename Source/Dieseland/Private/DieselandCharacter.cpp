@@ -153,6 +153,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	ParticleSystem = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	ParticleSystem->Template = SkillThreeParticle;
 	ParticleSystem->AttachTo(RootComponent);
+	// Another comment
 	ParticleSystem->bAutoActivate = false;
 	ParticleSystem->SetHiddenInGame(false);
 	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
