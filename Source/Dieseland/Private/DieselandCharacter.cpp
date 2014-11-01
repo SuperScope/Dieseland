@@ -166,7 +166,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	// Another comment
 	ParticleSystem->bAutoActivate = false;
 	ParticleSystem->SetHiddenInGame(false);
-	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	TauntSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Taunt Sound"));
 	TauntSound->AttachParent = RootComponent;
