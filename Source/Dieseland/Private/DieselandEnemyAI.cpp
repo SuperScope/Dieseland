@@ -162,7 +162,7 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 				DieselandPawn->OnProjectileZoneEnter();
 				ServerMeleeAttack();
 				SearchForSpawnLocation();
-				DieselandPawn->BasicAttackTimer = 1.0f;
+				DieselandPawn->BasicAttackTimer = FMath::FRandRange(0.8f, 1.2f);
 			}
 		}
 
@@ -175,7 +175,7 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 				SearchForSpawnLocation();
 				DieselandPawn->OnZoneEnter();
 				DieselandPawn->OnProjectileZoneEnter();
-				UpdateTimer = 0.2f;
+				UpdateTimer = FMath::FRandRange(0.1f, 0.3f);
 			}
 		}
 
@@ -195,7 +195,7 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 				DieselandPawn->StatusEffects.Remove(FString("Stunned"));
 
 				//TODO: Replace with calculated speeds based on enemy type/level
-				DieselandPawn->CharacterMovement->MaxWalkSpeed = 400.0f;
+				DieselandPawn->CharacterMovement->MaxWalkSpeed = 300.0f;
 				DieselandPawn->CharacterMovement->RotationRate = FRotator(0.0f, 360.0f, 0.0f);
 			}
 		}

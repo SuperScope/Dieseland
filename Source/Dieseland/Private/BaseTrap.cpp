@@ -9,13 +9,6 @@
 ABaseTrap::ABaseTrap(const class FPostConstructInitializeProperties& PCIP)
 : Super(PCIP)
 {
-
-	TrapCollider = PCIP.CreateDefaultSubobject<UBoxComponent>(this, TEXT("TrapCollision"));
-	RootComponent = TrapCollider;
-
-	TrapMesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("TrapMesh"));
-	TrapMesh->AttachTo(RootComponent);
-
 	TrapDamage = 40.f;
 	TrapSlow = 2.f;
 	LingerCoolDown = 5.f;

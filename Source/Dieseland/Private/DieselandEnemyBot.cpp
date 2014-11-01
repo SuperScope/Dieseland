@@ -111,7 +111,8 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	ParticleSystem->SetIsReplicated(true);
 
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
-	
+	this->CharacterMovement->RotationRate = FRotator(0.0f, 360.0f, 0.0f);
+	this->CharacterMovement->MaxWalkSpeed = 300;
 
 }
 
@@ -136,13 +137,60 @@ void ADieselandEnemyBot::Tick(float DeltaSeconds)
 		}
 
 	}
+	//set its move speed to 0
+
+	if (StatusEffects.Contains(FString("Stunned")))
+	{
+		StunTimer += DeltaSeconds;
+		StunLength += DeltaSeconds;
+		if (StunTimer > 0.05f)
+		{
+			if (!StatusEffects.Contains(FString("Charmed"))){
+				this->CharacterMovement->MaxWalkSpeed = 0;
+			
+			}
+			else if (StatusEffects.Contains(FString("Charmed"))){
+				this->CharacterMovement->MaxWalkSpeed = 100.0f;
+				IsMelee = true;
+			}
+			StunTimer = 0;
+			this->CharacterMovement->RotationRate = FRotator(0.0f, 1.0f, 0.0f);
+		}
+		if (StunLength >= 2.5f)
+		{
+			this->StatusEffects.Remove(FString("Stunned"));
+			this->StatusEffects.Remove(FString("Charmed"));
+			{
+				this->CharacterMovement->MaxWalkSpeed = 300;
+				this->CharacterMovement->RotationRate = FRotator(0.0f, 360.0f, 0.0f);
+				StunLength = 0.0f;
+				if (IsWalker)
+				{
+					IsMelee = false;
+				}
+			}
+		}
+		if (SlowRemaining > 0.0f)
+		{
+			SlowRemaining -= DeltaSeconds;
+			if (SlowRemaining <= 0.0f)
+			{
+				SlowRemaining = 0.0f;
+				StatusEffects.Remove(FString("Slowed"));
+				CharacterMovement->MaxWalkSpeed = 300.0f;
+			}
+		}
+	}
+
+
+
 	//here we setup health regeneration for bots
 	if (Health < MaxHealth){
 		HealthRegenTimer += DeltaSeconds;
 		if (HealthRegenTimer > 1)
 		{
 			Health += HealthRegeneration;
-			HealthRegenTimer = 0;
+			HealthRegenTimer = FMath::FRandRange(-0.2f, 0.2f);
 		}
 	}
 	if (LingerTimer > 0.0f)
@@ -170,20 +218,22 @@ void ADieselandEnemyBot::ResetStats()
 {
 	BasicAttackDamage = BaseAttackDamage;
 	HealthRegeneration = 2;
-	this->CharacterMovement->MaxWalkSpeed = 400;
+	this->CharacterMovement->MaxWalkSpeed = 300;
 }
 
 void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Target)
 {
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
-	{
-		Cast<ADieselandCharacter>(Target)->Health += Amt;
-		PlayerLabel->SetText(FString::FromInt(Health));
-
-		//i Don't think we need this function for the AI
-		if (Role < ROLE_Authority)
+	if (this != nullptr){
+		if (Target->ActorHasTag(FName(TEXT("Player"))))
 		{
-			Cast<ADieselandPlayerController>(Controller)->ServerEditHealth(Amt, Target);
+			Cast<ADieselandCharacter>(Target)->Health += Amt;
+			PlayerLabel->SetText(FString::FromInt(Health));
+
+			//i Don't think we need this function for the AI
+			if (Role < ROLE_Authority)
+			{
+				Cast<ADieselandPlayerController>(Controller)->ServerEditHealth(Amt, Target);
+			}
 		}
 	}
 }
@@ -193,7 +243,7 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Target)
 void ADieselandEnemyBot::MeleeAttack()
 {
 	//here I do an if check to test and see if the Bot is of melee type, if so then I proceed with the melee attack.
-	if (IsMelee){
+	if (IsMelee && (StatusEffects.Contains(FString("Stunned")) == false)){
 		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 		MeleeCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
@@ -223,7 +273,7 @@ void ADieselandEnemyBot::MeleeAttack()
 void ADieselandEnemyBot::RangedAttack_Implementation()
 {
 	//here I do an if check to test and see if the Bot is not of melee type, if so then I proceed with the ranged attack.
-	if (!IsMelee){
+	if (!IsMelee && (StatusEffects.Contains(FString("Stunned")) == false)){
 		UWorld* const World = GetWorld();
 		if (World)
 		{
@@ -297,7 +347,7 @@ void ADieselandEnemyBot::OnZoneEnter()
 		if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player")))){
 			isAggressive = true;
 			if (IsMelee == false){
-				this->CharacterMovement->MaxWalkSpeed = 400;
+				this->CharacterMovement->MaxWalkSpeed = 300;
 			}
 		}
 	}

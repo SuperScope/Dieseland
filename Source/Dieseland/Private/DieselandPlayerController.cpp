@@ -208,6 +208,25 @@ void ADieselandPlayerController::UpdateCooldownTimers_Implementation(float Delta
 			{
 				DieselandPawn->StunRemaining = 0.0f;
 				DieselandPawn->StatusEffects.Remove(FString("Stunned"));
+				//here we check and see if the play is also charmed, if so I then remove charm from the player
+				if (DieselandPawn->StatusEffects.Contains(FString("Charmed")))
+				{
+					DieselandPawn->StatusEffects.Remove(FString("Charmed"));
+				}
+			}
+			if (DieselandPawn->StatusEffects.Contains(FString("Charmed")))
+			{
+				DieselandPawn->CharacterMovement->Velocity += DieselandPawn->VectorDirection * 300;
+			}
+		}
+		if (DieselandPawn->SlowRemaining > 0.0f)
+		{
+			DieselandPawn->SlowRemaining -= DeltaSeconds;
+			if (DieselandPawn->SlowRemaining <= 0.0f)
+			{
+				DieselandPawn->SlowRemaining = 0.0f;
+				DieselandPawn->StatusEffects.Remove(FString("Slowed"));
+				DieselandPawn->CharacterMovement->MaxWalkSpeed = DieselandPawn->MoveSpeed;
 			}
 		}
 	}
@@ -703,11 +722,6 @@ bool ADieselandPlayerController::SwapMelee_Validate()
 	return true;
 }
 
-bool ADieselandPlayerController::ServerMeleeAttack_Validate()
-{
-	return true;
-}
-
 void ADieselandPlayerController::ServerMeleeAttack_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
@@ -716,10 +730,11 @@ void ADieselandPlayerController::ServerMeleeAttack_Implementation()
 	}
 }
 
-bool ADieselandPlayerController::ServerRangedAttack_Validate()
+bool ADieselandPlayerController::ServerMeleeAttack_Validate()
 {
 	return true;
 }
+
 
 void ADieselandPlayerController::ServerRangedAttack_Implementation()
 {
@@ -727,6 +742,11 @@ void ADieselandPlayerController::ServerRangedAttack_Implementation()
 	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned"))){
 		DieselandPawn->RangedAttack();
 	}
+}
+
+bool ADieselandPlayerController::ServerRangedAttack_Validate()
+{
+	return true;
 }
 
 bool ADieselandPlayerController::ServerOnAim_Validate(FRotator Rotation)

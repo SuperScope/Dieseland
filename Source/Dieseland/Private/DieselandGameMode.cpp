@@ -44,6 +44,13 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
 	static ConstructorHelpers::FObjectFinder<UClass> MayhemBPClass(TEXT("Class'/Game/Blueprints/Players/Mayhem_BP.Mayhem_BP_C'"));
 	static ConstructorHelpers::FObjectFinder<UClass> EngletonBPClass(TEXT("Class'/Game/Blueprints/Engleton.Engleton_C'"));
 	static ConstructorHelpers::FObjectFinder<UClass> StrykerBPClass(TEXT("Class'/Game/Blueprints/Players/Stryker_BP.Stryker_BP_C'"));
+    static ConstructorHelpers::FObjectFinder<UClass> HighlanderBPClass(TEXT("Class'/Game/Blueprints/Enemies/DieselandHighLanderKingBP.DieselandHighLanderKingBP_C'"));
+    
+    
+    if(HighlanderBPClass.Object)
+    {
+        HighlanderKing = HighlanderBPClass.Object;
+    }
 
 	if (MayhemBPClass.Object)
 	{
@@ -79,11 +86,21 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
     LocationArray.Add(FVector(-1353.48291, 1816.390625, -1500.0));
     LocationArray.Add(FVector(-3902.357666, -730.476562, -1500.0));
     LocationArray.Add(FVector(-3902.357666, -4332.289062, -1500.0));
+    
+    //Boss Zone 1
+    BossSpawnArray.Add(FVector(-910.0, -9200.0, 350.0));
+    //Boss Zone 2
+    BossSpawnArray.Add(FVector(6340.0, -4710.0, 350.0));
+    //Boss Zone 3
+    BossSpawnArray.Add(FVector(-3980.0, 8130.0, 350.0));
 
     
-	
-    
 	GameTimer = 9999.0f;
+    BossTimer = 300.0f;
+    canSpawn = true;
+    Gate1 = false;
+    Gate2 = false;
+    Gate3 = false;
 
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
@@ -97,11 +114,18 @@ void ADieselandGameMode::ReceiveBeginPlay()
 void ADieselandGameMode::Tick(float DeltaSeconds)
 {
 	GameTimer -= DeltaSeconds;
+    BossTimer -= DeltaSeconds;
 
 	if (GameTimer <= 0.0f)
 	{
 		EndGame();
 	}
+    
+    if (BossTimer <= 290.0f && canSpawn == true)
+    {
+        canSpawn = false;
+        SpawnBoss();
+    }
 
 	Super::Tick(DeltaSeconds);
 }
@@ -121,6 +145,31 @@ void ADieselandGameMode::StartGame_Implementation()
 			Cast<ADeathTile>(DeathTileArray[i])->DeathTileIndex = i;
 		}
 	}
+}
+
+void ADieselandGameMode::SpawnBoss()
+{
+    //Find world
+	UWorld* const World = GetWorld();
+    if(World)
+    {
+        int32 RandomBossIndex = FMath::RandRange(0, 2);
+        UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, HighlanderKing, BossSpawnArray[RandomBossIndex], FRotator(0, 0, 0));
+    
+    //UGameplayStatics::GetAllActorsOfClass(this, ABossGates::StaticClass(), GateArray);
+    if(RandomBossIndex == 0)
+    {
+        Gate1 = true;
+    }
+    else if(RandomBossIndex == 1)
+    {
+        Gate2 = true;
+    }
+    else if(RandomBossIndex == 2)
+    {
+        Gate3 = true;
+    }
+    }
 }
 
 bool ADieselandGameMode::StartGame_Validate()
@@ -207,6 +256,7 @@ void ADieselandGameMode::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandGameMode, GameTimer);
+    DOREPLIFETIME(ADieselandGameMode, BossTimer);
 	DOREPLIFETIME(ADieselandGameMode, DeathTileClassArray);
 	DOREPLIFETIME(ADieselandGameMode, LocationArray);
 }
