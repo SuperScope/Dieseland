@@ -163,10 +163,9 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	ParticleSystem = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	ParticleSystem->Template = SkillThreeParticle;
 	ParticleSystem->AttachTo(RootComponent);
-	// Another comment
 	ParticleSystem->bAutoActivate = false;
 	ParticleSystem->SetHiddenInGame(false);
-	//ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	TauntSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Taunt Sound"));
 	TauntSound->AttachParent = RootComponent;
