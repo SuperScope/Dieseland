@@ -44,6 +44,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	TopDownCameraComponent = PCIP.CreateDefaultSubobject<UCameraComponent>(this, TEXT("TopDownCamera"));
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	TopDownCameraComponent->SetIsReplicated(true);
 
 	CharacterLevel = 1;
 
@@ -220,6 +221,12 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 		}
 
 	}
+	if (SlowRemaining == 0 && StatusEffects.Contains(FString("SmokeScreen"))){
+	
+		StatusEffects.Remove(FString("SmokeScreen"));
+			ResetCamera();
+	
+	}
 }
 
 // CORE ATTRIBUTE CALCULATION FUNCTION
@@ -235,7 +242,7 @@ void ADieselandCharacter::CalculateStats_Implementation()
 			//adjustments for health
 			MaxHealth = BaseHealth + (Constitution * 20.0f) + (Strength * 3.0f);
 			//adjustments for health regeneration
-			HealthRegeneration = 1.0f + (Constitution / 10.0f) + (Strength / 20.0f);
+			HealthRegeneration = 4.0f + (Constitution / 8.0f) + (Strength / 16.0f);
 
 			//adjustments for damage
 			BasicAttackDamage = BaseDamage + (Strength * 1.5f) + (Dexterity * .5f) + (Intelligence * .5f);
@@ -254,6 +261,23 @@ void ADieselandCharacter::CalculateStats_Implementation()
 }
 
 bool ADieselandCharacter::CalculateStats_Validate()
+{
+	return true;
+}
+
+void ADieselandCharacter::ResetCamera_Implementation()
+{
+	TopDownCameraComponent->PostProcessSettings.bOverride_VignetteIntensity = 0;
+	TopDownCameraComponent->PostProcessSettings.bOverride_ColorGradingIntensity = 0;
+	TopDownCameraComponent->PostProcessSettings.bOverride_ColorGradingLUT = 0;
+	TopDownCameraComponent->PostProcessSettings.bOverride_SceneFringeIntensity = 0;
+	TopDownCameraComponent->PostProcessSettings.VignetteIntensity = 0;
+	TopDownCameraComponent->PostProcessSettings.bOverride_GrainIntensity = 0;
+	TopDownCameraComponent->PostProcessSettings.GrainIntensity = 0;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
+}
+
+bool ADieselandCharacter::ResetCamera_Validate()
 {
 	return true;
 }
@@ -561,10 +585,12 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
 	DOREPLIFETIME(ADieselandCharacter, StatusEffects);
 	DOREPLIFETIME(ADieselandCharacter, StunRemaining);
+	DOREPLIFETIME(ADieselandCharacter, SlowRemaining);
 
 	// Necessary
 	DOREPLIFETIME(ADieselandCharacter, Strength);
 	DOREPLIFETIME(ADieselandCharacter, Constitution);
 	DOREPLIFETIME(ADieselandCharacter, Dexterity);
 	DOREPLIFETIME(ADieselandCharacter, Intelligence);
+
 }

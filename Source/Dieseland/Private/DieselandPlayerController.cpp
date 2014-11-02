@@ -221,12 +221,14 @@ void ADieselandPlayerController::UpdateCooldownTimers_Implementation(float Delta
 		}
 		if (DieselandPawn->SlowRemaining > 0.0f)
 		{
-			DieselandPawn->SlowRemaining -= DeltaSeconds;
+			if (DieselandPawn->SlowRemaining > 0.0f){
+				DieselandPawn->SlowRemaining -= DeltaSeconds;
+			}
 			if (DieselandPawn->SlowRemaining <= 0.0f)
 			{
-				DieselandPawn->SlowRemaining = 0.0f;
 				DieselandPawn->StatusEffects.Remove(FString("Slowed"));
 				DieselandPawn->CharacterMovement->MaxWalkSpeed = DieselandPawn->MoveSpeed;
+				DieselandPawn->SlowRemaining = 0.0f;
 			}
 		}
 	}

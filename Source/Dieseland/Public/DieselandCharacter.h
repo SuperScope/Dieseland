@@ -220,6 +220,10 @@ public:
 	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation, Category = Gameplay)
 	void CalculateStats();
 
+	//Resetting the Camera
+	UFUNCTION(BlueprintCallable, Reliable, NetMulticast, WithValidation, Category = Gameplay)
+	void ResetCamera();
+
 	//CORE ATTRIBUTES ENDS HERE
 	
 	//Audio Functions
@@ -305,6 +309,7 @@ public:
 
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
 	float SlowRemaining;
+
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;

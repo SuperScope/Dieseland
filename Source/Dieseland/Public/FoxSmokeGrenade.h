@@ -15,6 +15,7 @@ class DIESELAND_API AFoxSmokeGrenade : public AActor
 
 	UPROPERTY(Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UStaticMeshComponent> Mesh;
+	
 
 	UPROPERTY(Replicated, Category = Visual, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UParticleSystemComponent> Particle;
@@ -25,14 +26,17 @@ class DIESELAND_API AFoxSmokeGrenade : public AActor
 	UPROPERTY(Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UPostProcessComponent> SmokeEffect;
 
+	UPROPERTY(Category = Combat, BlueprintReadOnly, VisibleAnywhere)
+	TSubobjectPtr<class UTexture2D> SmokeTexture;
+
 	
 
 
 	UFUNCTION(Reliable, NetMulticast, WithValidation)
 		void ServerActivateProjectile();
 
-//	UFUNCTION(Reliable, NetMulticast, WithValidation)
-	//	void ServerAdjustPostProcessing();
+	UFUNCTION(Reliable, NetMulticast, WithValidation)
+		void ServerAdjustPostProcessing(AActor* OtherActor);
 
 	virtual void ReceiveActorBeginOverlap(AActor* OtherActor) override;
 	
