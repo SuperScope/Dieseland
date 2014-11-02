@@ -71,7 +71,7 @@ public:
 	void OnShowScore();
 
 	// Cheat code to change characters
-	UFUNCTION(exec)
+	UFUNCTION(exec, BlueprintCallable, Category = Gameplay)
 	void ChangeCharacter(FString CharacterName);
 
 	UFUNCTION(Reliable, Server, WithValidation)
