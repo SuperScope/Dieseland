@@ -91,6 +91,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float HealthRegenTimer;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	bool PauseGameInput;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	bool PawnChosen;
 
 	// Input events
 	UFUNCTION(Reliable, Server, WithValidation)
@@ -103,6 +108,7 @@ public:
 
 	UFUNCTION(Reliable, Server, WithValidation, BlueprintCallable, Category = Gameplay)
 	void RespawnPawn();
+
 
 protected:
 
