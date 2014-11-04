@@ -2,6 +2,7 @@
 
 #include "Dieseland.h"
 #include "DieselandPlayerController.h"
+#include "DieselandPlayerState.h"
 #include "DieselandGameMode.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "DieselandCharacter.h"
@@ -340,6 +341,7 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 void ADieselandPlayerController::ChangeCharacter(FString Character)
 {
 	ServerChangeCharacter(Character);
+	Cast<ADieselandPlayerState>(PlayerState)->UpdateTeamColors();
 	
 }
 

@@ -310,10 +310,12 @@ public:
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
 	float SlowRemaining;
 
-
 protected:
 	virtual void Tick(float DeltaSeconds) override;
 	UClass* ScrapClass;
+	virtual void ReceiveBeginPlay() override;
 
+	UMaterial* HealthBarMatStatic;
+	UMaterial* HealthBarBackMatStatic;
 };
 

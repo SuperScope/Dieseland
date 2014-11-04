@@ -89,6 +89,8 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	HealthBar = PCIP.CreateDefaultSubobject<UMaterialBillboardComponent>(this, TEXT("HealthBar"));
 	HealthBar->AttachParent = RootComponent;
 	HealthBar->AddRelativeLocation(FVector(0.0f, 0.0f, 175.0f));
+	HealthBarMatStatic = HealthBarMatRef.Object;
+	HealthBarBackMatStatic = HealthBarBackMatRef.Object;
 	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
 	HealthBar->AddElement(HealthBarMaterial, NULL, false, 10.0f, 75.0f, NULL);
 	HealthBar->AddElement(HealthBarBackMatRef.Object, NULL, false, 10.0f, 75.0f, NULL);
@@ -195,6 +197,11 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	ParticleSystem->SetIsReplicated(true);
 	SetActorTickEnabled(true);
 	this->SetOwner(Controller);
+}
+
+void ADieselandCharacter::ReceiveBeginPlay()
+{
+
 }
 
 void ADieselandCharacter::Tick(float DeltaSeconds)
