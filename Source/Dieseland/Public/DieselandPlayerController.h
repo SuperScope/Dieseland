@@ -74,6 +74,9 @@ public:
 	UFUNCTION(exec, BlueprintCallable, Category = Gameplay)
 	void ChangeCharacter(FString CharacterName);
 
+	UFUNCTION(Reliable, Server, WithValidation, BlueprintCallable, Category = Gameplay)
+	void ServerChangeCharacter(const FString& CharacterName);
+
 	UFUNCTION(Reliable, Server, WithValidation)
 	void UpdateCooldownTimers(float DeltaSeconds);
 
@@ -87,18 +90,22 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
 	int32 StatPlusCount;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = Gameplay)
+	UPROPERTY(Replicated, BlueprintReadOnly, VisibleAnywhere, Category = Gameplay)
 	APawn* NewPawn;
 
 	// The health regen of a character
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float HealthRegenTimer;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	bool PauseGameInput;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	bool PawnChosen;
+
+	// Timer workaround to ensure replication
+	UFUNCTION(Reliable, Server, WithValidation)
+	void PossessNewPawn();
 
 	// Input events
 	UFUNCTION(Reliable, Server, WithValidation)

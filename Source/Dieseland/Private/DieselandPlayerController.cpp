@@ -339,10 +339,25 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 
 void ADieselandPlayerController::ChangeCharacter(FString Character)
 {
+	ServerChangeCharacter(Character);
+	
+}
+
+void ADieselandPlayerController::PossessNewPawn_Implementation()
+{
+	this->Possess(NewPawn);
+}
+
+bool ADieselandPlayerController::PossessNewPawn_Validate()
+{
+	return true;
+}
+void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FString& Character)
+{
 	APawn* TempPawn = GetPawn();
 
 	//this->UnPossess();
-	if (GetWorld() != nullptr){
+	if (GetWorld() != nullptr && Role == ROLE_Authority){
 		//Determine what player is desired and spawn that pawn
 		if (Character == FString(TEXT("Mayhem")))
 		{
@@ -353,7 +368,8 @@ void ADieselandPlayerController::ChangeCharacter(FString Character)
 				FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
 				FRotator(0.0f, 0.0f, 0.0f));
 
-			this->Possess(NewPawn);
+			// Timer workaround to ensure replication
+			GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
 
 		}
 		else if (Character == FString(TEXT("Engleton")))
@@ -365,7 +381,9 @@ void ADieselandPlayerController::ChangeCharacter(FString Character)
 				FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
 				FRotator(0.0f, 0.0f, 0.0f));
 
-			this->Possess(NewPawn);
+			// Timer workaround to ensure replication
+			GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
+
 
 		}
 		else if (Character == FString(TEXT("Stryker")))
@@ -377,7 +395,9 @@ void ADieselandPlayerController::ChangeCharacter(FString Character)
 				FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
 				FRotator(0.0f, 0.0f, 0.0f));
 
-			this->Possess(NewPawn);
+			// Timer workaround to ensure replication
+			GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
+
 
 		}
 		else if (Character == FString(TEXT("Fox")))
@@ -388,15 +408,24 @@ void ADieselandPlayerController::ChangeCharacter(FString Character)
 				FoxClass,
 				FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
 				FRotator(0.0f, 0.0f, 0.0f));
+			
+			// Timer workaround to ensure replication
+			GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
 
-			this->Possess(NewPawn);
 
 		}
+		
 		PauseGameInput = false;
 		// Destroy previous pawn
 		TempPawn->Destroy();
 	}
 }
+
+bool ADieselandPlayerController::ServerChangeCharacter_Validate(const FString& Character)
+{
+	return true;
+}
+
 bool ADieselandPlayerController::ServerReload_Validate()
 {
 	return true;
@@ -790,4 +819,14 @@ void ADieselandPlayerController::ServerOnAim_Implementation(FRotator Rotation)
 	if (GetPawn() != nullptr && !Cast<ADieselandCharacter>(GetPawn())->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		Cast<ADieselandCharacter>(GetPawn())->AimRotation = Rotation;
 	}
+}
+
+void ADieselandPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Replicate to everyone
+	DOREPLIFETIME(ADieselandPlayerController, PauseGameInput);
+	DOREPLIFETIME(ADieselandPlayerController, PawnChosen);
+	DOREPLIFETIME(ADieselandPlayerController, NewPawn);
 }
