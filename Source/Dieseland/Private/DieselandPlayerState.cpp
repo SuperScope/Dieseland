@@ -11,6 +11,13 @@ ADieselandPlayerState::ADieselandPlayerState(const class FPostConstructInitializ
 	TeamNumber = 0;
 }
 
+void ADieselandPlayerState::ClientInitialize(class AController* InController)
+{
+	Super::ClientInitialize(InController);
+
+	UpdateTeamColors();
+}
+
 void ADieselandPlayerState::UpdateTeamColors()
 {
 	AController* OwnerController = Cast<AController>(GetOwner());

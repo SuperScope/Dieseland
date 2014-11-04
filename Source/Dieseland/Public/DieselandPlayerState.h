@@ -34,10 +34,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	void UpdateTeamColors();
 
-protected:
 	/** team number */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_TeamColor)
+	UPROPERTY(Replicated, ReplicatedUsing = OnRep_TeamColor)
 	int32 TeamNumber;
+
+	/**
+	* Set the team
+	*
+	* @param	InController	The controller to initialize state with
+	*/
+	virtual void ClientInitialize(class AController* InController) override;
 
 	
 };

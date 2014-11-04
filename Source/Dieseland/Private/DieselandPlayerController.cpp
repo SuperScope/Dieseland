@@ -340,21 +340,7 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 
 void ADieselandPlayerController::ChangeCharacter(FString Character)
 {
-	ServerChangeCharacter(Character);
-}
 
-void ADieselandPlayerController::PossessNewPawn_Implementation()
-{
-	this->Possess(NewPawn);
-	Cast<ADieselandPlayerState>(PlayerState)->UpdateTeamColors();
-}
-
-bool ADieselandPlayerController::PossessNewPawn_Validate()
-{
-	return true;
-}
-void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FString& Character)
-{
 	APawn* TempPawn = GetPawn();
 
 	//this->UnPossess();
@@ -409,17 +395,40 @@ void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FStr
 				FoxClass,
 				FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
 				FRotator(0.0f, 0.0f, 0.0f));
-			
+
 			// Timer workaround to ensure replication
 			GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
 
 
 		}
-		
+
 		PauseGameInput = false;
 		// Destroy previous pawn
 		TempPawn->Destroy();
 	}
+
+	if (Role != ROLE_Authority)
+	{
+		ServerChangeCharacter(Character);
+
+	}
+
+	Cast<ADieselandPlayerState>(PlayerState)->UpdateTeamColors();
+}
+
+void ADieselandPlayerController::PossessNewPawn_Implementation()
+{
+	this->Possess(NewPawn);
+	//Cast<ADieselandPlayerState>(PlayerState)->UpdateTeamColors();
+}
+
+bool ADieselandPlayerController::PossessNewPawn_Validate()
+{
+	return true;
+}
+void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FString& Character)
+{
+	ChangeCharacter(Character);
 }
 
 bool ADieselandPlayerController::ServerChangeCharacter_Validate(const FString& Character)
