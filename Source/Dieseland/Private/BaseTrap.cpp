@@ -15,6 +15,10 @@ ABaseTrap::ABaseTrap(const class FPostConstructInitializeProperties& PCIP)
 	LingerDamage = 5;
 
 	SetActorTickEnabled(true);
+    PrimaryActorTick.bCanEverTick = true;
+    SetRemoteRoleForBackwardsCompat(ENetRole::ROLE_SimulatedProxy);
+	bReplicates = true;
+	bReplicateMovement = true;
 
 	Tags.Add(FName("Trap"));
 
