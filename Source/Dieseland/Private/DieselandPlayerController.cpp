@@ -20,16 +20,31 @@ ADieselandPlayerController::ADieselandPlayerController(const class FPostConstruc
 	//bShowMouseCursor = true;
 	//DefaultMouseCursor = EMouseCursor::Crosshairs;
 
+	static ConstructorHelpers::FObjectFinder<UClass> MayhemBPClass(TEXT("Class'/Game/Blueprints/Players/Mayhem_BP.Mayhem_BP_C'"));
+	static ConstructorHelpers::FObjectFinder<UClass> EngletonBPClass(TEXT("Class'/Game/Blueprints/Engleton.Engleton_C'"));
+	static ConstructorHelpers::FObjectFinder<UClass> StrykerBPClass(TEXT("Class'/Game/Blueprints/Players/Stryker_BP.Stryker_BP_C'"));
+	static ConstructorHelpers::FObjectFinder<UClass> FoxBPClass(TEXT("Class'/Game/Blueprints/Players/Fox_BP.Fox_BP_C'"));
+
 	static ConstructorHelpers::FObjectFinder<UClass> ScrapBlueprint(TEXT("Class'/Game/Blueprints/Scrap_BP.Scrap_BP_C'"));
 	if (ScrapBlueprint.Object)
 	{
 		ScrapClass = (UClass*)ScrapBlueprint.Object;
 	}
 
+	if (MayhemBPClass.Object)
+	{
+		MayhemClass = MayhemBPClass.Object;
+		EngletonClass = EngletonBPClass.Object;
+		StrykerClass = StrykerBPClass.Object;
+		FoxClass = FoxBPClass.Object;
+	}
+
 	HealthRegenTimer = 0;
 	bReplicates = true;
 	LingerCount = 0;
 	StatPlusCount = 0;
+	PawnChosen = false;
+	PauseGameInput = true;
 }
 
 void ADieselandPlayerController::PlayerTick(float DeltaTime)
@@ -324,63 +339,93 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 
 void ADieselandPlayerController::ChangeCharacter(FString Character)
 {
-	APawn* TempPawn = GetPawn();
-	APawn* NewPawn;
-	this->UnPossess();
+	ServerChangeCharacter(Character);
 	
-	//Determine what player is desired and spawn that pawn
-	if (Character == FString(TEXT("Mayhem")))
-	{
-		this->UnPossess();
-		
-		NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(), 
-			Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->MayhemClass, 
-			FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z), 
-			FRotator(0.0f, 0.0f, 0.0f));
-
-		this->Possess(NewPawn);
-
-	}
-	else if (Character == FString(TEXT("Engleton")))
-	{
-		this->UnPossess();
-
-		NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
-			Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->EngletonClass,
-			FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
-			FRotator(0.0f, 0.0f, 0.0f));
-
-		this->Possess(NewPawn);
-
-	}
-	else if (Character == FString(TEXT("Stryker")))
-	{
-		this->UnPossess();
-
-		NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
-			Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->StrykerClass,
-			FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
-			FRotator(0.0f, 0.0f, 0.0f));
-
-		this->Possess(NewPawn);
-
-	}
-	else if (Character == FString(TEXT("Fox")))
-	{
-		this->UnPossess();
-
-		NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
-			Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->FoxClass,
-			FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
-			FRotator(0.0f, 0.0f, 0.0f));
-
-		this->Possess(NewPawn);
-
-	}
-
-	// Destroy previous pawn
-	TempPawn->Destroy();
 }
+
+void ADieselandPlayerController::PossessNewPawn_Implementation()
+{
+	this->Possess(NewPawn);
+}
+
+bool ADieselandPlayerController::PossessNewPawn_Validate()
+{
+	return true;
+}
+void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FString& Character)
+{
+	APawn* TempPawn = GetPawn();
+
+	//this->UnPossess();
+	if (GetWorld() != nullptr && Role == ROLE_Authority){
+		//Determine what player is desired and spawn that pawn
+		if (Character == FString(TEXT("Mayhem")))
+		{
+			this->UnPossess();
+
+			NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
+				MayhemClass,
+				FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
+				FRotator(0.0f, 0.0f, 0.0f));
+
+			// Timer workaround to ensure replication
+			GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
+
+		}
+		else if (Character == FString(TEXT("Engleton")))
+		{
+			this->UnPossess();
+
+			NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
+				EngletonClass,
+				FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
+				FRotator(0.0f, 0.0f, 0.0f));
+
+			// Timer workaround to ensure replication
+			GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
+
+
+		}
+		else if (Character == FString(TEXT("Stryker")))
+		{
+			this->UnPossess();
+
+			NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
+				StrykerClass,
+				FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
+				FRotator(0.0f, 0.0f, 0.0f));
+
+			// Timer workaround to ensure replication
+			GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
+
+
+		}
+		else if (Character == FString(TEXT("Fox")))
+		{
+			this->UnPossess();
+
+			NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
+				FoxClass,
+				FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
+				FRotator(0.0f, 0.0f, 0.0f));
+			
+			// Timer workaround to ensure replication
+			GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
+
+
+		}
+		
+		PauseGameInput = false;
+		// Destroy previous pawn
+		TempPawn->Destroy();
+	}
+}
+
+bool ADieselandPlayerController::ServerChangeCharacter_Validate(const FString& Character)
+{
+	return true;
+}
+
 bool ADieselandPlayerController::ServerReload_Validate()
 {
 	return true;
@@ -451,14 +496,14 @@ bool ADieselandPlayerController::ServerEditSpeedDamage_Validate(int32 Speed, int
 
 void ADieselandPlayerController::OnMoveForward(float Val)
 {
-	if (GetPawn() != nullptr && !Cast<ADieselandCharacter>(GetPawn())->StatusEffects.Contains(FString("Stunned"))){
+	if (GetPawn() != nullptr && !Cast<ADieselandCharacter>(GetPawn())->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		GetPawn()->AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Val);
 	}
 }
 
 void ADieselandPlayerController::OnMoveRight(float Val)
 {
-	if (GetPawn() != nullptr && !Cast<ADieselandCharacter>(GetPawn())->StatusEffects.Contains(FString("Stunned"))){
+	if (GetPawn() != nullptr && !Cast<ADieselandCharacter>(GetPawn())->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		GetPawn()->AddMovementInput(FVector(0.0f, 1.0f, 0.0f), Val);
 	}
 }
@@ -467,7 +512,7 @@ void ADieselandPlayerController::OnFaceNorth(float Val)
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 	
-	if (GetPawn() != nullptr && Val != 0.0f && DieselandPawn->StatusEffects.Contains(FString("Stunned"))){
+	if (GetPawn() != nullptr && Val != 0.0f && DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 
 		// Convert the joystick axis to a rotator
 		FVector TempAxisVector = FVector(Val, (GetInputAxisValue("LookEast") * 1.0f), 0.0f);
@@ -488,7 +533,7 @@ void ADieselandPlayerController::OnFaceEast(float Val)
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 
-	if (GetPawn() != nullptr && Val != 0.0f && !DieselandPawn->StatusEffects.Contains(FString("Stunned"))){
+	if (GetPawn() != nullptr && Val != 0.0f && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		
 		// Convert the joystick axis to a rotator
 		FVector TempAxisVector = FVector(GetInputAxisValue("LookNorth"), Val * 1.0f, 0.0f);
@@ -508,7 +553,7 @@ void ADieselandPlayerController::OnFaceEast(float Val)
 
 void ADieselandPlayerController::OnAttackPress_Implementation()
 {
-	if (GetPawn() != nullptr && !Cast<ADieselandCharacter>(GetPawn())->StatusEffects.Contains(FString("Stunned"))){
+	if (GetPawn() != nullptr && !Cast<ADieselandCharacter>(GetPawn())->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		Cast<ADieselandCharacter>(GetPawn())->BasicAttackActive = true;
 	}
 }
@@ -533,7 +578,7 @@ bool ADieselandPlayerController::OnAttackRelease_Validate()
 void ADieselandPlayerController::ServerSkillOne_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned"))){
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		if (DieselandPawn->SkillOneTimer <= 0.0f)
 		{
 			DieselandPawn->SkillOne();
@@ -550,7 +595,7 @@ bool ADieselandPlayerController::ServerSkillOne_Validate()
 void ADieselandPlayerController::ServerSkillTwo_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned"))){
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		if (DieselandPawn->SkillTwoTimer <= 0.0f)
 		{
 			DieselandPawn->SkillTwo();
@@ -567,7 +612,7 @@ bool ADieselandPlayerController::ServerSkillTwo_Validate()
 void ADieselandPlayerController::ServerSkillThree_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned"))){
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		if (DieselandPawn->SkillThreeTimer <= 0.0f)
 		{
 			DieselandPawn->SkillThree();
@@ -585,7 +630,7 @@ void ADieselandPlayerController::OnTaunt_Implementation()
 {
 	//here is the real level up function
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")))
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput)
 	{
 		if (DieselandPawn->TauntTimer <= 0.0f && DieselandPawn->CommentTimer <= 0.0f && DieselandPawn->LaughTimer <= 0.0f)
 		{
@@ -606,7 +651,7 @@ bool ADieselandPlayerController::OnTaunt_Validate()
 void ADieselandPlayerController::OnLaugh_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")))
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput)
 	{
 		if (DieselandPawn->TauntTimer <= 0.0f && DieselandPawn->CommentTimer <= 0.0f && DieselandPawn->LaughTimer <= 0.0f)
 		{
@@ -625,7 +670,7 @@ bool ADieselandPlayerController::OnLaugh_Validate()
 void ADieselandPlayerController::OnComment_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")))
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput)
 	{
 		if (DieselandPawn->TauntTimer <= 0.0f && DieselandPawn->CommentTimer <= 0.0f && DieselandPawn->LaughTimer <= 0.0f)
 		{
@@ -647,7 +692,7 @@ void ADieselandPlayerController::UpgradeStrength_Implementation()
 {
 	//here is the real level up function
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3){
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3 && !PauseGameInput){
 		DieselandPawn->Scrap -= 3;
 		DieselandPawn->Strength += 3;
 		DieselandPawn->CalculateStats();
@@ -667,7 +712,7 @@ void ADieselandPlayerController::UpgradeIntelligence_Implementation()
 {
 	//here is the real level up function
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3){
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3 && !PauseGameInput){
 		DieselandPawn->Scrap -= 3;
 		DieselandPawn->Intelligence += 3;
 		DieselandPawn->CalculateStats();
@@ -684,7 +729,7 @@ void ADieselandPlayerController::UpgradeDexterity_Implementation()
 {
 	//here is the real level up function
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3){
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3 && !PauseGameInput){
 		DieselandPawn->Scrap -= 3;
 		DieselandPawn->Dexterity += 3;
 		DieselandPawn->CalculateStats();
@@ -701,7 +746,7 @@ void ADieselandPlayerController::UpgradeConstitution_Implementation()
 {
 	//here we upgrade the players constitution
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3){
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3 && !PauseGameInput){
 		DieselandPawn->Scrap -= 3;
 		DieselandPawn->Constitution += 3;
 		DieselandPawn->CalculateStats();
@@ -740,7 +785,7 @@ bool ADieselandPlayerController::SwapMelee_Validate()
 void ADieselandPlayerController::ServerMeleeAttack_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned"))){
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		DieselandPawn->MeleeAttack();
 	}
 }
@@ -754,7 +799,7 @@ bool ADieselandPlayerController::ServerMeleeAttack_Validate()
 void ADieselandPlayerController::ServerRangedAttack_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned"))){
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		DieselandPawn->RangedAttack();
 	}
 }
@@ -771,7 +816,17 @@ bool ADieselandPlayerController::ServerOnAim_Validate(FRotator Rotation)
 
 void ADieselandPlayerController::ServerOnAim_Implementation(FRotator Rotation)
 {
-	if (GetPawn() != nullptr && !Cast<ADieselandCharacter>(GetPawn())->StatusEffects.Contains(FString("Stunned"))){
+	if (GetPawn() != nullptr && !Cast<ADieselandCharacter>(GetPawn())->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		Cast<ADieselandCharacter>(GetPawn())->AimRotation = Rotation;
 	}
+}
+
+void ADieselandPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Replicate to everyone
+	DOREPLIFETIME(ADieselandPlayerController, PauseGameInput);
+	DOREPLIFETIME(ADieselandPlayerController, PawnChosen);
+	DOREPLIFETIME(ADieselandPlayerController, NewPawn);
 }

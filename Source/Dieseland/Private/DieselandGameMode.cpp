@@ -9,11 +9,13 @@
 #include "DeathTile.h"
 #include "UnrealNetwork.h"
 #include "DieselandStaticLibrary.h"
+#include "DieselandPlayerState.h"
 
 ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializeProperties& PCIP) : Super(PCIP)
 {
 	// use our custom PlayerController class
 	PlayerControllerClass = ADieselandPlayerController::StaticClass();
+	PlayerStateClass = ADieselandPlayerState::StaticClass();
 
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/BasicCharacter"));
@@ -109,7 +111,7 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
 
 void ADieselandGameMode::ReceiveBeginPlay()
 {
-	StartGame();
+	//StartGame();
 }
 
 void ADieselandGameMode::Tick(float DeltaSeconds)

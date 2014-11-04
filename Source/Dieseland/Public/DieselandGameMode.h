@@ -44,7 +44,7 @@ class ADieselandGameMode : public AGameMode
     UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	bool Gate3;
 
-	UFUNCTION(Reliable, Server, WithValidation, Category = Gameplay)
+	UFUNCTION(Reliable, Server, WithValidation, BlueprintCallable, Category = Gameplay)
 	void StartGame();
     
     UFUNCTION(BlueprintCallable, Category = Gameplay)
