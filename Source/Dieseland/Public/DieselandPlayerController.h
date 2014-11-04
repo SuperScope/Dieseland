@@ -87,6 +87,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
 	int32 StatPlusCount;
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = Gameplay)
+	APawn* NewPawn;
+
 	// The health regen of a character
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float HealthRegenTimer;
@@ -113,6 +116,11 @@ public:
 protected:
 
 	UClass* ScrapClass;
+
+	UClass* MayhemClass;
+	UClass* EngletonClass;
+	UClass* StrykerClass;
+	UClass* FoxClass;
 
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;

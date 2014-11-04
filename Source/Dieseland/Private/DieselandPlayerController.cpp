@@ -20,10 +20,23 @@ ADieselandPlayerController::ADieselandPlayerController(const class FPostConstruc
 	//bShowMouseCursor = true;
 	//DefaultMouseCursor = EMouseCursor::Crosshairs;
 
+	static ConstructorHelpers::FObjectFinder<UClass> MayhemBPClass(TEXT("Class'/Game/Blueprints/Players/Mayhem_BP.Mayhem_BP_C'"));
+	static ConstructorHelpers::FObjectFinder<UClass> EngletonBPClass(TEXT("Class'/Game/Blueprints/Engleton.Engleton_C'"));
+	static ConstructorHelpers::FObjectFinder<UClass> StrykerBPClass(TEXT("Class'/Game/Blueprints/Players/Stryker_BP.Stryker_BP_C'"));
+	static ConstructorHelpers::FObjectFinder<UClass> FoxBPClass(TEXT("Class'/Game/Blueprints/Players/Fox_BP.Fox_BP_C'"));
+
 	static ConstructorHelpers::FObjectFinder<UClass> ScrapBlueprint(TEXT("Class'/Game/Blueprints/Scrap_BP.Scrap_BP_C'"));
 	if (ScrapBlueprint.Object)
 	{
 		ScrapClass = (UClass*)ScrapBlueprint.Object;
+	}
+
+	if (MayhemBPClass.Object)
+	{
+		MayhemClass = MayhemBPClass.Object;
+		EngletonClass = EngletonBPClass.Object;
+		StrykerClass = StrykerBPClass.Object;
+		FoxClass = FoxBPClass.Object;
 	}
 
 	HealthRegenTimer = 0;
@@ -327,61 +340,62 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 void ADieselandPlayerController::ChangeCharacter(FString Character)
 {
 	APawn* TempPawn = GetPawn();
-	APawn* NewPawn;
-	this->UnPossess();
-	
-	//Determine what player is desired and spawn that pawn
-	if (Character == FString(TEXT("Mayhem")))
-	{
-		this->UnPossess();
-		
-		NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(), 
-			Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->MayhemClass, 
-			FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z), 
-			FRotator(0.0f, 0.0f, 0.0f));
 
-		this->Possess(NewPawn);
+	//this->UnPossess();
+	if (GetWorld() != nullptr){
+		//Determine what player is desired and spawn that pawn
+		if (Character == FString(TEXT("Mayhem")))
+		{
+			this->UnPossess();
 
+			NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
+				MayhemClass,
+				FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
+				FRotator(0.0f, 0.0f, 0.0f));
+
+			this->Possess(NewPawn);
+
+		}
+		else if (Character == FString(TEXT("Engleton")))
+		{
+			this->UnPossess();
+
+			NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
+				EngletonClass,
+				FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
+				FRotator(0.0f, 0.0f, 0.0f));
+
+			this->Possess(NewPawn);
+
+		}
+		else if (Character == FString(TEXT("Stryker")))
+		{
+			this->UnPossess();
+
+			NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
+				StrykerClass,
+				FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
+				FRotator(0.0f, 0.0f, 0.0f));
+
+			this->Possess(NewPawn);
+
+		}
+		else if (Character == FString(TEXT("Fox")))
+		{
+			this->UnPossess();
+
+			NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
+				FoxClass,
+				FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
+				FRotator(0.0f, 0.0f, 0.0f));
+
+			this->Possess(NewPawn);
+
+		}
+		PauseGameInput = false;
+		// Destroy previous pawn
+		TempPawn->Destroy();
 	}
-	else if (Character == FString(TEXT("Engleton")))
-	{
-		this->UnPossess();
-
-		NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
-			Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->EngletonClass,
-			FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
-			FRotator(0.0f, 0.0f, 0.0f));
-
-		this->Possess(NewPawn);
-
-	}
-	else if (Character == FString(TEXT("Stryker")))
-	{
-		this->UnPossess();
-
-		NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
-			Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->StrykerClass,
-			FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
-			FRotator(0.0f, 0.0f, 0.0f));
-
-		this->Possess(NewPawn);
-
-	}
-	else if (Character == FString(TEXT("Fox")))
-	{
-		this->UnPossess();
-
-		NewPawn = UDieselandStaticLibrary::SpawnBlueprint<APawn>(GetWorld(),
-			Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->FoxClass,
-			FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
-			FRotator(0.0f, 0.0f, 0.0f));
-
-		this->Possess(NewPawn);
-
-	}
-	PauseGameInput = false;
-	// Destroy previous pawn
-	TempPawn->Destroy();
 }
 bool ADieselandPlayerController::ServerReload_Validate()
 {
