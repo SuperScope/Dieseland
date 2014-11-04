@@ -52,8 +52,8 @@ void ADieselandPlayerState::UpdateTeamColors()
 					case 8:
 						Cast<UMaterialInstanceDynamic>(DieselandCharacter->HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.131611f, 0.925403f));
 						break;
-					//default:
-						//Cast<UMaterialInstanceDynamic>(DieselandCharacter->HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.000905f, 1.0f, 0.0f));
+					default:
+						Cast<UMaterialInstanceDynamic>(DieselandCharacter->HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.000905f, 1.0f, 0.0f));
 				}
 			}
 		}

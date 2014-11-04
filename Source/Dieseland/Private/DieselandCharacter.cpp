@@ -91,9 +91,9 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	HealthBar->AddRelativeLocation(FVector(0.0f, 0.0f, 175.0f));
 	HealthBarMatStatic = HealthBarMatRef.Object;
 	HealthBarBackMatStatic = HealthBarBackMatRef.Object;
-	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
+	/*HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
 	HealthBar->AddElement(HealthBarMaterial, NULL, false, 10.0f, 75.0f, NULL);
-	HealthBar->AddElement(HealthBarBackMatRef.Object, NULL, false, 10.0f, 75.0f, NULL);
+	HealthBar->AddElement(HealthBarBackMatRef.Object, NULL, false, 10.0f, 75.0f, NULL);*/
 
 	// Tag this character as a player
 	Tags.Add(FName("Player"));
@@ -201,7 +201,9 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 void ADieselandCharacter::ReceiveBeginPlay()
 {
-
+	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatStatic, this);
+	HealthBar->AddElement(HealthBarMaterial, NULL, false, 10.0f, 75.0f, NULL);
+	HealthBar->AddElement(HealthBarBackMatStatic, NULL, false, 10.0f, 75.0f, NULL);
 }
 
 void ADieselandCharacter::Tick(float DeltaSeconds)
@@ -211,7 +213,6 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	{
 		HealthPercentage = ((float)Health / (float)MaxHealth);
 		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
-		//HealthBar->Elements[0].Material = HealthBarMaterial;
 	}
 
 	Super::Tick(DeltaSeconds);
