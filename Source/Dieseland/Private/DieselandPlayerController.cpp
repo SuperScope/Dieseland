@@ -2,6 +2,7 @@
 
 #include "Dieseland.h"
 #include "DieselandPlayerController.h"
+#include "DieselandPlayerState.h"
 #include "DieselandGameMode.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "DieselandCharacter.h"
@@ -340,15 +341,23 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 void ADieselandPlayerController::ChangeCharacter(FString Character)
 {
 	ServerChangeCharacter(Character);
-	
+	GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
 }
 
-void ADieselandPlayerController::PossessNewPawn_Implementation()
+void ADieselandPlayerController::PossessNewPawn()
+{
+	//if (Role != ROLE_Authority)
+	//{
+		ServerPossessNewPawn();
+	//}
+}
+
+void ADieselandPlayerController::ServerPossessNewPawn_Implementation()
 {
 	this->Possess(NewPawn);
 }
 
-bool ADieselandPlayerController::PossessNewPawn_Validate()
+bool ADieselandPlayerController::ServerPossessNewPawn_Validate()
 {
 	return true;
 }
@@ -369,7 +378,7 @@ void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FStr
 				FRotator(0.0f, 0.0f, 0.0f));
 
 			// Timer workaround to ensure replication
-			GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
+			//GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
 
 		}
 		else if (Character == FString(TEXT("Engleton")))
@@ -382,7 +391,7 @@ void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FStr
 				FRotator(0.0f, 0.0f, 0.0f));
 
 			// Timer workaround to ensure replication
-			GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
+			//GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
 
 
 		}
@@ -396,7 +405,7 @@ void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FStr
 				FRotator(0.0f, 0.0f, 0.0f));
 
 			// Timer workaround to ensure replication
-			GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
+			//GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
 
 
 		}
@@ -408,17 +417,18 @@ void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FStr
 				FoxClass,
 				FVector(TempPawn->GetActorLocation().X + (70.0f), TempPawn->GetActorLocation().Y, TempPawn->GetActorLocation().Z),
 				FRotator(0.0f, 0.0f, 0.0f));
-			
+
 			// Timer workaround to ensure replication
-			GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
+			//GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
 
 
 		}
-		
+
 		PauseGameInput = false;
 		// Destroy previous pawn
 		TempPawn->Destroy();
 	}
+	GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
 }
 
 bool ADieselandPlayerController::ServerChangeCharacter_Validate(const FString& Character)
@@ -819,6 +829,16 @@ void ADieselandPlayerController::ServerOnAim_Implementation(FRotator Rotation)
 	if (GetPawn() != nullptr && !Cast<ADieselandCharacter>(GetPawn())->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		Cast<ADieselandCharacter>(GetPawn())->AimRotation = Rotation;
 	}
+}
+
+void ADieselandPlayerController::SetPauseGameInput_Implementation(bool paused)
+{
+	PauseGameInput = paused;
+}
+
+bool ADieselandPlayerController::SetPauseGameInput_Validate(bool paused)
+{
+	return true;
 }
 
 void ADieselandPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
