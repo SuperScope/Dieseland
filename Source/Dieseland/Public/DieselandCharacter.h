@@ -310,6 +310,9 @@ public:
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category = Status)
 	float SlowRemaining;
 
+	UFUNCTION(BlueprintCallable, Category = Networking)
+	void UpdateTeamColor();
+
 protected:
 	virtual void Tick(float DeltaSeconds) override;
 	UClass* ScrapClass;
@@ -317,5 +320,7 @@ protected:
 
 	UMaterial* HealthBarMatStatic;
 	UMaterial* HealthBarBackMatStatic;
+
+	int32 CharacterTeam;
 };
 

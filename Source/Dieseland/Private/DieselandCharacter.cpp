@@ -13,6 +13,7 @@
 #include "ScrapBox.h"
 #include "Scrap.h"
 #include "DieselandGameState.h"
+#include "DieselandPlayerState.h"
 
 ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
@@ -204,6 +205,10 @@ void ADieselandCharacter::ReceiveBeginPlay()
 	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatStatic, this);
 	HealthBar->AddElement(HealthBarMaterial, NULL, false, 10.0f, 75.0f, NULL);
 	HealthBar->AddElement(HealthBarBackMatStatic, NULL, false, 10.0f, 75.0f, NULL);
+	if (PlayerState != nullptr)
+	{
+		UpdateTeamColor();
+	}
 }
 
 void ADieselandCharacter::Tick(float DeltaSeconds)
@@ -213,6 +218,11 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	{
 		HealthPercentage = ((float)Health / (float)MaxHealth);
 		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
+		if (PlayerState && Cast<ADieselandPlayerState>(PlayerState)->TeamNumber != CharacterTeam)
+		{
+			CharacterTeam = Cast<ADieselandPlayerState>(PlayerState)->TeamNumber;
+			UpdateTeamColor();
+		}
 	}
 
 	Super::Tick(DeltaSeconds);
@@ -234,6 +244,42 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 		StatusEffects.Remove(FString("SmokeScreen"));
 			ResetCamera();
 	
+	}
+}
+
+void ADieselandCharacter::UpdateTeamColor()
+{
+	switch (Cast<ADieselandPlayerState>(PlayerState)->TeamNumber)
+	{
+	case 0:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.000905f, 1.0f, 0.0f));
+		break;
+	case 1:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.035f, 0.005232f, 0.004898f));
+		break;
+	case 2:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.0f, 0.035871f, 1.0f));
+		break;
+	case 3:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 1.0f, 1.0f));
+		break;
+	case 4:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.0f, 0.828977f, 1.0f));
+		break;
+	case 5:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.935999f, 0.0f));
+		break;
+	case 6:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.747108f, 0.0f, 1.0f));
+		break;
+	case 7:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.305141f, 0.0f));
+		break;
+	case 8:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.131611f, 0.925403f));
+		break;
+	default:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.000905f, 1.0f, 0.0f));
 	}
 }
 

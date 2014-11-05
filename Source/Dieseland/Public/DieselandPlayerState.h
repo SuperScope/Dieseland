@@ -30,6 +30,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	void SetTeamNum(int32 NewTeamNumber);
 
+	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
+	void ServerSetTeamNum(int32 NewTeamNumber);
+
 	/** Set the mesh colors based on the current teamnum variable */
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	void UpdateTeamColors();
