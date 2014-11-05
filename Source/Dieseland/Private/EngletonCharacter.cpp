@@ -6,6 +6,7 @@
 #include "DieselandPlayerController.h"
 #include "EngletonCrazyLaser.h"
 #include "EngletonMachineGun.h"
+#include "EngletonMachineGunSpark.h"
 #include "ParticleDefinitions.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -72,8 +73,8 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	PulseCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("PulseCollision"));
 	PulseCollision->AttachParent = (Mesh);
 	PulseCollision->AttachSocketName = FName(TEXT("AimSocket"));
-	PulseCollision->SetCapsuleHalfHeight(BombardmentRange / 2.0f);
-	PulseCollision->SetCapsuleRadius(BombardmentRange / 2.0f);
+	PulseCollision->SetCapsuleHalfHeight(PulseRange / 2.0f);
+	PulseCollision->SetCapsuleRadius(PulseRange/ 2.0f);
 	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	AOECollision->SetSphereRadius(10.0f);
@@ -93,6 +94,7 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	AimMesh2->AttachSocketName = FName(TEXT("AimSocket2"));
 	//AimMesh->SetStaticMesh(StaticAimMesh.Object);
 	AimMesh2->SetHiddenInGame(true);
+	AimMesh2->SetIsReplicated(true);
 	
 	//for sounds
 	IdleSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Idle Sound"));
@@ -292,10 +294,14 @@ void AEngletonCharacter::RangedAttack()
 		// spawn the projectile at the muzzle
 		AEngletonMachineGun* const Projectile = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 		AEngletonMachineGun* const Projectile2 = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), ProjectileRotation, SpawnParams);
+		AEngletonMachineGunSpark* const ProjectileLaunch = World->SpawnActor<AEngletonMachineGunSpark>(AEngletonMachineGunSpark::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+		AEngletonMachineGunSpark* const ProjectileLaunch2 = World->SpawnActor<AEngletonMachineGunSpark>(AEngletonMachineGunSpark::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), ProjectileRotation, SpawnParams);
 		if (Projectile && Projectile2)
 		{
 			//particle base is set into play, just need to adjust it's spawn position to the same point as his hands
 			ServerActivateParticle(MachineGunFireParticle);
+			ProjectileLaunch->ServerActivateProjectile();
+			ProjectileLaunch2->ServerActivateProjectile();
 
 			Projectile->ProjectileDamage = BasicAttackDamage/2;
 			Projectile2->ProjectileDamage = BasicAttackDamage/2;

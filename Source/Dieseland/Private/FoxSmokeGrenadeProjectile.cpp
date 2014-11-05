@@ -15,6 +15,11 @@ AFoxSmokeGrenadeProjectile::AFoxSmokeGrenadeProjectile(const class FPostConstruc
 	ProjCollision->SetCapsuleHalfHeight(150.0f);
 	ProjCollision->SetCapsuleRadius(150.0f);
 
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
+	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
+	Particle->Template = ParticleSystemAsset.Object;
+
 	//temp meshscale
 	FVector MeshScale;
 	MeshScale = FVector(1.0f, 1.0f, 1.0f);

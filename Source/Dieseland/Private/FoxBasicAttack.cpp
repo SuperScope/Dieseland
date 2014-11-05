@@ -19,7 +19,12 @@ AFoxBasicAttack::AFoxBasicAttack(const class FPostConstructInitializeProperties&
 	FVector MeshScale;
 	MeshScale = FVector(0.75f, 0.75f, 0.75f);
 
+
 	this->Mesh->SetWorldScale3D(MeshScale);
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_FoxSniperShot_WIP.Unreal_Particle_FoxSniperShot_WIP'"));
+	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
+	Particle->Template = ParticleSystemAsset.Object;
 
 	Piercing = false;
 }

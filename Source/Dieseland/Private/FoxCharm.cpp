@@ -21,9 +21,13 @@ AFoxCharm::AFoxCharm(const class FPostConstructInitializeProperties& PCIP)
 
 	//temp meshscale
 	FVector MeshScale;
-	MeshScale = FVector(4.0f, 4.0f, 4.0f);
+	MeshScale = FVector(3.0f,3.0f, 3.0f);
 
 	this->Mesh->SetWorldScale3D(MeshScale);
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_FoxCharm_WIP3.Unreal_Particle_FoxCharm_WIP3'"));
+	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
+	Particle->Template = ParticleSystemAsset.Object;
 
 	Piercing = true;
 	bReplicates = true;
