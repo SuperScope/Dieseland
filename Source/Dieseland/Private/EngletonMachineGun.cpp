@@ -14,9 +14,9 @@
 AEngletonMachineGun::AEngletonMachineGun(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	InitialLifeSpan = 1.0f;
+	InitialLifeSpan = .6f;
 	//the penetration round is meant to be large and move very quickly
-	ProjectileMovement->InitialSpeed = 700.0f;
+	ProjectileMovement->InitialSpeed = 1400.0f;
 	ProjCollision->SetCapsuleHalfHeight(150.0f);
 	ProjCollision->SetCapsuleRadius(150.0f);
 
@@ -50,6 +50,7 @@ void AEngletonMachineGun::ReceiveActorBeginOverlap(AActor* OtherActor)
 			if (OtherActor->ActorHasTag(TEXT("Player")) || (OtherActor->ActorHasTag(TEXT("Enemy"))))
 			{
 				ABaseProjectileOnHitEffect* const OnHitEffect = World->SpawnActor<ABaseProjectileOnHitEffect>(ABaseProjectileOnHitEffect::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
+				Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
 				OnHitEffect->ServerActivateProjectile();
 				this->Destroy();
 			}

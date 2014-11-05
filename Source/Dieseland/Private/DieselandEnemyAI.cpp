@@ -22,6 +22,7 @@ ADieselandEnemyAI::ADieselandEnemyAI(const class FPostConstructInitializePropert
 	PrimaryActorTick.bCanEverTick = true;
 	GameTimer = 0;
 
+
 	Tags.Add(FName("Enemy"));
 }
 

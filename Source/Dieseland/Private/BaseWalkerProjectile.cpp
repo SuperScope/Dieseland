@@ -21,7 +21,6 @@ ABaseWalkerProjectile::ABaseWalkerProjectile(const class FPostConstructInitializ
 	Mesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("Mesh"));
 	Mesh->SetStaticMesh(StaticMesh.Object);
 	RootComponent = Mesh;
-	Mesh->SetWorldScale3D(FVector(0.3f, 0.3f, 0.3f));
 	//Mesh->SetCollisionProfileName(FName(TEXT("OverlapAll")));
 	Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 	Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
@@ -50,7 +49,6 @@ ABaseWalkerProjectile::ABaseWalkerProjectile(const class FPostConstructInitializ
 
 	ProjectileMovement = PCIP.CreateDefaultSubobject<UProjectileMovementComponent>(this, TEXT("ProjectileMovement"));
 	ProjectileMovement->SetIsReplicated(true);
-	ProjectileMovement->InitialSpeed = 1600.0f;
 //	ProjectileMovement->Velocity
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 	ProjectileMovement->bInitialVelocityInLocalSpace = false;
@@ -68,7 +66,7 @@ ABaseWalkerProjectile::ABaseWalkerProjectile(const class FPostConstructInitializ
 
 	ProjectileDamage = 10;
 
-	InitialLifeSpan = 10.0f;
+	InitialLifeSpan = 1.0f;
 	Tags.Add(FName("Projectile"));
 
 	bReplicates = true;

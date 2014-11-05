@@ -58,7 +58,7 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> MayhemSkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_MayhemSkullCrusher_WIP.Unreal_Particle_MayhemSkullCrusher_WIP'"));
 	SkillOneParticle = MayhemSkillOneParticleAsset.Object;
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> RageParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_MayhemSkullCrusher_WIP.Unreal_Particle_MayhemSkullCrusher_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> RageParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_MayhemRage_WIP.Unreal_Particle_MayhemRage_WIP'"));
 	SkillTwoParticle = RageParticleAsset.Object;
 
 	IronArmorSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Iron Armor Sound"));
@@ -212,7 +212,7 @@ void AMayhemCharacter::SkillTwo()
 	RageSound->Play();
 	RageVoiceOver->Play();
 	RageMoveSpeedBuff = (CharacterMovement->MaxWalkSpeed * .5f) + (Strength * .06f);
-	RageAttkSpeedBuff = (BasicAttackCooldown * .2f) + (Strength * .06f);
+	RageAttkSpeedBuff = (BasicAttackCooldown * .1f) + (Strength * .03f);
 
 	BasicAttackCooldown -= RageAttkSpeedBuff;
 	CharacterMovement->MaxWalkSpeed += RageMoveSpeedBuff;

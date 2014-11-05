@@ -204,12 +204,12 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 		return;
 	}
 	
-	if (HealthBarMaterial != nullptr)
-	{
-		HealthPercentage = ((float)Health / (float)MaxHealth);
-		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
+//	if (HealthBarMaterial != nullptr)
+	//{
+		//HealthPercentage = ((float)Health / (float)MaxHealth);
+		//Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
 		//HealthBar->Elements[0].Material = HealthBarMaterial;
-	}
+	//}
 
 	Super::Tick(DeltaSeconds);
 

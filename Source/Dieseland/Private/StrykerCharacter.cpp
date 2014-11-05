@@ -65,8 +65,13 @@ AStrykerCharacter::AStrykerCharacter(const class FPostConstructInitializePropert
 	AActor* AssassinationTarget = NULL;
 
 	//particle effects
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> AssassinateParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_StrykerAssassinate.Unreal_Particle_StrykerAssassinate'"));
+	SkillOneParticle = AssassinateParticleAsset.Object;
+	
+
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> BlinkParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_StrykerBlinkCloak_WIP.Unreal_Particle_StrykerBlinkCloak_WIP'"));
-	this->SkillOneParticle = BlinkParticleAsset.Object;
+	this->SkillThreeParticle = BlinkParticleAsset.Object;
+
 
 
 	bReplicates = true;
@@ -156,6 +161,10 @@ bool AStrykerCharacter::UpdateDurationTimers_Validate(float DeltaSeconds)
 
 void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 {
+	if (this->Health <= 0){
+		AssasinationHitCounter = 6;
+		return;
+	}
 	AssassinationCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 	AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
@@ -232,6 +241,7 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 		//here we move around the player
 		if (AssasinationDuration2 > 0.25f && AssasinationDuration > 0.3f)
 		{
+			ServerActivateParticle(SkillOneParticle);
 			FVector VectorPlayer = this->GetActorLocation();
 			FVector VectorTarget = AssassinationTarget->GetActorLocation();
 			float MoveCharacterX = VectorPlayer.X - VectorTarget.X;
@@ -263,7 +273,7 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 		if (AssasinationDuration > 0.5f){
 		//	FRotator NewRot = (this->GetActorLocation() - AssassinationTarget->GetActorLocation()).Rotation();
 			//this->SetActorRotation(NewRot);
-	
+			ServerActivateParticle(SkillOneParticle);
 			FVector VectorPlayer = this->GetActorLocation();
 			FVector VectorTarget = AssassinationTarget->GetActorLocation();
 			float MoveCharacterX = VectorPlayer.X - VectorTarget.X;
@@ -321,6 +331,9 @@ bool AStrykerCharacter::SearchForAssassinationTarget_Validate()
 // Stryker Assasinate
 void AStrykerCharacter::SkillOne()
 {
+	ServerActivateParticle(SkillOneParticle);
+
+
 	//here I ensure the player can't cast this ability when in air as it will cause a bug...
 	if (this->CharacterMovement->Velocity.Z > 0 || this->CharacterMovement->Velocity.Z < 0){
 		SkillOneCooldown = 0;
@@ -382,7 +395,7 @@ void AStrykerCharacter::SkillThree()
 	}
 	UWorld* const World = GetWorld();
 	if (World){
-		ServerActivateParticle(SkillOneParticle);
+		ServerActivateParticle(SkillThreeParticle);
 		FRotator CharacterRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
 		CharacterRotation = FRotator(CharacterRotation.Pitch, CharacterRotation.Yaw + 90.0f, CharacterRotation.Roll);
 		this->SetActorRotation(CharacterRotation);

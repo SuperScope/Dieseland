@@ -22,7 +22,7 @@ AFoxBasicAttack::AFoxBasicAttack(const class FPostConstructInitializeProperties&
 
 	this->Mesh->SetWorldScale3D(MeshScale);
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_FoxSniperShot_WIP.Unreal_Particle_FoxSniperShot_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Effects/ParticleSystems/P_AssaultRifle_Trail.P_AssaultRifle_Trail'"));
 	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	Particle->Template = ParticleSystemAsset.Object;
 
