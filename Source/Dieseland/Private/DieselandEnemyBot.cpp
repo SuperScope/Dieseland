@@ -316,9 +316,27 @@ void ADieselandEnemyBot::RangedAttack_Implementation()
 			{
 				if (IsQueen)
 				{
+					FRotator ProjectileRotation2 = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 15, ProjectileRotation.Roll);
+					FRotator ProjectileRotation3 = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw - 15, ProjectileRotation.Roll);
+					ABaseWalkerProjectile* const Projectile2 = World->SpawnActor<ABaseWalkerProjectile>(ABaseWalkerProjectile::StaticClass(), SkeletalMesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation2, SpawnParams);
+					ABaseWalkerProjectile* const Projectile3 = World->SpawnActor<ABaseWalkerProjectile>(ABaseWalkerProjectile::StaticClass(), SkeletalMesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation3, SpawnParams);
 					Projectile->Mesh->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
 					Projectile->ProjectileMovement->InitialSpeed = 2500;
-					Projectile->Piercing = true;
+					Projectile->Piercing = false;
+
+					Projectile2->Mesh->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
+					Projectile2->ProjectileMovement->InitialSpeed = 2500;
+					Projectile2->Piercing = false;
+					Projectile2->ProjectileDamage = BasicAttackDamage;
+					Projectile2->ServerActivateProjectile();
+					Projectile2->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation2.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+
+					Projectile3->Mesh->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
+					Projectile3->ProjectileMovement->InitialSpeed = 2500;
+					Projectile3->Piercing = false;
+					Projectile3->ProjectileDamage = BasicAttackDamage;
+					Projectile3->ServerActivateProjectile();
+					Projectile3->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation3.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 				}
 				else if (IsQueen == false)
 				{
