@@ -346,10 +346,10 @@ void ADieselandPlayerController::ChangeCharacter(FString Character)
 
 void ADieselandPlayerController::PossessNewPawn()
 {
-	if (Role != ROLE_Authority)
-	{
+	//if (Role != ROLE_Authority)
+	//{
 		ServerPossessNewPawn();
-	}
+	//}
 }
 
 void ADieselandPlayerController::ServerPossessNewPawn_Implementation()
