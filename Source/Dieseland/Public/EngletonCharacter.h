@@ -54,8 +54,8 @@ class DIESELAND_API AEngletonCharacter : public ADieselandCharacter
 		TArray<AActor*> ActorsInPulseRange;
 
 	//pulse actor used for owning players
-	UPROPERTY(EditAnywhere, BlueprintreadWrite, Category = Gameplay)
-		AActor* PulseActor;
+	//UPROPERTY(EditAnywhere, BlueprintreadWrite, Category = Gameplay)
+	//	AActor* PulseActor;
 
 	//here I check to see how long bobmarbment has been active
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)

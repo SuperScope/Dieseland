@@ -75,6 +75,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	AimMesh->AttachSocketName = FName(TEXT("AimSocket"));
 	//AimMesh->SetStaticMesh(StaticAimMesh.Object);
 	AimMesh->SetHiddenInGame(true);
+	AimMesh->SetIsReplicated(true);
 	
 	CharacterLightSource = PCIP.CreateDefaultSubobject<UPointLightComponent>(this, TEXT("LightSource"));
 	CharacterLightSource->AttachParent = RootComponent;
@@ -199,7 +200,10 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 void ADieselandCharacter::Tick(float DeltaSeconds)
 {
-
+	if (this == nullptr){
+		return;
+	}
+	
 	if (HealthBarMaterial != nullptr)
 	{
 		HealthPercentage = ((float)Health / (float)MaxHealth);
