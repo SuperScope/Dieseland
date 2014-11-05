@@ -103,8 +103,12 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	bool PawnChosen;
 
-	// Timer workaround to ensure replication
+	// Timer workaround to ensure replication on server
 	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerPossessNewPawn();
+
+	// Timer workaround to ensure replication
+	UFUNCTION(BlueprintCallable, Category = Networking)
 	void PossessNewPawn();
 
 	// Input events
@@ -119,6 +123,8 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation, BlueprintCallable, Category = Gameplay)
 	void RespawnPawn();
 
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = UserInterface)
+	void SetPauseGameInput(bool paused);
 
 protected:
 
