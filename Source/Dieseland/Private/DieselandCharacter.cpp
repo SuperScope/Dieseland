@@ -339,30 +339,59 @@ bool ADieselandCharacter::ResetCamera_Validate()
 {
 	return true;
 }
-void ADieselandCharacter::EditHealth(int32 Amt, AActor* Target)
+void ADieselandCharacter::EditHealth(int32 Amt, AActor* Causer)
 {
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	if (this != nullptr)
 	{
-		Cast<ADieselandCharacter>(Target)->Health += Amt;
+		Health += Amt;
+
+		if (Health <= 0)
+		{
+			OnHasBeenKilled(Causer);
+		}
+
+		if (Causer->ActorHasTag(FName(TEXT("Player"))) || Causer->ActorHasTag(FName(TEXT("KillFloor"))))
+		{
+			LatestDamageCauser = Causer;
+		}
 
 		if (Role < ROLE_Authority)
 		{
-			Cast<ADieselandPlayerController>(Controller)->ServerEditHealth(Amt, Target);
+			ServerEditHealth(Amt, Causer);
 		}
 
-		if (Role == ROLE_Authority && Cast<ADieselandCharacter>(Target)->Health <= 0)
+		/*else if (Target->ActorHasTag(FName(TEXT("Enemy"))))
 		{
-			Kills += 1;
+		ServerDamageEnemy(Amt, Target);
+		}
+		else if (Target->ActorHasTag(FName(TEXT("ScrapBox"))))
+		{
+		Cast<AScrapBox>(Target)->DestroyCrate(this);
+		}*/
+	}
+}
+
+void ADieselandCharacter::ServerEditHealth_Implementation(int32 Amt, AActor* Causer)
+{
+	EditHealth(Amt, Causer);
+}
+
+bool ADieselandCharacter::ServerEditHealth_Validate(int32 Amt, AActor* Causer)
+{
+	return true;
+}
+
+void ADieselandCharacter::OnHasBeenKilled_Implementation(AActor* Causer)
+{
+	if (Role == ROLE_Authority)
+	{
+		if (Causer != nullptr && Causer->ActorHasTag(FName(TEXT("Player"))))
+		{
+			ADieselandPlayerState* TempPlayerState = Cast<ADieselandPlayerState>((Cast<ADieselandCharacter>(Causer)->PlayerState));
+			TempPlayerState->SetKillNum(TempPlayerState->Kills += 1);
 		}
 	}
-	else if (Target->ActorHasTag(FName(TEXT("Enemy"))))
-	{
-		ServerDamageEnemy(Amt, Target);
-	}
-	else if (Target->ActorHasTag(FName(TEXT("ScrapBox"))))
-	{
-		Cast<AScrapBox>(Target)->DestroyCrate(this);
-	}
+	Cast<ADieselandPlayerController>(Controller)->RespawnPawn();
 }
 
 //function for adjusting speed and health, currently using this for strykers posions, I put the function here so it is extendable to other characters in case
@@ -476,7 +505,7 @@ void ADieselandCharacter::MeleeAttack()
 		
 		if (Role == ROLE_Authority && CurActor != this)
 		{
-			EditHealth(-1 * BasicAttackDamage, CurActor);
+			Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 		}
 	}
 }
@@ -563,7 +592,7 @@ void ADieselandCharacter::SkillThree()
 
 		if (Role == ROLE_Authority && CurActor != this)
 		{
-			EditHealth(-1 * BasicAttackDamage, CurActor);
+			Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 		}
 	}
 }
@@ -581,6 +610,11 @@ void ADieselandCharacter::Laugh()
 void ADieselandCharacter::Comment()
 {
 	CommentSound->Play();
+}
+
+int32 ADieselandCharacter::GetTeamNumber()
+{
+	return Cast<ADieselandPlayerState>(PlayerState)->GetTeamNum();
 }
 
 void ADieselandCharacter::OnRep_AimRotation()
@@ -620,6 +654,8 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, MoveSpeed);
 
 	DOREPLIFETIME(ADieselandCharacter, ParticleSystem);
+	
+	DOREPLIFETIME(ADieselandCharacter, LatestDamageCauser);
 
 	DOREPLIFETIME(ADieselandCharacter, LingerTimer);
 

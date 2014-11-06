@@ -221,18 +221,18 @@ void ADieselandEnemyBot::ResetStats()
 	this->CharacterMovement->MaxWalkSpeed = 300;
 }
 
-void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Target)
+void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
 {
 	if (this != nullptr){
-		if (Target->ActorHasTag(FName(TEXT("Player"))))
+		if (Causer->ActorHasTag(FName(TEXT("Player"))))
 		{
-			Cast<ADieselandCharacter>(Target)->Health += Amt;
+			Health += Amt;
 			PlayerLabel->SetText(FString::FromInt(Health));
 
 			//i Don't think we need this function for the AI
 			if (Role < ROLE_Authority)
 			{
-				Cast<ADieselandPlayerController>(Controller)->ServerEditHealth(Amt, Target);
+				//EditHealth(Amt, Causer);
 			}
 		}
 	}
@@ -263,7 +263,7 @@ void ADieselandEnemyBot::MeleeAttack()
 			if (!CurActor->IsValidLowLevel()) continue;
 
 			if (Role == ROLE_Authority){
-				EditHealth(-1 * BasicAttackDamage, CurActor);
+				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 			}
 		}
 	}

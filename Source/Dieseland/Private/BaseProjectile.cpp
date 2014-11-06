@@ -8,7 +8,9 @@
 #include "DieselandEnemyAI.h"
 #include "DieselandCharacter.h"
 #include "DieselandPlayerController.h"
+#include "DieselandPlayerState.h"
 #include "ParticleDefinitions.h"
+#include "ScrapBox.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "StrykerCharacter.h"
@@ -100,12 +102,23 @@ void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 	if (IsPoison == false){
 		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 		{
-			if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))
+			if (OtherActor->ActorHasTag(TEXT("Player")) && 
+				Cast<ADieselandPlayerState>(Cast<ADieselandCharacter>(OtherActor))->GetTeamNum() != 
+				Cast<ADieselandPlayerState>(Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())))->GetTeamNum())
 			{
-				Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
-				if (!Piercing)				{
+				Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn()));
+				if (!Piercing)
+				{
 					this->Destroy();
 				}
+			}
+			else if (OtherActor->ActorHasTag(TEXT("Enemy")))
+			{
+				Cast<ADieselandEnemyBot>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
+			}
+			else if (OtherActor->ActorHasTag(TEXT("ScrapBox")))
+			{
+				Cast<AScrapBox>(OtherActor)->DestroyCrate(this);
 			}
 			else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
 			{
