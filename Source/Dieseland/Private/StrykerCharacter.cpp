@@ -103,6 +103,10 @@ AStrykerCharacter::AStrykerCharacter(const class FPostConstructInitializePropert
 	AssassinationSound->bAutoActivate = false;
 
 
+	SlashHitSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Slash On Hit"));
+	SlashHitSound->AttachParent = RootComponent;
+	SlashHitSound->bAutoActivate = false;
+
 	//here I set melee to true so that Stryker only uses melee attacks
 	IsMelee = true;
 }
@@ -142,6 +146,7 @@ void AStrykerCharacter::UpdateDurationTimers_Implementation(float DeltaSeconds)
 		AssasinationDuration2 = 0;
 		IsAssassinating = false;
 		AssasinationHitCounter = 0;
+		AssassinationSound->Stop();
 		AActor* AssassinationTarget = NULL;
 		this->StatusEffects.Remove(FString("Stunned"));
 	
@@ -238,8 +243,9 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 				return;
 			}
 		}
+	
 		//here we move around the player
-		if (AssasinationDuration2 > 0.25f && AssasinationDuration > 0.3f)
+		if (AssasinationDuration2 > 0.25f && AssasinationDuration < 0.3f)
 		{
 			ServerActivateParticle(SkillOneParticle);
 			FVector VectorPlayer = this->GetActorLocation();
@@ -294,6 +300,10 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 			EditHealth(-1 * (BasicAttackDamage + Dexterity), AssassinationTarget);
 			AssasinationDuration = 0;
 			AssasinationDuration2 = 0;
+			if (AssasinationHitCounter == 0)
+			{
+				AssassinationSound->Play();
+			}
 			AssasinationHitCounter++;
 			//here we continually increase the distance in which stryker moves because stryker may have to move further each swing to hit the player
 			if (AssasinationHitCounter == 1)
@@ -358,6 +368,7 @@ void AStrykerCharacter::SkillOne()
 //Stryker Poison
 void AStrykerCharacter::SkillTwo()
 {
+	PoisonSound->Play();
 	UWorld* const World = GetWorld();
 	if (World)
 	{
@@ -388,6 +399,7 @@ void AStrykerCharacter::SkillTwo()
 //Stryker Blink
 void AStrykerCharacter::SkillThree()
 {
+	BlinkSound->Play();
 	//here I ensure the player can't cast this ability when in air as it will cause a bug...
 	if (this->CharacterMovement->Velocity.Z > 0 || this->CharacterMovement->Velocity.Z < 0){
 		SkillThreeCooldown = 0;
@@ -417,16 +429,18 @@ void AStrykerCharacter::MeleeAttack()
 	MeleeCollision->SetCollisionProfileName(TEXT("OverlapAll"));
 	MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
 	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
+	SlashSound->Play();
 	AActor* CurActor = NULL;
 	for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)
 	{
 		CurActor = ActorsInMeleeRange[b];
 		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))) || CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))) continue;
 		if (!CurActor->IsValidLowLevel()) continue;
-
+		SlashSound->Stop();
 		if (Role == ROLE_Authority && CurActor != this)
 		{
+			
+			SlashHitSound->Play();
 			EditHealth(-1 * BasicAttackDamage, CurActor);
 		}
 	}

@@ -13,9 +13,10 @@
 #include "ScrapBox.h"
 #include "Scrap.h"
 #include "DieselandGameState.h"
+#include "DieselandPlayerState.h"
 
 ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializeProperties& PCIP)
-	: Super(PCIP)
+: Super(PCIP)
 {
 	// Set size for player capsule
 	CapsuleComponent->InitCapsuleSize(42.f, 96.0f);
@@ -76,7 +77,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	//AimMesh->SetStaticMesh(StaticAimMesh.Object);
 	AimMesh->SetHiddenInGame(true);
 	AimMesh->SetIsReplicated(true);
-	
+
 	CharacterLightSource = PCIP.CreateDefaultSubobject<UPointLightComponent>(this, TEXT("LightSource"));
 	CharacterLightSource->AttachParent = RootComponent;
 	CharacterLightSource->AddRelativeLocation(FVector(0.0f, 10.0f, 460.0f));
@@ -90,9 +91,11 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	HealthBar = PCIP.CreateDefaultSubobject<UMaterialBillboardComponent>(this, TEXT("HealthBar"));
 	HealthBar->AttachParent = RootComponent;
 	HealthBar->AddRelativeLocation(FVector(0.0f, 0.0f, 175.0f));
-	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
+	HealthBarMatStatic = HealthBarMatRef.Object;
+	HealthBarBackMatStatic = HealthBarBackMatRef.Object;
+	/*HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
 	HealthBar->AddElement(HealthBarMaterial, NULL, false, 10.0f, 75.0f, NULL);
-	HealthBar->AddElement(HealthBarBackMatRef.Object, NULL, false, 10.0f, 75.0f, NULL);
+	HealthBar->AddElement(HealthBarBackMatRef.Object, NULL, false, 10.0f, 75.0f, NULL);*/
 
 	// Tag this character as a player
 	Tags.Add(FName("Player"));
@@ -112,7 +115,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	RangedRange = 1200.0f;
 
 	//set default laugh, comment and taunt timers
-	LaughCooldown= 5.0f;
+	LaughCooldown = 5.0f;
 	CommentCooldown = 5.0f;
 	TauntCooldown = 5.0f;
 
@@ -143,7 +146,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	MeleeCollision->SetCapsuleHalfHeight(MeleeRange / 2.0f);
 	MeleeCollision->SetCapsuleRadius(MeleeRange / 2.0f);
 	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
+
 
 	AOECollision = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("AOECollision"));
 	AOECollision->AttachParent = (Mesh);
@@ -156,7 +159,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillTwoParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_StrykerBlinkCloak_WIP.Unreal_Particle_StrykerBlinkCloak_WIP'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillThreeParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse2_WIP.Unreal_Particle_EngletonPulse2_WIP'"));
-	
+
 	this->BasicAttackParticle = BasicAttackParticleAsset.Object;
 	this->SkillOneParticle = SkillOneParticleAsset.Object;
 	this->SkillTwoParticle = SkillTwoParticleAsset.Object;
@@ -180,7 +183,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	LaughSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Comment Sound"));
 	LaughSound->AttachParent = RootComponent;
 	LaughSound->bAutoActivate = false;
-	
+
 	//Find the scrap blueprint's class
 	static ConstructorHelpers::FObjectFinder<UClass> ScrapBlueprint(TEXT("Class'/Game/Blueprints/Scrap_BP.Scrap_BP_C'"));
 	if (ScrapBlueprint.Object)
@@ -198,18 +201,33 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	this->SetOwner(Controller);
 }
 
+void ADieselandCharacter::ReceiveBeginPlay()
+{
+//	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatStatic, this);
+//	HealthBar->AddElement(HealthBarMaterial, NULL, false, 10.0f, 75.0f, NULL);
+//	HealthBar->AddElement(HealthBarBackMatStatic, NULL, false, 10.0f, 75.0f, NULL);
+	if (PlayerState != nullptr)
+	{
+//		UpdateTeamColor();
+	}
+}
+
 void ADieselandCharacter::Tick(float DeltaSeconds)
 {
 	if (this == nullptr){
 		return;
 	}
-	
-//	if (HealthBarMaterial != nullptr)
-	//{
-		//HealthPercentage = ((float)Health / (float)MaxHealth);
+
+	if (HealthBarMaterial != nullptr)
+	{
+		HealthPercentage = ((float)Health / (float)MaxHealth);
 		//Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
-		//HealthBar->Elements[0].Material = HealthBarMaterial;
-	//}
+		if (PlayerState && Cast<ADieselandPlayerState>(PlayerState)->TeamNumber != CharacterTeam)
+		{
+			CharacterTeam = Cast<ADieselandPlayerState>(PlayerState)->TeamNumber;
+			UpdateTeamColor();
+		}
+	}
 
 	Super::Tick(DeltaSeconds);
 
@@ -226,11 +244,48 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 
 	}
 	if (SlowRemaining == 0 && StatusEffects.Contains(FString("SmokeScreen"))){
-	
+
 		StatusEffects.Remove(FString("SmokeScreen"));
-			ResetCamera();
-	
+		ResetCamera();
+
 	}
+}
+
+void ADieselandCharacter::UpdateTeamColor()
+{
+	/*
+	switch (Cast<ADieselandPlayerState>(PlayerState)->TeamNumber)
+	{
+	case 0:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.000905f, 1.0f, 0.0f));
+		break;
+	case 1:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.035f, 0.005232f, 0.004898f));
+		break;
+	case 2:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.0f, 0.035871f, 1.0f));
+		break;
+	case 3:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 1.0f, 1.0f));
+		break;
+	case 4:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.0f, 0.828977f, 1.0f));
+		break;
+	case 5:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.935999f, 0.0f));
+		break;
+	case 6:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.747108f, 0.0f, 1.0f));
+		break;
+	case 7:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.305141f, 0.0f));
+		break;
+	case 8:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.131611f, 0.925403f));
+		break;
+	default:
+		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.000905f, 1.0f, 0.0f));
+	}*/
 }
 
 // CORE ATTRIBUTE CALCULATION FUNCTION
@@ -318,14 +373,14 @@ void ADieselandCharacter::EditSpeedDamage(int32 Speed, int32 Damage, AActor* Tar
 	if (Target->ActorHasTag(FName(TEXT("Player"))))
 	{
 		Cast<ADieselandCharacter>(Target)->IsPoisoned = true;
-		Cast<ADieselandCharacter>(Target)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandCharacter>(Target)->CharacterMovement->MaxWalkSpeed * (Speed/100.0f);
-		Cast<ADieselandCharacter>(Target)->BasicAttackDamage = Cast<ADieselandCharacter>(Target)->BasicAttackDamage * (Damage/100.0f);
+		Cast<ADieselandCharacter>(Target)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandCharacter>(Target)->CharacterMovement->MaxWalkSpeed * (Speed / 100.0f);
+		Cast<ADieselandCharacter>(Target)->BasicAttackDamage = Cast<ADieselandCharacter>(Target)->BasicAttackDamage * (Damage / 100.0f);
 		if (Role < ROLE_Authority)
 		{
 			Cast<ADieselandPlayerController>(Controller)->ServerEditSpeedDamage(Speed, Damage, Target);
 		}
 	}
-	 if (Target->ActorHasTag(FName(TEXT("Enemy"))))
+	if (Target->ActorHasTag(FName(TEXT("Enemy"))))
 	{
 		ServerChangeSpeedDamageEnemy(Speed, Damage, Target);
 	}
@@ -359,13 +414,13 @@ void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Ta
 			}
 		}
 	}
-} 
+}
 
 void ADieselandCharacter::ServerChangeSpeedDamageEnemy_Implementation(int32 Speed, int32 Damage, AActor* Target)
 {
 	Cast<ADieselandEnemyBot>(Target)->IsPoisoned = true;
-	Cast<ADieselandEnemyBot>(Target)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandEnemyBot>(Target)->CharacterMovement->MaxWalkSpeed * (Speed/100.0f);
-	Cast<ADieselandEnemyBot>(Target)->BasicAttackDamage = Cast<ADieselandEnemyBot>(Target)->BasicAttackDamage * (Damage/100.0f);
+	Cast<ADieselandEnemyBot>(Target)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandEnemyBot>(Target)->CharacterMovement->MaxWalkSpeed * (Speed / 100.0f);
+	Cast<ADieselandEnemyBot>(Target)->BasicAttackDamage = Cast<ADieselandEnemyBot>(Target)->BasicAttackDamage * (Damage / 100.0f);
 }
 
 bool ADieselandCharacter::ServerChangeSpeedDamageEnemy_Validate(int32 Speed, int32 Damage, AActor* Target)
@@ -419,7 +474,7 @@ void ADieselandCharacter::MeleeAttack()
 		CurActor = ActorsInMeleeRange[b];
 		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
 		if (!CurActor->IsValidLowLevel()) continue;
-		
+
 		if (Role == ROLE_Authority && CurActor != this)
 		{
 			EditHealth(-1 * BasicAttackDamage, CurActor);
@@ -531,7 +586,7 @@ void ADieselandCharacter::Comment()
 
 void ADieselandCharacter::OnRep_AimRotation()
 {
-	
+
 }
 
 

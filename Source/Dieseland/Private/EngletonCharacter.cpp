@@ -298,7 +298,7 @@ void AEngletonCharacter::RangedAttack()
 		AEngletonMachineGunSpark* const ProjectileLaunch2 = World->SpawnActor<AEngletonMachineGunSpark>(AEngletonMachineGunSpark::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), ProjectileRotation, SpawnParams);
 		if (Projectile && Projectile2)
 		{
-			//particle base is set into play, just need to adjust it's spawn position to the same point as his hands
+			//particle base is set into play correctly
 			ServerActivateParticle(MachineGunFireParticle);
 			ProjectileLaunch->ServerActivateProjectile();
 			ProjectileLaunch2->ServerActivateProjectile();

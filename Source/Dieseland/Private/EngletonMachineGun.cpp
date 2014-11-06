@@ -23,6 +23,9 @@ AEngletonMachineGun::AEngletonMachineGun(const class FPostConstructInitializePro
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
 	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	Particle->Template = ParticleSystemAsset.Object;
+	Particle->AttachTo(Mesh);
+	Particle->SetRelativeRotation(this->GetActorRotation());
+	
 
 	//temp meshscale
 	FVector MeshScale;
