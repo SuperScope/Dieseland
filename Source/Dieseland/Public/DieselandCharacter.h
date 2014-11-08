@@ -43,6 +43,10 @@ public:
 	UFUNCTION(reliable, Server, WithValidation)
 	void ServerEditHealth(int32 Amt, AActor* Causer);
 
+	// Called by the server to edit client's health
+	UFUNCTION(reliable, Server, WithValidation)
+	void ServerEditSpeedDamage(int32 Speed, int32 Damage, AActor* Target);
+
 	// Called to adjust movement speed and damage
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void EditSpeedDamage(int32 Speed, int32 Damage, AActor* Target);

@@ -131,7 +131,8 @@ void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 	//this is for stryker only, ispoisoin is set to true on the poison projectiles
 	if (IsPoison)
 	{
-		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
+		//Old non-team code
+		/*if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 		{
 			if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))
 			{
@@ -139,6 +140,34 @@ void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 				if (!Piercing)				{
 					this->Destroy();
 				}
+			}
+			else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
+			{
+				if (!Piercing){
+					this->Destroy();
+				}
+			}
+		}*/
+
+		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
+		{
+			if (OtherActor->ActorHasTag(TEXT("Player")) && 
+				Cast<ADieselandPlayerState>(Cast<ADieselandCharacter>(OtherActor))->GetTeamNum() != 
+				Cast<ADieselandPlayerState>(Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())))->GetTeamNum())
+			{
+				Cast<ADieselandCharacter>(OtherActor)->EditSpeedDamage(PoisionSlowAmount, PoisionDamageReductionAmount, this);
+				if (!Piercing)
+				{
+					this->Destroy();
+				}
+			}
+			else if (OtherActor->ActorHasTag(TEXT("Enemy")))
+			{
+				Cast<ADieselandEnemyBot>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
+			}
+			else if (OtherActor->ActorHasTag(TEXT("ScrapBox")))
+			{
+				Cast<AScrapBox>(OtherActor)->DestroyCrate(this);
 			}
 			else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
 			{

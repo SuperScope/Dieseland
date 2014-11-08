@@ -4,6 +4,7 @@
 #include "DieselandPlayerController.h"
 #include "FoxSmokeGrenadeProjectile.h"
 #include "FoxSmokeGrenade.h"
+#include "DieselandCharacter.h"
 
 
 AFoxSmokeGrenadeProjectile::AFoxSmokeGrenadeProjectile(const class FPostConstructInitializeProperties& PCIP)
@@ -42,7 +43,7 @@ void AFoxSmokeGrenadeProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 		}
 		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 		{
-			if (OtherActor->ActorHasTag(TEXT("Player")) || (OtherActor->ActorHasTag(TEXT("Enemy"))))
+			if ((OtherActor->ActorHasTag(TEXT("Player")) || (OtherActor->ActorHasTag(TEXT("Enemy")))) && Cast<ADieselandCharacter>(OtherActor)->GetTeamNumber() != Cast<ADieselandCharacter>(GetOwner())->GetTeamNumber())
 			{
 				AFoxSmokeGrenade* const Grenade = World->SpawnActor<AFoxSmokeGrenade>(AFoxSmokeGrenade::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
 				Grenade->ServerActivateProjectile();

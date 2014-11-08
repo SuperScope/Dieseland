@@ -398,24 +398,25 @@ void ADieselandCharacter::OnHasBeenKilled_Implementation(AActor* Causer)
 //we want to use it again in the future
 void ADieselandCharacter::EditSpeedDamage(int32 Speed, int32 Damage, AActor* Target)
 {
-	if (Target->ActorHasTag(FName(TEXT("Player"))))
+	this->IsPoisoned = true;
+	this->CharacterMovement->MaxWalkSpeed = this->CharacterMovement->MaxWalkSpeed * (Speed / 100.0f);
+	this->BasicAttackDamage = this->BasicAttackDamage * (Damage / 100.0f);
+	if (Role < ROLE_Authority)
 	{
-		Cast<ADieselandCharacter>(Target)->IsPoisoned = true;
-		Cast<ADieselandCharacter>(Target)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandCharacter>(Target)->CharacterMovement->MaxWalkSpeed * (Speed/100.0f);
-		Cast<ADieselandCharacter>(Target)->BasicAttackDamage = Cast<ADieselandCharacter>(Target)->BasicAttackDamage * (Damage/100.0f);
-		if (Role < ROLE_Authority)
-		{
-			Cast<ADieselandPlayerController>(Controller)->ServerEditSpeedDamage(Speed, Damage, Target);
-		}
+		ServerEditSpeedDamage(Speed, Damage, Target);
 	}
-	 if (Target->ActorHasTag(FName(TEXT("Enemy"))))
-	{
-		ServerChangeSpeedDamageEnemy(Speed, Damage, Target);
-	}
-	else if (Target->ActorHasTag(FName(TEXT("ScrapBox"))))
-	{
-		Cast<AScrapBox>(Target)->DestroyCrate(this);
-	}
+}
+
+void ADieselandCharacter::ServerEditSpeedDamage_Implementation(int32 Speed, int32 Damage, AActor* Target)
+{
+	// Edit the health of the specific pawn
+	EditSpeedDamage(Speed, Damage, Target);
+
+}
+
+bool ADieselandCharacter::ServerEditSpeedDamage_Validate(int32 Speed, int32 Damage, AActor* Target)
+{
+	return true;
 }
 
 void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Target)
@@ -614,7 +615,14 @@ void ADieselandCharacter::Comment()
 
 int32 ADieselandCharacter::GetTeamNumber()
 {
-	return Cast<ADieselandPlayerState>(PlayerState)->GetTeamNum();
+	if (PlayerState != nullptr)
+	{
+		return Cast<ADieselandPlayerState>(PlayerState)->GetTeamNum();
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 void ADieselandCharacter::OnRep_AimRotation()
