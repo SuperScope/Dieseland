@@ -318,7 +318,7 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 
 			//Spawn Scrap pieces here
 			UWorld* const World = GetWorld();
-			if (World && DieselandPawn->LatestDamageCauser->ActorHasTag(FName(TEXT("Player"))))
+			if (World && DieselandPawn->LatestDamageCauser != nullptr && DieselandPawn->LatestDamageCauser->ActorHasTag(FName(TEXT("Player"))))
 			{
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.Owner = this;
