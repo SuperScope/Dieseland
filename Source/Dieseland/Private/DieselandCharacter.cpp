@@ -615,7 +615,7 @@ void ADieselandCharacter::Comment()
 
 int32 ADieselandCharacter::GetTeamNumber()
 {
-	if (PlayerState != nullptr)
+	if (this != nullptr && PlayerState != nullptr)
 	{
 		return Cast<ADieselandPlayerState>(PlayerState)->GetTeamNum();
 	}

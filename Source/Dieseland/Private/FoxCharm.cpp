@@ -44,7 +44,8 @@ void AFoxCharm::ReceiveActorBeginOverlap(AActor* OtherActor)
 	}
 	if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 	{
-		if (OtherActor->ActorHasTag(TEXT("Player")))
+		if (OtherActor->ActorHasTag(TEXT("Player")) && Cast<ADieselandCharacter>(OtherActor)->GetTeamNumber() !=
+			Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->GetTeamNumber())
 		{
 			Cast<ADieselandCharacter>(OtherActor)->StunRemaining = 3.0f;
 			Cast<ADieselandCharacter>(OtherActor)->StatusEffects.Add(FString("Stunned"));

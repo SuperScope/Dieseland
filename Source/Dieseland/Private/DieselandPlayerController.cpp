@@ -366,9 +366,9 @@ void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FStr
 	APawn* TempPawn = GetPawn();
 
 	//this->UnPossess();
-	if (GetWorld() != nullptr && Role == ROLE_Authority){
+	if (GetWorld() != nullptr && Role == ROLE_Authority && TempPawn != nullptr){
 		//Determine what player is desired and spawn that pawn
-		if (Character == FString(TEXT("Mayhem")))
+		if (Character == FString(TEXT("Mayhem")) && TempPawn != nullptr)
 		{
 			this->UnPossess();
 
@@ -381,7 +381,7 @@ void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FStr
 			//GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
 
 		}
-		else if (Character == FString(TEXT("Engleton")))
+		else if (Character == FString(TEXT("Engleton")) && TempPawn != nullptr)
 		{
 			this->UnPossess();
 
@@ -395,7 +395,7 @@ void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FStr
 
 
 		}
-		else if (Character == FString(TEXT("Stryker")))
+		else if (Character == FString(TEXT("Stryker")) && TempPawn != nullptr)
 		{
 			this->UnPossess();
 
@@ -409,7 +409,7 @@ void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FStr
 
 
 		}
-		else if (Character == FString(TEXT("Fox")))
+		else if (Character == FString(TEXT("Fox")) && TempPawn != nullptr)
 		{
 			this->UnPossess();
 

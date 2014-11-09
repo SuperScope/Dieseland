@@ -102,9 +102,9 @@ void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 	if (IsPoison == false){
 		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 		{
-			if (OtherActor->ActorHasTag(TEXT("Player")) && 
-				Cast<ADieselandPlayerState>(Cast<ADieselandCharacter>(OtherActor))->GetTeamNum() != 
-				Cast<ADieselandPlayerState>(Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())))->GetTeamNum())
+			if (OtherActor != nullptr && OtherActor->ActorHasTag(TEXT("Player")) &&
+				Cast<ADieselandCharacter>(OtherActor)->GetTeamNumber() != 
+				Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->GetTeamNumber())
 			{
 				Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn()));
 				if (!Piercing)
