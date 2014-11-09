@@ -292,6 +292,7 @@ void ADieselandCharacter::CalculateStats_Implementation()
 {
 	if (this->ActorHasTag(FName(TEXT("Player"))))
 	{
+		//This increases the character level for every 3 stat points accrewed
 		if (Cast<ADieselandPlayerController>(Controller)->StatPlusCount > 3){
 			CharacterLevel++;
 			Cast<ADieselandPlayerController>(Controller)->StatPlusCount = 0;
@@ -318,10 +319,12 @@ void ADieselandCharacter::CalculateStats_Implementation()
 	}
 }
 
+//Returns bool 
 bool ADieselandCharacter::CalculateStats_Validate()
 {
 	return true;
 }
+
 
 void ADieselandCharacter::ResetCamera_Implementation()
 {
@@ -339,6 +342,7 @@ bool ADieselandCharacter::ResetCamera_Validate()
 {
 	return true;
 }
+//This function edits the health of the player
 void ADieselandCharacter::EditHealth(int32 Amt, AActor* Causer)
 {
 	if (this != nullptr)
