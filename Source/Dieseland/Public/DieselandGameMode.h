@@ -23,32 +23,24 @@ class ADieselandGameMode : public AGameMode
 	//Array for the Death Tiles
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	TArray<AActor*> DeathTileArray;
-    
-    //Array for the Death Tiles
-	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
-	TArray<AActor*> GateArray;
 
 	// Timer to keep track of the duration of the match
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	float GameTimer;
     
+    // Timer used to determined when boss should be spawned
     UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	float BossTimer;
     
     UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
-	bool Gate1;
+	int32 RandomBossIndex;
     
-    UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
-	bool Gate2;
-    
-    UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
-	bool Gate3;
+    // Used to start timer when game actually starts
+    UPROPERTY(Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+    bool StartBossTimer;
 
 	UFUNCTION(Reliable, Server, WithValidation, BlueprintCallable, Category = Gameplay)
 	void StartGame();
-    
-    UFUNCTION(BlueprintCallable, Category = Gameplay)
-    void SpawnBoss();
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void RespawnTile(FVector SpawnLocation);
@@ -63,9 +55,8 @@ class ADieselandGameMode : public AGameMode
 	UClass* EngletonClass;
 	UClass* StrykerClass;
 	UClass* FoxClass;
-    UClass* HighlanderKing;
     
-    bool canSpawn;
+    bool CanSpawn;
 
 	uint8 PlayersSpawned;
 
