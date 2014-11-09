@@ -293,7 +293,7 @@ void ADieselandCharacter::CalculateStats_Implementation()
 	if (this->ActorHasTag(FName(TEXT("Player"))))
 	{
 		//This increases the character level for every 3 stat points accrewed
-		if (Cast<ADieselandPlayerController>(Controller)->StatPlusCount > 3){
+		if (Cast<ADieselandPlayerController>(Controller)->StatPlusCount >= 3){
 			CharacterLevel++;
 			Cast<ADieselandPlayerController>(Controller)->StatPlusCount = 0;
 		}
