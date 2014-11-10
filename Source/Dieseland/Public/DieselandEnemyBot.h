@@ -192,6 +192,8 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 
 protected:
 
+	UClass* ScrapClass;
+
 	//timer for updating UI
 	virtual void Tick(float DeltaSeconds) override;
 };

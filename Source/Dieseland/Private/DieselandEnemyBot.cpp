@@ -9,6 +9,8 @@
 #include "BaseWalkerProjectile.h"
 #include "UnrealNetwork.h"
 #include "EngletonCrazyLaser.h"
+#include "Scrap.h"
+#include "DieselandStaticLibrary.h"
 
 
 ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializeProperties& PCIP)
@@ -118,6 +120,12 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	this->CharacterMovement->RotationRate = FRotator(0.0f, 360.0f, 0.0f);
 	this->CharacterMovement->MaxWalkSpeed = 300;
+
+	static ConstructorHelpers::FObjectFinder<UClass> ScrapBlueprint(TEXT("Class'/Game/Blueprints/Scrap_BP.Scrap_BP_C'"));
+	if (ScrapBlueprint.Object)
+	{
+		ScrapClass = (UClass*)ScrapBlueprint.Object;
+	}
 
 }
 
@@ -246,18 +254,38 @@ void ADieselandEnemyBot::ResetStats()
 	this->CharacterMovement->MaxWalkSpeed = 300;
 }
 
-void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Target)
+void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
 {
 	if (this != nullptr){
-		if (Target->ActorHasTag(FName(TEXT("Player"))))
+		if (Causer->ActorHasTag(FName(TEXT("Player"))))
 		{
-			Cast<ADieselandCharacter>(Target)->Health += Amt;
+			Health += Amt;
 			PlayerLabel->SetText(FString::FromInt(Health));
 
 			//i Don't think we need this function for the AI
 			if (Role < ROLE_Authority)
 			{
-				Cast<ADieselandPlayerController>(Controller)->ServerEditHealth(Amt, Target);
+				//EditHealth(Amt, Causer);
+			}
+		}
+	}
+	if (this->Health <= 0 && Causer->ActorHasTag(FName(TEXT("Player"))))
+	{
+		FVector TempEnemyLoc = FVector(Causer->GetActorLocation().X, Causer->GetActorLocation().Y, Causer->GetActorLocation().Z);
+
+		//Spawn Scrap pieces here
+		UWorld* const World = GetWorld();
+		if (World && Causer != nullptr && Causer->ActorHasTag(FName(TEXT("Player"))))
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = Instigator;
+			for (int32 x = 0; x < 5; x++)
+			{
+				UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(this->GetActorLocation().X, this->GetActorLocation().Y, this->GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f));
+				this->Destroy();
+				//Alternatively used to spawn c++ class
+				//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
 			}
 		}
 	}
@@ -288,7 +316,7 @@ void ADieselandEnemyBot::MeleeAttack()
 			if (!CurActor->IsValidLowLevel()) continue;
 
 			if (Role == ROLE_Authority){
-				EditHealth(-1 * BasicAttackDamage, CurActor);
+				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 			}
 		}
 	}

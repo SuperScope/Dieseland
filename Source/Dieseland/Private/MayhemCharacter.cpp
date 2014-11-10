@@ -155,7 +155,10 @@ void AMayhemCharacter::MeleeAttack()
 
 		if (Role == ROLE_Authority && CurActor != this)
 		{
-			EditHealth(-1 * BasicAttackDamage, CurActor);
+			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+			{
+				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+			}
 		}
 	}
 	PunchSound->Play();
@@ -179,15 +182,15 @@ void AMayhemCharacter::SkillOne()
 
 		if (Role == ROLE_Authority && CurActor != this)
 		{
-			EditHealth(-1 * BasicAttackDamage, CurActor);
-			if (CurActor->ActorHasTag(FName(TEXT("Player"))))
+			//EditHealth(-1 * BasicAttackDamage, CurActor);
+			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
 			{
 				ADieselandCharacter* PlayerActor = Cast<ADieselandCharacter>(CurActor);
 
 				PlayerActor->StatusEffects.Add(FString("Stunned"));
 				PlayerActor->StunRemaining = StunLength;
 
-				EditHealth(-1 * BasicAttackDamage, CurActor);
+				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 			}
 			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
 			{
