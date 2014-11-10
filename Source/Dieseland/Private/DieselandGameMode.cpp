@@ -104,18 +104,21 @@ void ADieselandGameMode::Tick(float DeltaSeconds)
 {
 	GameTimer -= DeltaSeconds;
     
+    //If time to start timer, start timer
     if(StartBossTimer == true)
     {
         BossTimer -= DeltaSeconds;
     }
     
+    //If its time to spawn boss and we can spawn a boss
     if (BossTimer <= 295.0f && CanSpawn == true)
     {
         CanSpawn = false;
-        RandomBossIndex = FMath::RandRange(0, 2);
-        GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor::Blue, FString("Random Number: ") + RandomBossIndex);
+        //Select a random boss and boss zone
+        RandomSpawnIndex = FMath::RandRange(0, 2);
+        RandomBossIndex = FMath::RandRange(0,1);
         
-        //Spawning is done is boss tiles
+        //Spawning is done is BossTiles.cpp
     }
 
 	if (GameTimer <= 0.0f)
@@ -141,6 +144,7 @@ void ADieselandGameMode::StartGame_Implementation()
 			Cast<ADeathTile>(DeathTileArray[i])->DeathTileIndex = i;
 		}
 	}
+    //Start boss timer when game starts
     StartBossTimer = true;
 }
 
@@ -230,7 +234,9 @@ void ADieselandGameMode::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandGameMode, GameTimer);
     DOREPLIFETIME(ADieselandGameMode, BossTimer);
+    DOREPLIFETIME(ADieselandGameMode, CanSpawn);
     DOREPLIFETIME(ADieselandGameMode, RandomBossIndex);
+    DOREPLIFETIME(ADieselandGameMode, RandomSpawnIndex);
 	DOREPLIFETIME(ADieselandGameMode, DeathTileClassArray);
 	DOREPLIFETIME(ADieselandGameMode, LocationArray);
 }
