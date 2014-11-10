@@ -29,12 +29,16 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	BasicAttackDamage = 25;
 	HealthRegeneration = 2;
 
+	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarTextRef(TEXT("Material'/Game/MaterialsDLC/M_HealthText.M_HealthText'"));
+
 	// Create the text component
-	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
-	PlayerLabel->AttachTo(RootComponent);
-	PlayerLabel->AddRelativeLocation(FVector(-80.0f, 0.0f, 0.0f), false);
-	PlayerLabel->AddLocalRotation(FRotator(90.0f, 0.0f, -180.0f));
-	PlayerLabel->Text = FString::FromInt(Health);
+	HealthLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("HealthLabel"));
+	HealthLabel->AttachTo(RootComponent);
+	HealthLabel->AddRelativeLocation(FVector(0.0f, 0.0f, 200.0f), false);
+	HealthLabel->Text = FString::FromInt(Health);
+	HealthLabel->SetMaterial(0, HealthBarTextRef.Object);
+	HealthLabel->VerticalAlignment = EVerticalTextAligment::EVRTA_TextCenter;
+	HealthLabel->HorizontalAlignment = EHorizTextAligment::EHTA_Center;
 
 	// Find the mesh to use for AimMesh component
 	//static ConstructorHelpers::FObjectFinder<UStaticMesh> SkeletalMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube.Shape_Cube'"));
@@ -95,6 +99,18 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	ProjectileZoneCollision->SetCapsuleRadius(ProjectileZone / 2.0f);
 	ProjectileZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarMatRef(TEXT("Material'/Game/UserInterfaceAssets/HUD/Materials/M_HUD_Health_Bar.M_HUD_Health_Bar'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarBackMatRef(TEXT("Material'/Game/MaterialsDLC/Material_BasicDarkGrey.Material_BasicDarkGrey'"));
+
+	HealthBar = PCIP.CreateDefaultSubobject<UMaterialBillboardComponent>(this, TEXT("HealthBar"));
+	HealthBar->AttachParent = RootComponent;
+	HealthBar->AddRelativeLocation(FVector(0.0f, 0.0f, 175.0f));
+	HealthBarMatStatic = HealthBarMatRef.Object;
+	HealthBarBackMatStatic = HealthBarBackMatRef.Object;
+	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
+	HealthBar->AddElement(HealthBarMaterial, nullptr, false, 10.0f, 75.0f, nullptr);
+	HealthBar->AddElement(HealthBarBackMatRef.Object, nullptr, false, 10.0f, 75.0f, nullptr);
+
 	// Ensure replication
 	bReplicates = true;
 	bReplicateMovement = true;
@@ -129,12 +145,26 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 
 }
 
+void ADieselandEnemyBot::ReceiveBeginPlay()
+{
+	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatStatic, this);
+	HealthBar->AddElement(HealthBarMaterial, nullptr, false, 10.0f, 75.0f, nullptr);
+	HealthBar->AddElement(HealthBarBackMatStatic, nullptr, false, 10.0f, 75.0f, nullptr);
+
+	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.0f, 0.0f));
+
+	Super::ReceiveBeginPlay();
+}
 
 void ADieselandEnemyBot::Tick(float DeltaSeconds)
 {
 	// Every frame set the health display
-	// TODO: Remove when UI is completed
-	PlayerLabel->SetText(FString::FromInt(Health));
+	HealthLabel->SetText(FString::FromInt(Health));
+	HealthLabel->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
+
+	HealthPercentage = ((float)Health / (float)MaxHealth);
+	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
+
 
 	Super::Tick(DeltaSeconds);
 
@@ -260,7 +290,7 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
 		if (Causer->ActorHasTag(FName(TEXT("Player"))))
 		{
 			Health += Amt;
-			PlayerLabel->SetText(FString::FromInt(Health));
+			HealthLabel->SetText(FString::FromInt(Health));
 
 			//i Don't think we need this function for the AI
 			if (Role < ROLE_Authority)

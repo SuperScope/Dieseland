@@ -85,6 +85,17 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	CharacterLightSource->SetLightColor(FColor::FromHex(FString("C2A171FF")));
 	CharacterLightSource->SetCastShadows(false);
 
+	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarTextRef(TEXT("Material'/Game/MaterialsDLC/M_HealthText.M_HealthText'"));
+
+	// Create the text component
+	HealthLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("HealthLabel"));
+	HealthLabel->AttachTo(RootComponent);
+	HealthLabel->AddRelativeLocation(FVector(0.0f, 0.0f, 200.0f), false);
+	HealthLabel->Text = FString::FromInt(Health);
+	HealthLabel->SetMaterial(0, HealthBarTextRef.Object);
+	HealthLabel->VerticalAlignment = EVerticalTextAligment::EVRTA_TextCenter;
+	HealthLabel->HorizontalAlignment = EHorizTextAligment::EHTA_Center;
+
 	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarMatRef(TEXT("Material'/Game/UserInterfaceAssets/HUD/Materials/M_HUD_Health_Bar.M_HUD_Health_Bar'"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarBackMatRef(TEXT("Material'/Game/MaterialsDLC/Material_BasicDarkGrey.Material_BasicDarkGrey'"));
 
@@ -206,6 +217,8 @@ void ADieselandCharacter::ReceiveBeginPlay()
 	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatStatic, this);
 	HealthBar->AddElement(HealthBarMaterial, nullptr, false, 10.0f, 75.0f, nullptr);
 	HealthBar->AddElement(HealthBarBackMatStatic, nullptr, false, 10.0f, 75.0f, nullptr);
+
+	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.000905f, 1.0f, 0.0f));
 	if (PlayerState != nullptr)
 	{
 		UpdateTeamColor();
@@ -218,6 +231,10 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 		return;
 	}
 	
+	// Every frame set the health display
+	HealthLabel->SetText(FString::FromInt(Health));
+	HealthLabel->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
+
 	HealthPercentage = ((float)Health / (float)MaxHealth);
 	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
 	if (PlayerState && GetTeamNumber() != CharacterTeam)
@@ -250,7 +267,7 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 
 void ADieselandCharacter::UpdateTeamColor()
 {
-	if (HealthBar->Elements[0].Material){
+	if (HealthBarMaterial != nullptr){
 		switch (Cast<ADieselandPlayerState>(PlayerState)->TeamNumber)
 		{
 		case 0:

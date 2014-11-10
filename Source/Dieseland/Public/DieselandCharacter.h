@@ -20,6 +20,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
+	// Numerical display of health value
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
+	TSubobjectPtr<class UTextRenderComponent> HealthLabel;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
 	TSubobjectPtr<class UMaterialBillboardComponent> HealthBar;
 
