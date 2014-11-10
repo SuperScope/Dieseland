@@ -50,6 +50,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 
 	// Tag this character as a player
 	Tags.Add(FName("Enemy"));
+	IsQueen = false;
 
 
 	// Set default ranges
@@ -57,8 +58,11 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	AttackZone = 1800.0f;
 	ProjectileZone = 1200.0f;
 
+
+
 	// Cooldown values
 	BasicAttackCooldown = 0.2f;
+	SpawnTimer = 0.0f;
 
 
 	// Timer values
@@ -102,6 +106,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 
 	//here we set the dieseland aggresion to false
 	isAggressive = false;
+	FirstRun = false;
 	LingerCount = 0;
 
 	//here is what we use to setup our particle system
@@ -195,10 +200,20 @@ void ADieselandEnemyBot::Tick(float DeltaSeconds)
 	//here we setup health regeneration for bots
 	if (Health < MaxHealth){
 		HealthRegenTimer += DeltaSeconds;
-		if (HealthRegenTimer > 1)
+		if (isAggressive){
+			if (HealthRegenTimer > 1)
+			{
+				Health += HealthRegeneration;
+				HealthRegenTimer = FMath::FRandRange(-0.2f, 0.2f);
+			}
+		}
+		else if (isAggressive == false)
 		{
-			Health += HealthRegeneration;
-			HealthRegenTimer = FMath::FRandRange(-0.2f, 0.2f);
+			if (HealthRegenTimer > 0.1f)
+			{
+				Health += HealthRegeneration;
+				HealthRegenTimer = FMath::FRandRange(-0.05f, 0.05f);
+			}
 		}
 	}
 	if (LingerTimer > 0.0f)
@@ -218,6 +233,16 @@ void ADieselandEnemyBot::Tick(float DeltaSeconds)
 		{
 			Health = Health - LingerDamage;
 			LingerCount = 0;
+		}
+	}
+	if (FirstRun)
+	{
+		SpawnTimer += DeltaSeconds;
+		if (SpawnTimer > 0.5f){
+			ADieselandEnemyAI* BotController = Cast<ADieselandEnemyAI>(Controller);
+		//	BotController->SearchForEnemy();
+			FirstRun = false;
+			SpawnTimer = 0.0f;
 		}
 	}
 }
@@ -317,6 +342,36 @@ void ADieselandEnemyBot::RangedAttack_Implementation()
 			ABaseWalkerProjectile* const Projectile = World->SpawnActor<ABaseWalkerProjectile>(ABaseWalkerProjectile::StaticClass(), SkeletalMesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 			if (Projectile)
 			{
+				if (IsQueen)
+				{
+					FRotator ProjectileRotation2 = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 15, ProjectileRotation.Roll);
+					FRotator ProjectileRotation3 = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw - 15, ProjectileRotation.Roll);
+					ABaseWalkerProjectile* const Projectile2 = World->SpawnActor<ABaseWalkerProjectile>(ABaseWalkerProjectile::StaticClass(), SkeletalMesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation2, SpawnParams);
+					ABaseWalkerProjectile* const Projectile3 = World->SpawnActor<ABaseWalkerProjectile>(ABaseWalkerProjectile::StaticClass(), SkeletalMesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation3, SpawnParams);
+					Projectile->Mesh->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
+					Projectile->ProjectileMovement->InitialSpeed = 2500;
+					Projectile->Piercing = false;
+
+					Projectile2->Mesh->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
+					Projectile2->ProjectileMovement->InitialSpeed = 2500;
+					Projectile2->Piercing = false;
+					Projectile2->ProjectileDamage = BasicAttackDamage;
+					Projectile2->ServerActivateProjectile();
+					Projectile2->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation2.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+
+					Projectile3->Mesh->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
+					Projectile3->ProjectileMovement->InitialSpeed = 2500;
+					Projectile3->Piercing = false;
+					Projectile3->ProjectileDamage = BasicAttackDamage;
+					Projectile3->ServerActivateProjectile();
+					Projectile3->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation3.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+				}
+				else if (IsQueen == false)
+				{
+					Projectile->Mesh->SetWorldScale3D(FVector(0.3f,0.3f, 0.3f));
+					Projectile->ProjectileMovement->InitialSpeed = 1600;
+					Projectile->Piercing = false;
+				}
 				Projectile->ProjectileDamage = BasicAttackDamage;
 				Projectile->ServerActivateProjectile();
 

@@ -73,7 +73,15 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 
 	//set for the AIs attack type
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		bool IsQueen;
+
+	//set for the AIs attack type
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		bool IsWalker;
+
+	//set for the AIs attack type
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		bool FirstRun;
 
 	// Damage amount for basic attacks
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
@@ -90,6 +98,9 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	// Health Regeneration
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		float HealthRegeneration;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float SpawnTimer;
 
 	// Timer for health regen.
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)

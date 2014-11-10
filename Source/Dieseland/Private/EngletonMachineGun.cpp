@@ -14,15 +14,18 @@
 AEngletonMachineGun::AEngletonMachineGun(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	InitialLifeSpan = 1.0f;
+	InitialLifeSpan = .6f;
 	//the penetration round is meant to be large and move very quickly
-	ProjectileMovement->InitialSpeed = 700.0f;
+	ProjectileMovement->InitialSpeed = 1400.0f;
 	ProjCollision->SetCapsuleHalfHeight(150.0f);
 	ProjCollision->SetCapsuleRadius(150.0f);
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
 	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	Particle->Template = ParticleSystemAsset.Object;
+	Particle->AttachTo(Mesh);
+	Particle->SetRelativeRotation(this->GetActorRotation());
+	
 
 	//temp meshscale
 	FVector MeshScale;
@@ -50,6 +53,7 @@ void AEngletonMachineGun::ReceiveActorBeginOverlap(AActor* OtherActor)
 			if (OtherActor->ActorHasTag(TEXT("Player")) || (OtherActor->ActorHasTag(TEXT("Enemy"))))
 			{
 				ABaseProjectileOnHitEffect* const OnHitEffect = World->SpawnActor<ABaseProjectileOnHitEffect>(ABaseProjectileOnHitEffect::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
+				Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
 				OnHitEffect->ServerActivateProjectile();
 				this->Destroy();
 			}

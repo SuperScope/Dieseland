@@ -93,9 +93,9 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	HealthBar->AddRelativeLocation(FVector(0.0f, 0.0f, 175.0f));
 	HealthBarMatStatic = HealthBarMatRef.Object;
 	HealthBarBackMatStatic = HealthBarBackMatRef.Object;
-	/*HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
-	HealthBar->AddElement(HealthBarMaterial, NULL, false, 10.0f, 75.0f, NULL);
-	HealthBar->AddElement(HealthBarBackMatRef.Object, NULL, false, 10.0f, 75.0f, NULL);*/
+	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
+	HealthBar->AddElement(HealthBarMaterial, nullptr, false, 10.0f, 75.0f, nullptr);
+	HealthBar->AddElement(HealthBarBackMatRef.Object, nullptr, false, 10.0f, 75.0f, nullptr);
 
 	// Tag this character as a player
 	Tags.Add(FName("Player"));
@@ -115,7 +115,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	RangedRange = 1200.0f;
 
 	//set default laugh, comment and taunt timers
-	LaughCooldown= 5.0f;
+	LaughCooldown = 5.0f;
 	CommentCooldown = 5.0f;
 	TauntCooldown = 5.0f;
 
@@ -204,8 +204,8 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 void ADieselandCharacter::ReceiveBeginPlay()
 {
 	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatStatic, this);
-	HealthBar->AddElement(HealthBarMaterial, NULL, false, 10.0f, 75.0f, NULL);
-	HealthBar->AddElement(HealthBarBackMatStatic, NULL, false, 10.0f, 75.0f, NULL);
+	HealthBar->AddElement(HealthBarMaterial, nullptr, false, 10.0f, 75.0f, nullptr);
+	HealthBar->AddElement(HealthBarBackMatStatic, nullptr, false, 10.0f, 75.0f, nullptr);
 	if (PlayerState != nullptr)
 	{
 		UpdateTeamColor();
@@ -218,15 +218,12 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 		return;
 	}
 	
-	if (HealthBarMaterial != nullptr)
+	HealthPercentage = ((float)Health / (float)MaxHealth);
+	Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
+	if (PlayerState && GetTeamNumber() != CharacterTeam)
 	{
-		HealthPercentage = ((float)Health / (float)MaxHealth);
-		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
-		if (PlayerState && Cast<ADieselandPlayerState>(PlayerState)->TeamNumber != CharacterTeam)
-		{
-			CharacterTeam = Cast<ADieselandPlayerState>(PlayerState)->TeamNumber;
-			UpdateTeamColor();
-		}
+		CharacterTeam = GetTeamNumber();
+		UpdateTeamColor();
 	}
 
 	Super::Tick(DeltaSeconds);
@@ -253,37 +250,39 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 
 void ADieselandCharacter::UpdateTeamColor()
 {
-	switch (Cast<ADieselandPlayerState>(PlayerState)->TeamNumber)
-	{
-	case 0:
-		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.000905f, 1.0f, 0.0f));
-		break;
-	case 1:
-		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.035f, 0.005232f, 0.004898f));
-		break;
-	case 2:
-		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.0f, 0.035871f, 1.0f));
-		break;
-	case 3:
-		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 1.0f, 1.0f));
-		break;
-	case 4:
-		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.0f, 0.828977f, 1.0f));
-		break;
-	case 5:
-		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.935999f, 0.0f));
-		break;
-	case 6:
-		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.747108f, 0.0f, 1.0f));
-		break;
-	case 7:
-		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.305141f, 0.0f));
-		break;
-	case 8:
-		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.131611f, 0.925403f));
-		break;
-	default:
-		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.000905f, 1.0f, 0.0f));
+	if (HealthBar->Elements[0].Material){
+		switch (Cast<ADieselandPlayerState>(PlayerState)->TeamNumber)
+		{
+		case 0:
+			Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.000905f, 1.0f, 0.0f));
+			break;
+		case 1:
+			Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.035f, 0.005232f, 0.004898f));
+			break;
+		case 2:
+			Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.0f, 0.035871f, 1.0f));
+			break;
+		case 3:
+			Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 1.0f, 1.0f));
+			break;
+		case 4:
+			Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.0f, 0.828977f, 1.0f));
+			break;
+		case 5:
+			Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.935999f, 0.0f));
+			break;
+		case 6:
+			Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.747108f, 0.0f, 1.0f));
+			break;
+		case 7:
+			Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.305141f, 0.0f));
+			break;
+		case 8:
+			Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.131611f, 0.925403f));
+			break;
+		default:
+			Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.000905f, 1.0f, 0.0f));
+		}
 	}
 }
 
@@ -362,14 +361,14 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Causer)
 		if (Role < ROLE_Authority)
 		{
 			ServerEditHealth(Amt, Causer);
-		}
+	}
 
 		/*else if (Target->ActorHasTag(FName(TEXT("Enemy"))))
-		{
+	{
 		ServerDamageEnemy(Amt, Target);
-		}
-		else if (Target->ActorHasTag(FName(TEXT("ScrapBox"))))
-		{
+	}
+	else if (Target->ActorHasTag(FName(TEXT("ScrapBox"))))
+	{
 		Cast<AScrapBox>(Target)->DestroyCrate(this);
 		}*/
 	}
@@ -393,8 +392,8 @@ void ADieselandCharacter::OnHasBeenKilled_Implementation(AActor* Causer)
 		{
 			ADieselandPlayerState* TempPlayerState = Cast<ADieselandPlayerState>((Cast<ADieselandCharacter>(Causer)->PlayerState));
 			TempPlayerState->SetKillNum(TempPlayerState->Kills += 1);
-		}
 	}
+}
 	Cast<ADieselandPlayerController>(Controller)->RespawnPawn();
 }
 
@@ -405,21 +404,21 @@ void ADieselandCharacter::EditSpeedDamage(int32 Speed, int32 Damage, AActor* Tar
 	this->IsPoisoned = true;
 	this->CharacterMovement->MaxWalkSpeed = this->CharacterMovement->MaxWalkSpeed * (Speed / 100.0f);
 	this->BasicAttackDamage = this->BasicAttackDamage * (Damage / 100.0f);
-	if (Role < ROLE_Authority)
-	{
+		if (Role < ROLE_Authority)
+		{
 		ServerEditSpeedDamage(Speed, Damage, Target);
+		}
 	}
-}
 
 void ADieselandCharacter::ServerEditSpeedDamage_Implementation(int32 Speed, int32 Damage, AActor* Target)
-{
+	{
 	// Edit the health of the specific pawn
 	EditSpeedDamage(Speed, Damage, Target);
 
-}
+	}
 
 bool ADieselandCharacter::ServerEditSpeedDamage_Validate(int32 Speed, int32 Damage, AActor* Target)
-{
+	{
 	return true;
 }
 
@@ -452,8 +451,8 @@ void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Ta
 void ADieselandCharacter::ServerChangeSpeedDamageEnemy_Implementation(int32 Speed, int32 Damage, AActor* Target)
 {
 	Cast<ADieselandEnemyBot>(Target)->IsPoisoned = true;
-	Cast<ADieselandEnemyBot>(Target)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandEnemyBot>(Target)->CharacterMovement->MaxWalkSpeed * (Speed/100.0f);
-	Cast<ADieselandEnemyBot>(Target)->BasicAttackDamage = Cast<ADieselandEnemyBot>(Target)->BasicAttackDamage * (Damage/100.0f);
+	Cast<ADieselandEnemyBot>(Target)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandEnemyBot>(Target)->CharacterMovement->MaxWalkSpeed * (Speed / 100.0f);
+	Cast<ADieselandEnemyBot>(Target)->BasicAttackDamage = Cast<ADieselandEnemyBot>(Target)->BasicAttackDamage * (Damage / 100.0f);
 }
 
 bool ADieselandCharacter::ServerChangeSpeedDamageEnemy_Validate(int32 Speed, int32 Damage, AActor* Target)
@@ -666,7 +665,7 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, MoveSpeed);
 
 	DOREPLIFETIME(ADieselandCharacter, ParticleSystem);
-	
+
 	DOREPLIFETIME(ADieselandCharacter, LatestDamageCauser);
 
 	DOREPLIFETIME(ADieselandCharacter, LingerTimer);

@@ -17,10 +17,14 @@ class DIESELAND_API ADieselandWalkerQueen : public ADieselandEnemyBot
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float WalkerSummonCooldown;
 
+
+
 	// The timer for skill 1
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = Combat)
 	float WalkerSummonTimer;
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void SummonWalkerBodyGuard();
+
+	UClass* Walker;
 };
