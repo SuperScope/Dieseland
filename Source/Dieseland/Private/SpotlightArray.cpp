@@ -7,6 +7,7 @@
 ASpotlightArray::ASpotlightArray(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
+	this->InitialLifeSpan = 15.0f;
 	SetRemoteRoleForBackwardsCompat(ENetRole::ROLE_SimulatedProxy);
 }
 

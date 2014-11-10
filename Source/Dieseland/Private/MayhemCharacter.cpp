@@ -58,7 +58,7 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> MayhemSkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_MayhemSkullCrusher_WIP.Unreal_Particle_MayhemSkullCrusher_WIP'"));
 	SkillOneParticle = MayhemSkillOneParticleAsset.Object;
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> RageParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_MayhemSkullCrusher_WIP.Unreal_Particle_MayhemSkullCrusher_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> RageParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_MayhemRage_WIP.Unreal_Particle_MayhemRage_WIP'"));
 	SkillTwoParticle = RageParticleAsset.Object;
 
 	IronArmorSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Iron Armor Sound"));
@@ -155,7 +155,10 @@ void AMayhemCharacter::MeleeAttack()
 
 		if (Role == ROLE_Authority && CurActor != this)
 		{
-			EditHealth(-1 * BasicAttackDamage, CurActor);
+			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+			{
+				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+			}
 		}
 	}
 	PunchSound->Play();
@@ -179,15 +182,15 @@ void AMayhemCharacter::SkillOne()
 
 		if (Role == ROLE_Authority && CurActor != this)
 		{
-			EditHealth(-1 * BasicAttackDamage, CurActor);
-			if (CurActor->ActorHasTag(FName(TEXT("Player"))))
+			//EditHealth(-1 * BasicAttackDamage, CurActor);
+			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
 			{
 				ADieselandCharacter* PlayerActor = Cast<ADieselandCharacter>(CurActor);
 
 				PlayerActor->StatusEffects.Add(FString("Stunned"));
 				PlayerActor->StunRemaining = StunLength;
 
-				EditHealth(-1 * BasicAttackDamage, CurActor);
+				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 			}
 			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
 			{
@@ -212,7 +215,7 @@ void AMayhemCharacter::SkillTwo()
 	RageSound->Play();
 	RageVoiceOver->Play();
 	RageMoveSpeedBuff = (CharacterMovement->MaxWalkSpeed * .5f) + (Strength * .06f);
-	RageAttkSpeedBuff = (BasicAttackCooldown * .2f) + (Strength * .06f);
+	RageAttkSpeedBuff = (BasicAttackCooldown * .1f) + (Strength * .03f);
 
 	BasicAttackCooldown -= RageAttkSpeedBuff;
 	CharacterMovement->MaxWalkSpeed += RageMoveSpeedBuff;

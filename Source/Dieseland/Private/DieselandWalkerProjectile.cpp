@@ -4,6 +4,7 @@
 #include "DieselandWalkerProjectile.h"
 #include "DieselandEnemyBot.h"
 #include "DieselandEnemyAI.h"
+#include "DieselandCharacter.h"
 
 
 ADieselandWalkerProjectile::ADieselandWalkerProjectile(const class FPostConstructInitializeProperties& PCIP)
@@ -38,16 +39,16 @@ void ADieselandWalkerProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 
 	if (Role == ROLE_Authority && Cast<ADieselandEnemyAI>(GetOwner())->GetPawn() != OtherActor)
 	{
-		if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy")) || OtherActor->ActorHasTag(TEXT("ScrapBox")))
+		if (OtherActor->ActorHasTag(TEXT("Player")))
 		{
-			Cast<ADieselandEnemyBot>(Cast<ADieselandEnemyAI>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
+			Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
 			if (!Piercing)
 			{
 				this->Destroy();
 			}
 
-			}
-		else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
+		}
+		else if (!OtherActor->ActorHasTag(TEXT("Projectile")) && !OtherActor->ActorHasTag(TEXT("Enemy")))
 		{
 				this->Destroy();
 		}

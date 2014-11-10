@@ -5,6 +5,7 @@
 #include "DieselandCharacter.h"
 #include "DieselandEnemyBot.h"
 #include "UnrealNetwork.h"
+#include "ScrapBox.h"
 #include "DieselandPlayerController.h"
 #include "StrykerPoisionProjectile.h"
 #include "ParticleDefinitions.h"
@@ -65,8 +66,13 @@ AStrykerCharacter::AStrykerCharacter(const class FPostConstructInitializePropert
 	AActor* AssassinationTarget = NULL;
 
 	//particle effects
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> AssassinateParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_StrykerAssassinate.Unreal_Particle_StrykerAssassinate'"));
+	SkillOneParticle = AssassinateParticleAsset.Object;
+	
+
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> BlinkParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_StrykerBlinkCloak_WIP.Unreal_Particle_StrykerBlinkCloak_WIP'"));
-	this->SkillOneParticle = BlinkParticleAsset.Object;
+	this->SkillThreeParticle = BlinkParticleAsset.Object;
+
 
 
 	bReplicates = true;
@@ -97,6 +103,10 @@ AStrykerCharacter::AStrykerCharacter(const class FPostConstructInitializePropert
 	AssassinationSound->AttachParent = RootComponent;
 	AssassinationSound->bAutoActivate = false;
 
+
+	SlashHitSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Slash On Hit"));
+	SlashHitSound->AttachParent = RootComponent;
+	SlashHitSound->bAutoActivate = false;
 
 	//here I set melee to true so that Stryker only uses melee attacks
 	IsMelee = true;
@@ -137,6 +147,7 @@ void AStrykerCharacter::UpdateDurationTimers_Implementation(float DeltaSeconds)
 		AssasinationDuration2 = 0;
 		IsAssassinating = false;
 		AssasinationHitCounter = 0;
+		AssassinationSound->Stop();
 		AActor* AssassinationTarget = NULL;
 		this->StatusEffects.Remove(FString("Stunned"));
 	
@@ -156,6 +167,10 @@ bool AStrykerCharacter::UpdateDurationTimers_Validate(float DeltaSeconds)
 
 void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 {
+	if (this->Health <= 0){
+		AssasinationHitCounter = 6;
+		return;
+	}
 	AssassinationCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 	AssassinationCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
@@ -173,7 +188,7 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 	for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)
 	{
 		CurActor = ActorsInMeleeRange[b];
-		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
+		if (!CurActor && ((CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy")))))) continue;
 		if (!CurActor->IsValidLowLevel()) continue;
 
 		if (Role == ROLE_Authority && CurActor != this){
@@ -181,7 +196,7 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 			{
 				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message! %"), CurActor);
 				this->CharacterMovement->Velocity += FVector(0, 0, 0);
-				if ((CurActor->ActorHasTag(FName(TEXT("Player")))))
+				if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
 				{
 					//this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 					//this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
@@ -212,6 +227,7 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 			}
 		}
 	}
+
 	//used for figuring out the distanec the player must move to strike with assassinate
 	if (AssassinationTarget != NULL){
 		//here we test to see if the target is dead, if so we stop attacking
@@ -222,16 +238,19 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 				return;
 			}
 		}
-		else if (AssassinationTarget->ActorHasTag(FName(TEXT("Player")))){
+		if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+		{
 			ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(AssassinationTarget);
 			if (DieselandPawn->Health <= 0){
 				AssasinationHitCounter = 6;
 				return;
 			}
 		}
+	
 		//here we move around the player
-		if (AssasinationDuration2 > 0.25f && AssasinationDuration > 0.3f)
+		if (AssasinationDuration2 > 0.25f && AssasinationDuration < 0.3f)
 		{
+			ServerActivateParticle(SkillOneParticle);
 			FVector VectorPlayer = this->GetActorLocation();
 			FVector VectorTarget = AssassinationTarget->GetActorLocation();
 			float MoveCharacterX = VectorPlayer.X - VectorTarget.X;
@@ -263,7 +282,7 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 		if (AssasinationDuration > 0.5f){
 		//	FRotator NewRot = (this->GetActorLocation() - AssassinationTarget->GetActorLocation()).Rotation();
 			//this->SetActorRotation(NewRot);
-	
+			ServerActivateParticle(SkillOneParticle);
 			FVector VectorPlayer = this->GetActorLocation();
 			FVector VectorTarget = AssassinationTarget->GetActorLocation();
 			float MoveCharacterX = VectorPlayer.X - VectorTarget.X;
@@ -281,9 +300,21 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 				MoveCharacterY = -1;
 			}
 
-			EditHealth(-1 * (BasicAttackDamage + Dexterity), AssassinationTarget);
+			if (AssassinationTarget->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(AssassinationTarget)->GetTeamNumber() != this->GetTeamNumber())
+			{
+				Cast<ADieselandCharacter>(AssassinationTarget)->EditHealth(-1 * BasicAttackDamage, this);
+			}
+			else if (AssassinationTarget->ActorHasTag(FName(TEXT("Enemy"))))
+			{
+				Cast<ADieselandEnemyBot>(AssassinationTarget)->EditHealth(-1 * BasicAttackDamage, this);
+			}
+			
 			AssasinationDuration = 0;
 			AssasinationDuration2 = 0;
+			if (AssasinationHitCounter == 0)
+			{
+				AssassinationSound->Play();
+			}
 			AssasinationHitCounter++;
 			//here we continually increase the distance in which stryker moves because stryker may have to move further each swing to hit the player
 			if (AssasinationHitCounter == 1)
@@ -321,6 +352,9 @@ bool AStrykerCharacter::SearchForAssassinationTarget_Validate()
 // Stryker Assasinate
 void AStrykerCharacter::SkillOne()
 {
+	ServerActivateParticle(SkillOneParticle);
+
+
 	//here I ensure the player can't cast this ability when in air as it will cause a bug...
 	if (this->CharacterMovement->Velocity.Z > 0 || this->CharacterMovement->Velocity.Z < 0){
 		SkillOneCooldown = 0;
@@ -345,6 +379,7 @@ void AStrykerCharacter::SkillOne()
 //Stryker Poison
 void AStrykerCharacter::SkillTwo()
 {
+	PoisonSound->Play();
 	UWorld* const World = GetWorld();
 	if (World)
 	{
@@ -375,6 +410,7 @@ void AStrykerCharacter::SkillTwo()
 //Stryker Blink
 void AStrykerCharacter::SkillThree()
 {
+	BlinkSound->Play();
 	//here I ensure the player can't cast this ability when in air as it will cause a bug...
 	if (this->CharacterMovement->Velocity.Z > 0 || this->CharacterMovement->Velocity.Z < 0){
 		SkillThreeCooldown = 0;
@@ -382,7 +418,7 @@ void AStrykerCharacter::SkillThree()
 	}
 	UWorld* const World = GetWorld();
 	if (World){
-		ServerActivateParticle(SkillOneParticle);
+		ServerActivateParticle(SkillThreeParticle);
 		FRotator CharacterRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
 		CharacterRotation = FRotator(CharacterRotation.Pitch, CharacterRotation.Yaw + 90.0f, CharacterRotation.Roll);
 		this->SetActorRotation(CharacterRotation);
@@ -404,16 +440,30 @@ void AStrykerCharacter::MeleeAttack()
 	MeleeCollision->SetCollisionProfileName(TEXT("OverlapAll"));
 	MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
 	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
+	SlashSound->Play();
 	AActor* CurActor = NULL;
 	for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)
 	{
 		CurActor = ActorsInMeleeRange[b];
 		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))) || CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))) continue;
 		if (!CurActor->IsValidLowLevel()) continue;
-
+		SlashSound->Stop();
 		if (Role == ROLE_Authority && CurActor != this)
 		{
+			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+			{
+				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+			}
+			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+			{
+				Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+			}
+			else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
+			{
+				Cast<AScrapBox>(CurActor)->DestroyCrate(this);
+			}
+			
+			SlashHitSound->Play();
 			EditHealth(-1 * BasicAttackDamage, CurActor);
 		}
 	}

@@ -68,6 +68,9 @@ class DIESELAND_API AStrykerCharacter : public ADieselandCharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
 		TSubobjectPtr <UAudioComponent> AssassinationSound;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> SlashHitSound;
+
 
 
 

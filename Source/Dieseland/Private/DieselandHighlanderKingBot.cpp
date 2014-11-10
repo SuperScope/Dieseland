@@ -15,6 +15,8 @@
 ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
+	AttackZone = 1400.0f;
+	ProjectileZone = 800.0f;
 	CannonRange = 800;
 	CannonAttackDamage = 40;
 	BaseAttackDamage = 60;
