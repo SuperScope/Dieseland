@@ -268,24 +268,24 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
 				//EditHealth(Amt, Causer);
 			}
 		}
-	}
-	if (this->Health <= 0 && Causer->ActorHasTag(FName(TEXT("Player"))))
-	{
-		FVector TempEnemyLoc = FVector(Causer->GetActorLocation().X, Causer->GetActorLocation().Y, Causer->GetActorLocation().Z);
-
-		//Spawn Scrap pieces here
-		UWorld* const World = GetWorld();
-		if (World && Causer != nullptr && Causer->ActorHasTag(FName(TEXT("Player"))))
+		if (this->Health <= 0 && Causer->ActorHasTag(FName(TEXT("Player"))))
 		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this;
-			SpawnParams.Instigator = Instigator;
-			for (int32 x = 0; x < 5; x++)
+			FVector TempEnemyLoc = FVector(Causer->GetActorLocation().X, Causer->GetActorLocation().Y, Causer->GetActorLocation().Z);
+
+			//Spawn Scrap pieces here
+			UWorld* const World = GetWorld();
+			if (World && Causer != nullptr && Causer->ActorHasTag(FName(TEXT("Player"))))
 			{
-				UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(this->GetActorLocation().X, this->GetActorLocation().Y, this->GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f));
-				this->Destroy();
-				//Alternatively used to spawn c++ class
-				//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = this;
+				SpawnParams.Instigator = Instigator;
+				for (int32 x = 0; x < 5; x++)
+				{
+					UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(this->GetActorLocation().X, this->GetActorLocation().Y, this->GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f));
+					this->Destroy();
+					//Alternatively used to spawn c++ class
+					//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+				}
 			}
 		}
 	}

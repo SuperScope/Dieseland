@@ -163,9 +163,16 @@ void AEngletonCharacter::SkillOne()
 
 		if (Role == ROLE_Authority && CurActor != this)
 		{	
-			//because this damage is applied every half and a second and not every second, the damage is halved. 
-			//I apply the damage every half a second so that damage is more realisticly applied from the ability
-			EditHealth(-1 * (30 + (Intelligence * 1.5f)), CurActor);
+			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+			{
+				//because this damage is applied every half and a second and not every second, the damage is halved. 
+				//I apply the damage every half a second so that damage is more realisticly applied from the ability
+				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * (30 + (Intelligence * 1.5f)), this);
+			}
+			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+			{
+				Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * (30 + (Intelligence * 1.5f)), this);
+			}
 		}
 	}
 }
