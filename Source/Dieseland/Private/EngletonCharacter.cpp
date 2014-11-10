@@ -163,9 +163,16 @@ void AEngletonCharacter::SkillOne()
 
 		if (Role == ROLE_Authority && CurActor != this)
 		{	
-			//because this damage is applied every half and a second and not every second, the damage is halved. 
-			//I apply the damage every half a second so that damage is more realisticly applied from the ability
-			EditHealth(-1 * (30 + (Intelligence * 1.5f)), CurActor);
+			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+			{
+				//because this damage is applied every half and a second and not every second, the damage is halved. 
+				//I apply the damage every half a second so that damage is more realisticly applied from the ability
+				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * (30 + (Intelligence * 1.5f)), this);
+			}
+			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+			{
+				Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * (30 + (Intelligence * 1.5f)), this);
+			}
 		}
 	}
 }
@@ -241,8 +248,8 @@ void AEngletonCharacter::SkillThree()
 			if (MoveCharacterY <= 0){
 				MoveCharacterY = -1;
 			}
-			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 600 + (Intelligence * 1.5f), -MoveCharacterY * 600 + (Intelligence * 1.5f), 0);
-			DieselandPawn->CharacterMovement->JumpZVelocity = 400 + (Intelligence * 1);
+			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 6000 + (Intelligence * 20.0f), -MoveCharacterY * 6000 + (Intelligence * 20.0f), 0);
+			DieselandPawn->CharacterMovement->JumpZVelocity = 4000 + (Intelligence * 10);
 			DieselandPawn->CharacterMovement->DoJump(false);
 		}
 		//here we do it for enemies
@@ -268,7 +275,7 @@ void AEngletonCharacter::SkillThree()
 			if (MoveCharacterY <= 0){
 				MoveCharacterY = -1;
 			}
-			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 500, -MoveCharacterY * 500, 0);
+			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 600, -MoveCharacterY * 600, 0);
 			DieselandPawn->CharacterMovement->JumpZVelocity = 350 + (Intelligence * 3);
 			DieselandPawn->CharacterMovement->DoJump(false);
 		}
@@ -298,7 +305,7 @@ void AEngletonCharacter::RangedAttack()
 		AEngletonMachineGunSpark* const ProjectileLaunch2 = World->SpawnActor<AEngletonMachineGunSpark>(AEngletonMachineGunSpark::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), ProjectileRotation, SpawnParams);
 		if (Projectile && Projectile2)
 		{
-			//particle base is set into play, just need to adjust it's spawn position to the same point as his hands
+			//particle base is set into play correctly
 			ServerActivateParticle(MachineGunFireParticle);
 			ProjectileLaunch->ServerActivateProjectile();
 			ProjectileLaunch2->ServerActivateProjectile();

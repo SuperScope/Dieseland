@@ -19,6 +19,9 @@ class DIESELAND_API ADieselandWalkerQueenAI : public ADieselandEnemyAI
 	//here we update our  cooldown timers
 	void UpdateCooldownTimers(float DeltaSeconds);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float AttackTimer;
+
 	// Begin tick timer
 	virtual void Tick(float DeltaTime) override;
 	
