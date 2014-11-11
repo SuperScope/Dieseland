@@ -114,11 +114,11 @@ void ABaseProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 			}
 			else if (OtherActor->ActorHasTag(TEXT("Enemy")))
 			{
-				Cast<ADieselandEnemyBot>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
+				Cast<ADieselandEnemyBot>(OtherActor)->EditHealth(-1 * ProjectileDamage, Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn()));
 			}
 			else if (OtherActor->ActorHasTag(TEXT("ScrapBox")))
 			{
-				Cast<AScrapBox>(OtherActor)->DestroyCrate(this);
+				Cast<AScrapBox>(OtherActor)->DestroyCrate(Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn()));
 			}
 			else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
 			{

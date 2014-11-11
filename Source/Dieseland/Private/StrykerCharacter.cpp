@@ -473,7 +473,6 @@ void AStrykerCharacter::MeleeAttack()
 			}
 			
 			SlashHitSound->Play();
-			EditHealth(-1 * BasicAttackDamage, CurActor);
 		}
 	}
 }
