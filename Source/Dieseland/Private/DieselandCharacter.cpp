@@ -294,7 +294,6 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	// Every frame set the health display
 	HealthLabel->SetText(FString::FromInt(Health));
 	HealthLabel->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
-	MiniMapIcon->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
 
 	if (HealthBarMaterial){
 		HealthPercentage = ((float)Health / (float)MaxHealth);
