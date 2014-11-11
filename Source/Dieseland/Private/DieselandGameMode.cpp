@@ -226,14 +226,7 @@ APawn* ADieselandGameMode::SpawnDefaultPawnFor(AController* NewPlayer, AActor* S
 	SpawnInfo.Instigator = Instigator;
 	APawn* ResultPawn;
 
-	if (PlayersSpawned % 2 == 0)
-	{
-		ResultPawn = GetWorld()->SpawnActor<APawn>(StrykerClass, StartLocation, StartRotation, SpawnInfo);
-	}
-	else
-	{
-		ResultPawn = GetWorld()->SpawnActor<APawn>(EngletonClass, StartLocation, StartRotation, SpawnInfo);
-	}
+	ResultPawn = GetWorld()->SpawnActor<APawn>(EngletonClass, StartLocation, StartRotation, SpawnInfo);
 
 	if (ResultPawn != NULL)
 	{

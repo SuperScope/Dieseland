@@ -103,6 +103,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarMatRef(TEXT("Material'/Game/UserInterfaceAssets/HUD/Materials/M_HUD_Health_Bar.M_HUD_Health_Bar'"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarBackMatRef(TEXT("Material'/Game/MaterialsDLC/Material_BasicDarkGrey.Material_BasicDarkGrey'"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> AimBarMatRef(TEXT("Material'/Game/UserInterfaceAssets/HUD/Materials/M_HUD_Health_Bar.M_HUD_Health_Bar'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> MiniMapMatRef(TEXT("Material'/Game/Materials/MiniMapIcon.MiniMapIcon'"));
 
 	HealthBar = PCIP.CreateDefaultSubobject<UMaterialBillboardComponent>(this, TEXT("HealthBar"));
 	HealthBar->AttachParent = RootComponent;
@@ -122,11 +123,22 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	AimBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AimBarMatStatic = AimBarMatRef.Object;
 	//for the aim sphere
+
+
 	AimSphere = PCIP.CreateDefaultSubobject<UStaticMeshComponent >(this, TEXT("AimSphere"));
 	AimSphere->AttachParent = Mesh;
 	AimSphere->SetStaticMesh(SphereMesh.Object);
 	AimSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AimSphere->SetHiddenInGame(true);
+
+
+	//used for the minimap
+	MiniMapIcon = PCIP.CreateDefaultSubobject<UStaticMeshComponent >(this, TEXT("MiniMap Icon"));
+	MiniMapIcon->AttachParent = TopDownCameraComponent;
+	MiniMapIcon->SetStaticMesh(CubeMesh.Object);
+	MiniMapIcon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	IconMatStatic = MiniMapMatRef.Object;
+	MiniMapIcon->SetIsReplicated(false);
 	
 
 	// Tag this character as a player
@@ -238,10 +250,20 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 void ADieselandCharacter::ReceiveBeginPlay()
 {
 	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
+
 	//AimBar->SetWorldLocation(FVector(0, 0, -50));
 	AimBar->SetWorldScale3D(FVector(4.0f, 1.0, 0.01));
 	AimBar->CastShadow = false;
 	AimBar->Materials.Add(AimBarMaterial);
+
+	MiniMapMaterial = UMaterialInstanceDynamic::Create(IconMatStatic, this);
+	MiniMapIcon->SetWorldScale3D(FVector(7.0f, 7.0, 0.01f));
+
+	MiniMapIcon->AddRelativeLocation(FVector(0.0f, 0.0f,1500.0f));
+	MiniMapIcon->CastShadow = false;
+
+
+
 	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.0, 0.75f, 0.0f));
 	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetScalarParameterValue(FName(TEXT("Health percentage")), 1.0f);
 	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetScalarParameterValue(FName(TEXT("Opacity")), 0.2f);
@@ -267,6 +289,7 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	if (this == nullptr){
 		return;
 	}
+
 
 	// Every frame set the health display
 	HealthLabel->SetText(FString::FromInt(Health));

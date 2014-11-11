@@ -25,8 +25,8 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	// Set the starting values
 	MaxHealth = 175;
 	Health = 175;
-	BaseAttackDamage = 25;
-	BasicAttackDamage = 25;
+	BaseAttackDamage = 35;
+	BasicAttackDamage = 35;
 	HealthRegeneration = 2;
 
 	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarTextRef(TEXT("Material'/Game/MaterialsDLC/M_HealthText.M_HealthText'"));
