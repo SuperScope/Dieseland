@@ -528,7 +528,9 @@ void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Ta
 			SpawnParams.Instigator = Instigator;
 			for (int32 x = 0; x < 5; x++)
 			{
-				UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(TempEnemyLoc.X, TempEnemyLoc.Y, TempEnemyLoc.Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f));
+                RandomX = FMath::RandRange(-30, 30);
+                RandomY = FMath::RandRange(-30, 30);
+				UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(TempEnemyLoc.X + RandomX, TempEnemyLoc.Y + RandomY, TempEnemyLoc.Z), FRotator(0.0f, 0.0f, 0.0f));
 
 				//Alternatively used to spawn c++ class
 				//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
@@ -761,6 +763,9 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, LatestDamageCauser);
 
 	DOREPLIFETIME(ADieselandCharacter, LingerTimer);
+    
+    DOREPLIFETIME(ADieselandCharacter, RandomX);
+    DOREPLIFETIME(ADieselandCharacter, RandomY);
 
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackTimer);
 	DOREPLIFETIME(ADieselandCharacter, BasicAttackReloadTimer);

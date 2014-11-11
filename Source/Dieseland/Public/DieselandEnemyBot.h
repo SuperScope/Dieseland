@@ -60,6 +60,12 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
 	float StunLength;
+    
+    UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+    int32 RandomX;
+    
+    UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+    int32 RandomY;
 
 
 	//Damage done to actors from fire traps upon exitting them
