@@ -9,10 +9,14 @@ AEngletonMachineGunSpark::AEngletonMachineGunSpark(const class FPostConstructIni
 {
 	InitialLifeSpan = 0.2f;
 	Mesh->SetWorldScale3D(FVector(1.5f, 1.5f, 1.5f));
+	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Particle->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonMachineGun_WIP.Unreal_Particle_EngletonMachineGun_WIP'"));
 	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	Particle->Template = ParticleSystemAsset.Object;
+		
 }
 
 

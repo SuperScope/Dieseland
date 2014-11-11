@@ -163,7 +163,14 @@ void ADieselandEnemyAI::UpdateCooldownTimers(float DeltaSeconds)
 				DieselandPawn->OnProjectileZoneEnter();
 				ServerMeleeAttack();
 				SearchForSpawnLocation();
-				DieselandPawn->BasicAttackTimer = FMath::FRandRange(0.8f, 1.2f);
+				if (DieselandPawn->IsWalker)
+				{
+					DieselandPawn->BasicAttackTimer = FMath::FRandRange(1.4f, 2.0f);
+				}
+				if (!DieselandPawn->IsWalker)
+				{
+					DieselandPawn->BasicAttackTimer = FMath::FRandRange(2.0f, 2.5f);
+				}
 			}
 		}
 

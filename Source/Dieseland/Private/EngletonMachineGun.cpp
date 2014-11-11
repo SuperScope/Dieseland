@@ -42,27 +42,29 @@ void AEngletonMachineGun::ReceiveActorBeginOverlap(AActor* OtherActor)
 	UWorld* const World = GetWorld();
 	if (World)
 	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = this;
-		SpawnParams.Instigator = Instigator;
+		if (OtherActor->ActorHasTag(TEXT("Player")) || OtherActor->ActorHasTag(TEXT("Enemy"))){
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = Instigator;
 
-		if (Role == ROLE_Authority /*&& Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor*/)
-		{
-			if (OtherActor->ActorHasTag(TEXT("Player")) &&
-				Cast<ADieselandPlayerState>(Cast<ADieselandCharacter>(OtherActor))->GetTeamNum() !=
-				Cast<ADieselandPlayerState>(Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())))->GetTeamNum())
+			if (Role == ROLE_Authority /*&& Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor*/)
 			{
-				ABaseProjectileOnHitEffect* const OnHitEffect = World->SpawnActor<ABaseProjectileOnHitEffect>(ABaseProjectileOnHitEffect::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
-				Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
-				OnHitEffect->ServerActivateProjectile();
-				this->Destroy();
-			}
-			if (OtherActor->ActorHasTag(TEXT("Enemy")))
-			{
-				ABaseProjectileOnHitEffect* const OnHitEffect = World->SpawnActor<ABaseProjectileOnHitEffect>(ABaseProjectileOnHitEffect::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
-				Cast<ADieselandEnemyBot>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
-				OnHitEffect->ServerActivateProjectile();
-				this->Destroy();
+				if (OtherActor->ActorHasTag(TEXT("Player")) &&
+					Cast<ADieselandPlayerState>(Cast<ADieselandCharacter>(OtherActor))->GetTeamNum() !=
+					Cast<ADieselandPlayerState>(Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())))->GetTeamNum())
+				{
+				//	ABaseProjectileOnHitEffect* const OnHitEffect = World->SpawnActor<ABaseProjectileOnHitEffect>(ABaseProjectileOnHitEffect::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
+					Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
+			//		OnHitEffect->ServerActivateProjectile();
+					this->Destroy();
+				}
+				if (OtherActor->ActorHasTag(TEXT("Enemy")))
+				{
+				//	ABaseProjectileOnHitEffect* const OnHitEffect = World->SpawnActor<ABaseProjectileOnHitEffect>(ABaseProjectileOnHitEffect::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
+					Cast<ADieselandEnemyBot>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
+				//	OnHitEffect->ServerActivateProjectile();
+					this->Destroy();
+				}
 			}
 		}
 	}

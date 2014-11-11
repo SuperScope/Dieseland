@@ -341,14 +341,19 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
 //here is the basic melee attack for the AI
 void ADieselandEnemyBot::MeleeAttack()
 {
-	if (IsKing)
+	if (isAggressive && IsWalker == false)
 	{
-		KingSwing->Play();
+		if (IsKing)
+		{
+
+			KingSwing->Play();
+		}
+		if (!IsKing)
+		{
+			SwordSwing->Play();
+		}
 	}
-	if (!IsKing)
-	{
-		SwordSwing->Play();
-	}
+
 	//here I do an if check to test and see if the Bot is of melee type, if so then I proceed with the melee attack.
 	if (IsMelee && (StatusEffects.Contains(FString("Stunned")) == false)){
 		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
