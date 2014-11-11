@@ -269,9 +269,15 @@ void ADieselandPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Attack", IE_Pressed, this, &ADieselandPlayerController::OnAttackPress);
 	InputComponent->BindAction("Attack", IE_Released, this, &ADieselandPlayerController::OnAttackRelease);
 
-	InputComponent->BindAction("Skill_1", IE_Pressed, this, &ADieselandPlayerController::ServerSkillOne);
-	InputComponent->BindAction("Skill_2", IE_Pressed, this, &ADieselandPlayerController::ServerSkillTwo);
-	InputComponent->BindAction("Skill_3", IE_Pressed, this, &ADieselandPlayerController::ServerSkillThree);
+	InputComponent->BindAction("Aim_1", IE_Pressed, this, &ADieselandPlayerController::AimOne);
+	InputComponent->BindAction("Skill_1", IE_Released, this, &ADieselandPlayerController::AimOneRelease);
+	InputComponent->BindAction("Aim_2", IE_Pressed, this, &ADieselandPlayerController::AimTwo);
+	InputComponent->BindAction("Skill_2", IE_Released, this, &ADieselandPlayerController::AimTwoRelease);
+	InputComponent->BindAction("Aim_3", IE_Pressed, this, &ADieselandPlayerController::AimThree);
+	InputComponent->BindAction("Skill_3", IE_Released, this, &ADieselandPlayerController::AimThreeRelease);
+	InputComponent->BindAction("Skill_1", IE_Released, this, &ADieselandPlayerController::ServerSkillOne);
+	InputComponent->BindAction("Skill_2", IE_Released, this, &ADieselandPlayerController::ServerSkillTwo);
+	InputComponent->BindAction("Skill_3", IE_Released, this, &ADieselandPlayerController::ServerSkillThree);
 
 	InputComponent->BindAction("Reload", IE_Pressed, this, &ADieselandPlayerController::ServerReload);
 
@@ -584,6 +590,75 @@ bool ADieselandPlayerController::OnAttackRelease_Validate()
 {
 	return true;
 }
+void ADieselandPlayerController::AimOne()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
+		if (DieselandPawn->SkillOneTimer <= 0.0f)
+		{
+			DieselandPawn->SkillOneAim();
+		}
+	}
+}
+void ADieselandPlayerController::AimOneRelease()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
+		if (DieselandPawn->SkillOneTimer <= 0.0f)
+		{
+			DieselandPawn->SkillOneAimRelease();
+		}
+	}
+}
+
+
+
+void ADieselandPlayerController::AimTwo()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
+		if (DieselandPawn->SkillTwoTimer <= 0.0f)
+		{
+			DieselandPawn->SkillTwoAim();
+		}
+	}
+}
+
+void ADieselandPlayerController::AimTwoRelease()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
+		if (DieselandPawn->SkillTwoTimer <= 0.0f)
+		{
+			DieselandPawn->SkillTwoAimRelease();
+		}
+	}
+}
+
+
+void ADieselandPlayerController::AimThree()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
+		if (DieselandPawn->SkillThreeTimer <= 0.0f)
+		{
+			DieselandPawn->SkillThreeAim();
+		}
+	}
+}
+
+void ADieselandPlayerController::AimThreeRelease()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
+		if (DieselandPawn->SkillThreeTimer <= 0.0f)
+		{
+			DieselandPawn->SkillThreeAimRelease();
+		}
+	}
+}
+
+
 
 void ADieselandPlayerController::ServerSkillOne_Implementation()
 {

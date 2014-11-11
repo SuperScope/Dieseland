@@ -55,6 +55,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	// Tag this character as a player
 	Tags.Add(FName("Enemy"));
 	IsQueen = false;
+	IsKing = false;
 
 
 	// Set default ranges
@@ -107,8 +108,8 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	HealthBar->AddRelativeLocation(FVector(0.0f, 0.0f, 175.0f));
 	HealthBarMatStatic = HealthBarMatRef.Object;
 	HealthBarBackMatStatic = HealthBarBackMatRef.Object;
-	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
-	HealthBar->AddElement(HealthBarMaterial, nullptr, false, 10.0f, 75.0f, nullptr);
+	//HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
+	HealthBar->AddElement(HealthBarMatRef.Object, nullptr, false, 10.0f, 75.0f, nullptr);
 	HealthBar->AddElement(HealthBarBackMatRef.Object, nullptr, false, 10.0f, 75.0f, nullptr);
 
 	// Ensure replication
@@ -138,17 +139,30 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	this->CharacterMovement->MaxWalkSpeed = 300;
 
 	static ConstructorHelpers::FObjectFinder<UClass> ScrapBlueprint(TEXT("Class'/Game/Blueprints/Scrap_BP.Scrap_BP_C'"));
+
 	if (ScrapBlueprint.Object)
 	{
 		ScrapClass = (UClass*)ScrapBlueprint.Object;
 	}
 
+	WalkerCannon = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Walker Cannon Sound"));
+	WalkerCannon->AttachParent = RootComponent;
+	WalkerCannon->bAutoActivate = false;
+
+	KingSwing = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("King Swang Sound"));
+	KingSwing->AttachParent = RootComponent;
+	KingSwing->bAutoActivate = false;
+
+	SwordSwing = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Basic Sword Swing Sound"));
+	SwordSwing->AttachParent = RootComponent;
+	SwordSwing->bAutoActivate = false;
 }
+
 
 void ADieselandEnemyBot::ReceiveBeginPlay()
 {
 	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatStatic, this);
-	HealthBar->AddElement(HealthBarMaterial, nullptr, false, 10.0f, 75.0f, nullptr);
+	HealthBar->Elements[0].Material = HealthBarMaterial;
 	HealthBar->AddElement(HealthBarBackMatStatic, nullptr, false, 10.0f, 75.0f, nullptr);
 
 	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.0f, 0.0f));
@@ -163,8 +177,10 @@ void ADieselandEnemyBot::Tick(float DeltaSeconds)
 	HealthLabel->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
 
 	HealthPercentage = ((float)Health / (float)MaxHealth);
-	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
-
+	if (HealthBarMaterial)
+	{
+		Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
+	}
 
 	Super::Tick(DeltaSeconds);
 
@@ -325,6 +341,14 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
 //here is the basic melee attack for the AI
 void ADieselandEnemyBot::MeleeAttack()
 {
+	if (IsKing)
+	{
+		KingSwing->Play();
+	}
+	if (!IsKing)
+	{
+		SwordSwing->Play();
+	}
 	//here I do an if check to test and see if the Bot is of melee type, if so then I proceed with the melee attack.
 	if (IsMelee && (StatusEffects.Contains(FString("Stunned")) == false)){
 		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -372,6 +396,7 @@ void ADieselandEnemyBot::RangedAttack_Implementation()
 			ABaseWalkerProjectile* const Projectile = World->SpawnActor<ABaseWalkerProjectile>(ABaseWalkerProjectile::StaticClass(), SkeletalMesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 			if (Projectile)
 			{
+				WalkerCannon->Play();
 				if (IsQueen)
 				{
 					FRotator ProjectileRotation2 = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 15, ProjectileRotation.Roll);

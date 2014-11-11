@@ -9,7 +9,7 @@
 ADieselandPlayerState::ADieselandPlayerState(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	TeamNumber = 0;
+	TeamNumber = 1;
 	Kills = 0;
 }
 

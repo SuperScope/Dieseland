@@ -35,8 +35,7 @@
 /Intermediate
 /Saved
 /Build
-/Plugins
-
+/Plugins/VictoryPlugin/Binaries/
 
 *.hmap
 

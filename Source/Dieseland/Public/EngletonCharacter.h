@@ -21,6 +21,14 @@ class DIESELAND_API AEngletonCharacter : public ADieselandCharacter
 	virtual void RangedAttack() override;
 
 
+
+	virtual void SkillOneAim() override;
+	virtual void SkillTwoAim() override;
+	virtual void SkillThreeAim() override;
+
+
+
+
 	// The range of this character's Bombardment
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 		float PulseRange;
@@ -46,12 +54,11 @@ class DIESELAND_API AEngletonCharacter : public ADieselandCharacter
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	bool PulseActivated;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	TArray<AActor*> ActorsInBombardmentRange;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
-		TArray<AActor*> ActorsInBombardmentRange;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
-		TArray<AActor*> ActorsInPulseRange;
+	TArray<AActor*> ActorsInPulseRange;
 
 	//pulse actor used for owning players
 	//UPROPERTY(EditAnywhere, BlueprintreadWrite, Category = Gameplay)

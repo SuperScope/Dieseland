@@ -23,6 +23,13 @@ class DIESELAND_API AStrykerCharacter : public ADieselandCharacter
 	virtual void MeleeAttack() override;
 	virtual void RangedAttack() override;
 
+
+	virtual void SkillOneAim() override;
+	virtual void SkillTwoAim() override;
+	virtual void SkillThreeAim() override;
+
+
+
 	// Collider used to detect melee range
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 		TSubobjectPtr<class UCapsuleComponent> AssassinationCollider;
@@ -41,6 +48,8 @@ class DIESELAND_API AStrykerCharacter : public ADieselandCharacter
 		float AssasinationDuration;
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 		float AssasinationDuration2;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+		FRotator AssasinationRotation;
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = Combat)
 		int32 AssasinationHitCounter;
@@ -49,7 +58,7 @@ class DIESELAND_API AStrykerCharacter : public ADieselandCharacter
 
 
 	//combat functions
-	UFUNCTION(Reliable, Server, WithValidation)
+	UFUNCTION(Reliable, NetMulticast, WithValidation)
 		void SearchForAssassinationTarget();
 
 	//audio assets

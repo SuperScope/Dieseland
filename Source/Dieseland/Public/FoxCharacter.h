@@ -18,6 +18,13 @@ class DIESELAND_API AFoxCharacter : public ADieselandCharacter
 	virtual void SkillThree() override;
 	virtual void MeleeAttack() override;
 	virtual void RangedAttack() override;
+
+
+	virtual void SkillOneAim() override;
+	virtual void SkillTwoAim() override;
+	virtual void SkillThreeAim() override;
+
+
 	//audio assets
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")

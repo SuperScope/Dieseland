@@ -206,3 +206,25 @@ void AFoxCharacter::MeleeAttack()
 {
 	//fox doesn't use melee
 }
+void AFoxCharacter::SkillOneAim()
+{
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("Get Jinxed!")), FVector(0.0f, 1.0f, 0.0f));
+
+	AimBar->SetHiddenInGame(false);
+}
+
+void AFoxCharacter::SkillTwoAim()
+{
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("Get Jinxed!")), FVector(0.0f, 1.0f, 0.0f));
+
+	AimBar->SetHiddenInGame(false);
+}
+
+void AFoxCharacter::SkillThreeAim()
+{
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("Get Jinxed!")), FVector(0.0f, 1.0f, 0.0f));
+
+	AimBar->SetHiddenInGame(false);
+}
+
+

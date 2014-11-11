@@ -15,8 +15,8 @@
 ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	AttackZone = 1400.0f;
-	ProjectileZone = 800.0f;
+	AttackZone = 1200.0f;
+	ProjectileZone = 700.0f;
 	CannonRange = 800;
 	CannonAttackDamage = 40;
 	BaseAttackDamage = 60;
@@ -43,6 +43,8 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 
 	ParticleSystem->Template = BeamParticle;
 	this->BeamParticle = BeamParticleAsset.Object;
+
+	IsKing = true;
 
 	
 

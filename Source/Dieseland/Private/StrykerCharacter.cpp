@@ -43,6 +43,7 @@ AStrykerCharacter::AStrykerCharacter(const class FPostConstructInitializePropert
 	MoveSpeed = BaseMoveSpeed + (Dexterity * 3);
 	this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
 
+
 	AssassinationColliderRange = 250.0f;
 
 	//base cooldowns
@@ -246,7 +247,7 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 				return;
 			}
 		}
-	
+
 		//here we move around the player
 		if (AssasinationDuration2 > 0.25f && AssasinationDuration < 0.3f)
 		{
@@ -274,10 +275,18 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 		}
 		//here I  rotate towards the player before attacking
 		if (AssasinationDuration > 0.4f){
-			FRotator NewRot = FRotationMatrix::MakeFromX(AssassinationTarget->GetActorLocation() - this->GetActorLocation()).Rotator();
+			AssasinationRotation = FRotationMatrix::MakeFromX(AssassinationTarget->GetActorLocation() - this->GetActorLocation()).Rotator();
 			//FRotator NewRot = UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), AssassinationTarget->GetActorLocation());
-			this->SetActorRotation(NewRot);
+			ADieselandPlayerController* DieselandControler = Cast<ADieselandPlayerController >(Controller);
+			this->SetActorRotation(AssasinationRotation);
+			this->ClientSetRotation(AssasinationRotation);
+			ReplicatedBasedMovement.Rotation = AssasinationRotation;
+			//this->ClientSetRotation(AssasinationRotation);
+			//this->AddActorLocalRotation(AssasinationRotation);
+			//this->Rotation
+
 		}
+	
 		//here we attack the player
 		if (AssasinationDuration > 0.5f){
 		//	FRotator NewRot = (this->GetActorLocation() - AssassinationTarget->GetActorLocation()).Rotation();
@@ -352,8 +361,8 @@ bool AStrykerCharacter::SearchForAssassinationTarget_Validate()
 // Stryker Assasinate
 void AStrykerCharacter::SkillOne()
 {
+	
 	ServerActivateParticle(SkillOneParticle);
-
 
 	//here I ensure the player can't cast this ability when in air as it will cause a bug...
 	if (this->CharacterMovement->Velocity.Z > 0 || this->CharacterMovement->Velocity.Z < 0){
@@ -473,6 +482,35 @@ void AStrykerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > &
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(AStrykerCharacter, AssasinationRotation);
+	DOREPLIFETIME(AStrykerCharacter, AssassinationTarget);
+	DOREPLIFETIME(AStrykerCharacter, AssasinationAttemptDuration);
+	DOREPLIFETIME(AStrykerCharacter, AssasinationDuration);
+	DOREPLIFETIME(AStrykerCharacter, AssasinationDuration2);
+
 }
+
+
+void AStrykerCharacter::SkillOneAim()
+{
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("Get Jinxed!")), FVector(0.0f, 1.0f, 0.0f));
+
+	AimBar->SetHiddenInGame(false);
+}
+
+void AStrykerCharacter::SkillTwoAim()
+{
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("Get Jinxed!")), FVector(0.0f, 1.0f, 0.0f));
+
+	AimBar->SetHiddenInGame(false);
+}
+
+void AStrykerCharacter::SkillThreeAim()
+{
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("Get Jinxed!")), FVector(0.0f, 1.0f, 0.0f));
+
+	AimBar->SetHiddenInGame(false);
+}
+
 
 

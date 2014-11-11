@@ -3,6 +3,7 @@
 #include "Dieseland.h"
 #include "MayhemCharacter.h"
 #include "DieselandCharacter.h"
+#include "ScrapBox.h"
 #include "DieselandPlayerController.h"
 #include "DieselandEnemyBot.h"
 #include "DieselandEnemyAI.h"
@@ -96,6 +97,10 @@ void AMayhemCharacter::Tick(float DeltaSeconds)
 
 void AMayhemCharacter::UpdateDurationTimers_Implementation(float DeltaSeconds)
 {
+	//update aim spheres
+	AimSphere->SetWorldRotation(AimRotation.GetNormalized());
+	AimSphere->AddLocalRotation(FRotator(0, 90, 0));
+
 	if (IronArmorTimer > 0.0f)
 	{
 		IronArmorTimer -= DeltaSeconds;
@@ -159,6 +164,14 @@ void AMayhemCharacter::MeleeAttack()
 			{
 				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 			}
+			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+			{
+				Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+			}
+			else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
+			{
+				Cast<AScrapBox>(CurActor)->DestroyCrate(this);
+			}
 		}
 	}
 	PunchSound->Play();
@@ -201,7 +214,11 @@ void AMayhemCharacter::SkillOne()
 				EnemyActor->CharacterMovement->MaxWalkSpeed = 0.0f;
 				EnemyActor->CharacterMovement->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
 			
-				EditHealth(-1 * BasicAttackDamage, CurActor);
+				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+			}
+			else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
+			{
+				Cast<AScrapBox>(CurActor)->DestroyCrate(this);
 			}
 		}
 	}
@@ -237,6 +254,39 @@ void AMayhemCharacter::SkillThree()
 	HealthRegeneration += IronArmorRegenBuff;
 	IronArmorSound->Play();
 }
+
+void AMayhemCharacter::SkillOneAim()
+{
+	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
+	//AimBar->SetWorldLocation(FVector(0, 0, -50));
+	AimSphere->SetRelativeLocation(FVector(0, 0, 60));
+	AimSphere->SetWorldScale3D(FVector(4.5f, 4.5f, 0.1));
+	AimSphere->CastShadow = false;
+	AimSphere->Materials.Add(AimBarMaterial);
+	Cast<UMaterialInstanceDynamic>(AimSphere->Materials[0])->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.75f, 0.01f, 0.01f));
+	Cast<UMaterialInstanceDynamic>(AimSphere->Materials[0])->SetScalarParameterValue(FName(TEXT("Health percentage")), 1.0f);
+	Cast<UMaterialInstanceDynamic>(AimSphere->Materials[0])->SetScalarParameterValue(FName(TEXT("Opacity")), 0.15f);
+
+	AimSphere->SetHiddenInGame(false);
+
+	AimBar->SetHiddenInGame(true);
+}
+
+void AMayhemCharacter::SkillTwoAim()
+{
+
+
+	AimBar->SetHiddenInGame(true);
+}
+
+void AMayhemCharacter::SkillThreeAim()
+{
+
+	AimBar->SetHiddenInGame(true);
+}
+
+
+
 
 void AMayhemCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
