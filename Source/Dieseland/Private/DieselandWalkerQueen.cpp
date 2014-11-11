@@ -13,7 +13,7 @@
 ADieselandWalkerQueen::ADieselandWalkerQueen(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	AttackZone = 1400.0f;
+	AttackZone = 1200.0f;
 	ProjectileZone = 700.0f;
 	BaseAttackDamage = 40;
 	HealthRegeneration = 6;

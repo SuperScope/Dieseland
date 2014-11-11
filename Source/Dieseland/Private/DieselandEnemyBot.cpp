@@ -49,6 +49,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	// Tag this character as a player
 	Tags.Add(FName("Enemy"));
 	IsQueen = false;
+	IsKing = false;
 
 
 	// Set default ranges
@@ -119,6 +120,17 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	this->CharacterMovement->RotationRate = FRotator(0.0f, 360.0f, 0.0f);
 	this->CharacterMovement->MaxWalkSpeed = 300;
 
+	WalkerCannon = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Walker Cannon Sound"));
+	WalkerCannon->AttachParent = RootComponent;
+	WalkerCannon->bAutoActivate = false;
+
+	KingSwing = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("King Swang Sound"));
+	KingSwing->AttachParent = RootComponent;
+	KingSwing->bAutoActivate = false;
+
+	SwordSwing = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Basic Sword Swing Sound"));
+	SwordSwing->AttachParent = RootComponent;
+	SwordSwing->bAutoActivate = false;
 }
 
 
@@ -267,6 +279,14 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Target)
 //here is the basic melee attack for the AI
 void ADieselandEnemyBot::MeleeAttack()
 {
+	if (IsKing)
+	{
+		KingSwing->Play();
+	}
+	if (!IsKing)
+	{
+		SwordSwing->Play();
+	}
 	//here I do an if check to test and see if the Bot is of melee type, if so then I proceed with the melee attack.
 	if (IsMelee && (StatusEffects.Contains(FString("Stunned")) == false)){
 		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -314,6 +334,7 @@ void ADieselandEnemyBot::RangedAttack_Implementation()
 			ABaseWalkerProjectile* const Projectile = World->SpawnActor<ABaseWalkerProjectile>(ABaseWalkerProjectile::StaticClass(), SkeletalMesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 			if (Projectile)
 			{
+				WalkerCannon->Play();
 				if (IsQueen)
 				{
 					FRotator ProjectileRotation2 = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 15, ProjectileRotation.Roll);

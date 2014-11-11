@@ -62,6 +62,11 @@ public:
 
 	virtual void SkillThree() override;
 
+
+	virtual void SkillOneAim() override;
+	virtual void SkillTwoAim() override;
+	virtual void SkillThreeAim() override;
+
 protected:
 	virtual void Tick(float DeltaSeconds) override;
 };

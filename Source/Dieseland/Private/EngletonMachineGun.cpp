@@ -6,6 +6,7 @@
 #include "BaseProjectileOnHitEffect.h"
 #include "DieselandCharacter.h"
 #include "DieselandPlayerController.h"
+#include "UnrealNetwork.h"
 #include "ParticleDefinitions.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -14,18 +15,16 @@
 AEngletonMachineGun::AEngletonMachineGun(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
+	//SetRemoteRoleForBackwardsCompat(ENetRole::ROLE_AutonomousProxy);
 	InitialLifeSpan = .6f;
 	//the penetration round is meant to be large and move very quickly
 	ProjectileMovement->InitialSpeed = 1400.0f;
 	ProjCollision->SetCapsuleHalfHeight(150.0f);
 	ProjCollision->SetCapsuleRadius(150.0f);
-
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
-	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	Particle->Template = ParticleSystemAsset.Object;
-	Particle->AttachTo(Mesh);
-	Particle->SetRelativeRotation(this->GetActorRotation());
-	
+
+
 
 	//temp meshscale
 	FVector MeshScale;
@@ -48,6 +47,10 @@ void AEngletonMachineGun::ReceiveActorBeginOverlap(AActor* OtherActor)
 		if (OtherActor == nullptr){
 			return;
 		}
+		if (Cast<ADieselandPlayerController>(GetOwner())->GetPawn() == nullptr){
+			return;
+		}
+
 		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 		{
 			if (OtherActor->ActorHasTag(TEXT("Player")) || (OtherActor->ActorHasTag(TEXT("Enemy"))))

@@ -31,6 +31,24 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerRangedAttack();
 
+	UFUNCTION()
+	void AimOne();
+
+	UFUNCTION()
+	void AimOneRelease();
+
+	UFUNCTION()
+	void AimTwo();
+
+	UFUNCTION()
+	void AimTwoRelease();
+
+	UFUNCTION()	
+	void AimThree();
+
+	UFUNCTION()
+	void AimThreeRelease();
+
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerSkillOne();
 

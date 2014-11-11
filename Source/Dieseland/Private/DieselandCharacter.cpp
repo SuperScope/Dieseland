@@ -18,6 +18,10 @@
 ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializeProperties& PCIP)
 : Super(PCIP)
 {
+	//getting cubes and stuff
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube.Shape_Cube'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Sphere.Shape_Sphere'"));
+
 	// Set size for player capsule
 	CapsuleComponent->InitCapsuleSize(42.f, 96.0f);
 	CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
@@ -87,6 +91,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarMatRef(TEXT("Material'/Game/UserInterfaceAssets/HUD/Materials/M_HUD_Health_Bar.M_HUD_Health_Bar'"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarBackMatRef(TEXT("Material'/Game/MaterialsDLC/Material_BasicDarkGrey.Material_BasicDarkGrey'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> AimBarMatRef(TEXT("Material'/Game/UserInterfaceAssets/HUD/Materials/M_HUD_Health_Bar.M_HUD_Health_Bar'"));
 
 	HealthBar = PCIP.CreateDefaultSubobject<UMaterialBillboardComponent>(this, TEXT("HealthBar"));
 	HealthBar->AttachParent = RootComponent;
@@ -96,6 +101,22 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	/*HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
 	HealthBar->AddElement(HealthBarMaterial, NULL, false, 10.0f, 75.0f, NULL);
 	HealthBar->AddElement(HealthBarBackMatRef.Object, NULL, false, 10.0f, 75.0f, NULL);*/
+
+
+	//for the aim bar and aim sphere stuff
+	AimBar = PCIP.CreateDefaultSubobject<UStaticMeshComponent >(this, TEXT("AimBar"));
+	AimBar->AttachParent = Mesh;
+	AimBar->AttachSocketName = FName(TEXT("AimSocket"));
+	AimBar->SetStaticMesh(CubeMesh.Object);
+	AimBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AimBarMatStatic = AimBarMatRef.Object;
+	//for the aim sphere
+	AimSphere = PCIP.CreateDefaultSubobject<UStaticMeshComponent >(this, TEXT("AimSphere"));
+	AimSphere->AttachParent = Mesh;
+	AimSphere->SetStaticMesh(SphereMesh.Object);
+	AimSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AimSphere->SetHiddenInGame(true);
+	
 
 	// Tag this character as a player
 	Tags.Add(FName("Player"));
@@ -159,6 +180,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillTwoParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_StrykerBlinkCloak_WIP.Unreal_Particle_StrykerBlinkCloak_WIP'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillThreeParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse2_WIP.Unreal_Particle_EngletonPulse2_WIP'"));
+	
 
 	this->BasicAttackParticle = BasicAttackParticleAsset.Object;
 	this->SkillOneParticle = SkillOneParticleAsset.Object;
@@ -194,8 +216,9 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	// Ensure replication
 	bReplicates = true;
 	bReplicateMovement = true;
+	bReplicateInstigator = true;
 	AimMesh->SetIsReplicated(true);
-	//Mesh->SetIsReplicated(true);
+	Mesh->SetIsReplicated(true);
 	ParticleSystem->SetIsReplicated(true);
 	SetActorTickEnabled(true);
 	this->SetOwner(Controller);
@@ -203,6 +226,16 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 void ADieselandCharacter::ReceiveBeginPlay()
 {
+	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
+	//AimBar->SetWorldLocation(FVector(0, 0, -50));
+	AimBar->SetWorldScale3D(FVector(4.0f, 1.0, 0.01));
+	AimBar->CastShadow = false;
+	AimBar->Materials.Add(AimBarMaterial);
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.0, 0.75f, 0.0f));
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetScalarParameterValue(FName(TEXT("Health percentage")), 1.0f);
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetScalarParameterValue(FName(TEXT("Opacity")), 0.2f);
+
+	AimBar->SetHiddenInGame(true);
 //	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatStatic, this);
 //	HealthBar->AddElement(HealthBarMaterial, NULL, false, 10.0f, 75.0f, NULL);
 //	HealthBar->AddElement(HealthBarBackMatStatic, NULL, false, 10.0f, 75.0f, NULL);
@@ -221,11 +254,11 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	if (HealthBarMaterial != nullptr)
 	{
 		HealthPercentage = ((float)Health / (float)MaxHealth);
-		//Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
+	//	Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
 		if (PlayerState && Cast<ADieselandPlayerState>(PlayerState)->TeamNumber != CharacterTeam)
 		{
 			CharacterTeam = Cast<ADieselandPlayerState>(PlayerState)->TeamNumber;
-			UpdateTeamColor();
+	//		UpdateTeamColor();
 		}
 	}
 
@@ -251,9 +284,43 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	}
 }
 
+void ADieselandCharacter::SkillOneAim()
+{
+	AimBar->SetHiddenInGame(false);
+}
+
+void ADieselandCharacter::SkillOneAimRelease()
+{
+	AimBar->SetHiddenInGame(true);
+	AimSphere->SetHiddenInGame(true);
+}
+
+void ADieselandCharacter::SkillTwoAim()
+{
+	AimBar->SetHiddenInGame(false);
+}
+
+void ADieselandCharacter::SkillTwoAimRelease()
+{
+	AimBar->SetHiddenInGame(true);
+	AimSphere->SetHiddenInGame(true);
+}
+
+void ADieselandCharacter::SkillThreeAim()
+{
+	AimBar->SetHiddenInGame(false);
+}
+
+void ADieselandCharacter::SkillThreeAimRelease()
+{
+	AimBar->SetHiddenInGame(true);
+	AimSphere->SetHiddenInGame(true);
+}
+
+
 void ADieselandCharacter::UpdateTeamColor()
 {
-	/*
+	
 	switch (Cast<ADieselandPlayerState>(PlayerState)->TeamNumber)
 	{
 	case 0:
@@ -285,7 +352,7 @@ void ADieselandCharacter::UpdateTeamColor()
 		break;
 	default:
 		Cast<UMaterialInstanceDynamic>(HealthBar->Elements[0].Material)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.000905f, 1.0f, 0.0f));
-	}*/
+	}
 }
 
 // CORE ATTRIBUTE CALCULATION FUNCTION
@@ -333,7 +400,6 @@ void ADieselandCharacter::ResetCamera_Implementation()
 	TopDownCameraComponent->PostProcessSettings.VignetteIntensity = 0;
 	TopDownCameraComponent->PostProcessSettings.bOverride_GrainIntensity = 0;
 	TopDownCameraComponent->PostProcessSettings.GrainIntensity = 0;
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
 }
 
 bool ADieselandCharacter::ResetCamera_Validate()
@@ -461,6 +527,8 @@ void ADieselandCharacter::RangedAttack()
 	}
 }
 
+
+
 void ADieselandCharacter::MeleeAttack()
 {
 	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -487,6 +555,7 @@ void ADieselandCharacter::SkillOne()
 	UWorld* const World = GetWorld();
 	if (World)
 	{
+		AimBar->SetHiddenInGame(true);
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
 		SpawnParams.Instigator = Instigator;
@@ -515,7 +584,7 @@ void ADieselandCharacter::SkillOne()
 void ADieselandCharacter::SkillTwo()
 {
 	ServerActivateParticle(SkillTwoParticle);
-
+	AimBar->SetHiddenInGame(true);
 	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
 	RV_TraceParams.bTraceComplex = true;
 	RV_TraceParams.bTraceAsyncScene = true;
@@ -549,7 +618,7 @@ void ADieselandCharacter::SkillTwo()
 void ADieselandCharacter::SkillThree()
 {
 	ServerActivateParticle(SkillThreeParticle);
-
+	AimBar->SetHiddenInGame(true);
 	AOECollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	AOECollision->SetCollisionProfileName(TEXT("OverlapAll"));
 	AOECollision->GetOverlappingActors(ActorsInAOERange);
@@ -629,6 +698,9 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, SkillOneTimer);
 	DOREPLIFETIME(ADieselandCharacter, SkillTwoTimer);
 	DOREPLIFETIME(ADieselandCharacter, SkillThreeTimer);
+	DOREPLIFETIME(ADieselandCharacter, SkillOneCooldown);
+	DOREPLIFETIME(ADieselandCharacter, SkillTwoCooldown);
+	DOREPLIFETIME(ADieselandCharacter, SkillThreeCooldown);
 	DOREPLIFETIME(ADieselandCharacter, TauntTimer);
 	DOREPLIFETIME(ADieselandCharacter, LaughTimer);
 	DOREPLIFETIME(ADieselandCharacter, CommentTimer);

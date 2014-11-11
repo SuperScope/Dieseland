@@ -5,6 +5,7 @@
 #include "DieselandEnemyBot.h"
 #include "DieselandPlayerController.h"
 #include "EngletonCrazyLaser.h"
+#include "UnrealNetwork.h"
 #include "EngletonMachineGun.h"
 #include "EngletonMachineGunSpark.h"
 #include "ParticleDefinitions.h"
@@ -15,6 +16,7 @@
 AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
+	//SetRemoteRoleForBackwardsCompat(ENetRole::ROLE_AutonomousProxy);
 	//here I set his base values
 	BaseMoveSpeed = 375;
 	BaseHealth = 350;
@@ -95,6 +97,7 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	//AimMesh->SetStaticMesh(StaticAimMesh.Object);
 	AimMesh2->SetHiddenInGame(true);
 	AimMesh2->SetIsReplicated(true);
+	//AimMesh2->
 	
 	//for sounds
 	IdleSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Idle Sound"));
@@ -156,7 +159,7 @@ void AEngletonCharacter::SkillOne()
 	AActor* CurActor = NULL;
 	for (int32 b = 0; b < ActorsInBombardmentRange.Num(); b++)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
 		CurActor = ActorsInBombardmentRange[b];
 		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
 		if (!CurActor->IsValidLowLevel()) continue;
@@ -242,7 +245,7 @@ void AEngletonCharacter::SkillThree()
 				MoveCharacterY = -1;
 			}
 			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 6000 + (Intelligence * 20.0f), -MoveCharacterY * 6000 + (Intelligence * 20.0f), 0);
-			DieselandPawn->CharacterMovement->JumpZVelocity = 4000 + (Intelligence * 10);
+			DieselandPawn->CharacterMovement->JumpZVelocity = 400 + (Intelligence * 10);
 			DieselandPawn->CharacterMovement->DoJump(false);
 		}
 		//here we do it for enemies
@@ -268,13 +271,11 @@ void AEngletonCharacter::SkillThree()
 			if (MoveCharacterY <= 0){
 				MoveCharacterY = -1;
 			}
-			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 600, -MoveCharacterY * 600, 0);
-			DieselandPawn->CharacterMovement->JumpZVelocity = 350 + (Intelligence * 3);
+			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 1500, -MoveCharacterY * 1500, 0);
+			DieselandPawn->CharacterMovement->JumpZVelocity = 550 + (Intelligence * 5);
 			DieselandPawn->CharacterMovement->DoJump(false);
 		}
-		
 	}
-
 }
 
 void AEngletonCharacter::RangedAttack()
@@ -290,45 +291,49 @@ void AEngletonCharacter::RangedAttack()
 		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
 
 		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw, ProjectileRotation.Roll);
+		
 
 		// spawn the projectile at the muzzle
 		AEngletonMachineGun* const Projectile = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 		AEngletonMachineGun* const Projectile2 = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), ProjectileRotation, SpawnParams);
 		AEngletonMachineGunSpark* const ProjectileLaunch = World->SpawnActor<AEngletonMachineGunSpark>(AEngletonMachineGunSpark::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 		AEngletonMachineGunSpark* const ProjectileLaunch2 = World->SpawnActor<AEngletonMachineGunSpark>(AEngletonMachineGunSpark::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), ProjectileRotation, SpawnParams);
+
 		if (Projectile && Projectile2)
 		{
-			//particle base is set into play correctly
-			ServerActivateParticle(MachineGunFireParticle);
+
 			ProjectileLaunch->ServerActivateProjectile();
 			ProjectileLaunch2->ServerActivateProjectile();
 
-			Projectile->ProjectileDamage = BasicAttackDamage/2;
-			Projectile2->ProjectileDamage = BasicAttackDamage/2;
+			Projectile->ProjectileDamage = BasicAttackDamage / 2;
+			Projectile2->ProjectileDamage = BasicAttackDamage / 2;
 			// Start the particle effect
 			Projectile->ServerActivateProjectile();
 			Projectile2->ServerActivateProjectile();
 
 			// Add the character's velocity to the projectile
+
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 			Projectile2->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 		}
 	}
 }
+
+
+
 void AEngletonCharacter::MeleeAttack()
 {
 	//Engleton does not use Melee
 }
 
-//replicate values to the server
-void AEngletonCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	//DOREPLIFETIME(AEngletonCharacter, BombardmentRange);
-}
 void AEngletonCharacter::UpdateTimers(float DeltaSeconds)
 {
+
+	//here I set aiming and rotating rotations
+	AimSphere->SetWorldRotation(AimRotation.GetNormalized());
+	AimSphere->AddLocalRotation(FRotator(0, 90, 0));
+	AimBar->SetRelativeLocation(FVector(700.0f, 40.0f, -50.0f));
+	AimBar->SetWorldRotation(AimRotation.GetNormalized());
 	//here I check to see if health is > maxhealth if so I set to health
 
 	//here I check to see if Bombardment has been activated, if it has I peridocally deal damage over a set amount of time
@@ -373,4 +378,65 @@ void AEngletonCharacter::Tick(float DeltaSeconds)
 	UpdateTimers(DeltaSeconds);
 	Super::Tick(DeltaSeconds);
 }
+
+
+void AEngletonCharacter::SkillOneAim()
+{
+	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
+	//AimBar->SetWorldLocation(FVector(0, 0, -50));
+	AimSphere->SetRelativeLocation(FVector(0, 0, 60));
+	AimSphere->SetWorldScale3D(FVector(8.0f, 8.0f, 0.1));
+	AimSphere->CastShadow = false;
+	AimSphere->Materials.Add(AimBarMaterial);
+	Cast<UMaterialInstanceDynamic>(AimSphere->Materials[0])->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.01, 0.01f, 0.75f));
+	Cast<UMaterialInstanceDynamic>(AimSphere->Materials[0])->SetScalarParameterValue(FName(TEXT("Health percentage")), 1.0f);
+	Cast<UMaterialInstanceDynamic>(AimSphere->Materials[0])->SetScalarParameterValue(FName(TEXT("Opacity")), 0.15f);
+
+	AimSphere->SetHiddenInGame(false);
+}
+
+void AEngletonCharacter::SkillTwoAim()
+{
+	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
+	//AimBar->SetWorldLocation(FVector(0, 0, -50));
+	AimBar->SetWorldScale3D(FVector(16.0f, 1.0, 0.01));
+	AimBar->CastShadow = false;
+	AimBar->Materials.Add(AimBarMaterial);
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.01f, 0.01f, 0.75f));
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetScalarParameterValue(FName(TEXT("Health percentage")), 1.0f);
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetScalarParameterValue(FName(TEXT("Opacity")), 0.15f);
+	AimBar->SetHiddenInGame(false);
+}
+
+void AEngletonCharacter::SkillThreeAim()
+{
+	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
+	//AimBar->SetWorldLocation(FVector(0, 0, -50));
+	AimSphere->SetRelativeLocation(FVector(0, 0, 60));
+	AimSphere->SetWorldScale3D(FVector(6.0f, 6.0f, 0.1));
+	AimSphere->CastShadow = false;
+	AimSphere->Materials.Add(AimBarMaterial);
+	Cast<UMaterialInstanceDynamic>(AimSphere->Materials[0])->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.01, 0.01f, 0.75f));
+	Cast<UMaterialInstanceDynamic>(AimSphere->Materials[0])->SetScalarParameterValue(FName(TEXT("Health percentage")), 1.0f);
+	Cast<UMaterialInstanceDynamic>(AimSphere->Materials[0])->SetScalarParameterValue(FName(TEXT("Opacity")), 0.15f);
+
+	AimSphere->SetHiddenInGame(false);
+}
+
+//replicate values to the server
+void AEngletonCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AEngletonCharacter, BombardmentRange);
+	DOREPLIFETIME(AEngletonCharacter, PulseRange);
+	DOREPLIFETIME(AEngletonCharacter, BombardmentActivated);
+	DOREPLIFETIME(AEngletonCharacter, PulseActivated);
+	DOREPLIFETIME(AEngletonCharacter, BombardmentTimer);
+	DOREPLIFETIME(AEngletonCharacter, PulseTimer);
+	DOREPLIFETIME(AEngletonCharacter, BombardmentHitCounter);
+	DOREPLIFETIME(AEngletonCharacter, BasicAttackDamage);
+}
+
+
 

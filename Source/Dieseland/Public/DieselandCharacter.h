@@ -23,6 +23,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
 	TSubobjectPtr<class UMaterialBillboardComponent> HealthBar;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
+	TSubobjectPtr<class UStaticMeshComponent> AimBar;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
+	TSubobjectPtr<class UStaticMeshComponent> AimSphere;
+
 	// Mesh attached to the torso socket which is used to show attack direction - invisible by default
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UStaticMeshComponent> AimMesh;
@@ -180,6 +186,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
 	UMaterialInstanceDynamic* HealthBarMaterial;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
+	UMaterialInstanceDynamic* AimBarMaterial;
+
+
 	//FireTrap Damage Timer
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Trap)
 	float LingerTimer;
@@ -242,6 +252,24 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	virtual void MeleeAttack();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	virtual void SkillOneAim();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	virtual void SkillOneAimRelease();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	virtual void SkillTwoAim();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	virtual void SkillTwoAimRelease();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	virtual void SkillThreeAim();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	virtual void SkillThreeAimRelease();
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	virtual void SkillOne();
@@ -319,6 +347,7 @@ protected:
 	virtual void ReceiveBeginPlay() override;
 
 	UMaterial* HealthBarMatStatic;
+	UMaterial* AimBarMatStatic;
 	UMaterial* HealthBarBackMatStatic;
 
 	int32 CharacterTeam;

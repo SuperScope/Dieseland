@@ -17,7 +17,6 @@
 ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Sphere.Shape_Sphere'"));
 	Mesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("Mesh"));
 	Mesh->SetStaticMesh(StaticMesh.Object);
@@ -64,6 +63,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/MovingBulletTest_WIP.MovingBulletTest_WIP'"));
 	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	Particle->Template = ParticleSystemAsset.Object;
+	
 	Particle->AttachTo(Mesh);
 	Particle->bAutoActivate = false;
 	Particle->SetHiddenInGame(false);
@@ -145,5 +145,6 @@ void ABaseProjectile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	// Replicate to everyone
 	DOREPLIFETIME(ABaseProjectile, ProjectileMovement);
 	DOREPLIFETIME(ABaseProjectile, Particle);
+
 
 }

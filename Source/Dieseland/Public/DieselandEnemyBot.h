@@ -77,6 +77,10 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 
 	//set for the AIs attack type
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		bool IsKing;
+
+	//set for the AIs attack type
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		bool IsWalker;
 
 	//set for the AIs attack type
@@ -187,6 +191,15 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	//this grabs the particle system
 	UPROPERTY(Replicated, Category = Visual, BlueprintReadOnly, VisibleAnywhere)
 		TSubobjectPtr<class UParticleSystemComponent> ParticleSystem;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> WalkerCannon;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> KingSwing;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> SwordSwing;
 
 
 
