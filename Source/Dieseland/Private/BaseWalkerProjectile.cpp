@@ -98,7 +98,7 @@ void ABaseWalkerProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 		{
 			if (OtherActor->ActorHasTag(TEXT("Player")))
 			{
-				Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
+				Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, Cast<ADieselandEnemyAI>(GetOwner())->GetPawn());
 				if (!Piercing)
 				{
 					this->Destroy();
@@ -107,7 +107,7 @@ void ABaseWalkerProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 			}
 			else if (!OtherActor->ActorHasTag(TEXT("Enemy")))
 			{
-				Cast<ADieselandEnemyBot>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
+				//Cast<ADieselandEnemyBot>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
 				if (!Piercing)
 				{
 					this->Destroy();
@@ -128,7 +128,7 @@ void ABaseWalkerProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 			//UE_LOG(LogClass, Log, TEXT("Log text %s"), *OtherActor->GetName());
 			if (OtherActor->ActorHasTag(TEXT("Player")))
 			{
-				Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
+				Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, Cast<ADieselandEnemyAI>(GetOwner())->GetPawn());
 				if (!Piercing)
 				{
 					this->Destroy();

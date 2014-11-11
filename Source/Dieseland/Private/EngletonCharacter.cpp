@@ -303,14 +303,14 @@ void AEngletonCharacter::RangedAttack()
 		// spawn the projectile at the muzzle
 		AEngletonMachineGun* const Projectile = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 		AEngletonMachineGun* const Projectile2 = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), ProjectileRotation, SpawnParams);
-		AEngletonMachineGunSpark* const ProjectileLaunch = World->SpawnActor<AEngletonMachineGunSpark>(AEngletonMachineGunSpark::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
-		AEngletonMachineGunSpark* const ProjectileLaunch2 = World->SpawnActor<AEngletonMachineGunSpark>(AEngletonMachineGunSpark::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), ProjectileRotation, SpawnParams);
+	//	AEngletonMachineGunSpark* const ProjectileLaunch = World->SpawnActor<AEngletonMachineGunSpark>(AEngletonMachineGunSpark::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
+	//	AEngletonMachineGunSpark* const ProjectileLaunch2 = World->SpawnActor<AEngletonMachineGunSpark>(AEngletonMachineGunSpark::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), ProjectileRotation, SpawnParams);
 
 		if (Projectile && Projectile2)
 		{
 
-			ProjectileLaunch->ServerActivateProjectile();
-			ProjectileLaunch2->ServerActivateProjectile();
+		//	ProjectileLaunch->ServerActivateProjectile();
+		//	ProjectileLaunch2->ServerActivateProjectile();
 
 			Projectile->ProjectileDamage = BasicAttackDamage / 2;
 			Projectile2->ProjectileDamage = BasicAttackDamage / 2;

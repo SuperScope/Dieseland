@@ -7,6 +7,7 @@
 #include "DieselandCharacter.h"
 #include "DieselandPlayerState.h"
 #include "DieselandEnemyBot.h"
+#include "ScrapBox.h"
 #include "DieselandPlayerController.h"
 #include "UnrealNetwork.h"
 #include "ParticleDefinitions.h"
@@ -50,19 +51,23 @@ void AEngletonMachineGun::ReceiveActorBeginOverlap(AActor* OtherActor)
 		{
 			if (OtherActor->ActorHasTag(TEXT("Player")) &&
 				Cast<ADieselandCharacter>(OtherActor)->GetTeamNumber() !=
-				Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner()))->GetTeamNumber())
+				Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->GetTeamNumber())
 			{
 				ABaseProjectileOnHitEffect* const OnHitEffect = World->SpawnActor<ABaseProjectileOnHitEffect>(ABaseProjectileOnHitEffect::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
-				Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
+				Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn()));
 				OnHitEffect->ServerActivateProjectile();
 				this->Destroy();
 			}
-			if (OtherActor->ActorHasTag(TEXT("Enemy")))
+			else if (OtherActor->ActorHasTag(TEXT("Enemy")))
 			{
+				Cast<ADieselandEnemyBot>(OtherActor)->EditHealth(-1 * ProjectileDamage, Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn()));
 				ABaseProjectileOnHitEffect* const OnHitEffect = World->SpawnActor<ABaseProjectileOnHitEffect>(ABaseProjectileOnHitEffect::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
-				Cast<ADieselandEnemyBot>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
 				OnHitEffect->ServerActivateProjectile();
 				this->Destroy();
+			}
+			else if (OtherActor->ActorHasTag(TEXT("ScrapBox")))
+			{
+				Cast<AScrapBox>(OtherActor)->DestroyCrate(this);
 			}
 		}
 	}

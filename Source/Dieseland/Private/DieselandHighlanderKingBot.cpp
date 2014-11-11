@@ -5,6 +5,7 @@
 #include "UnrealNetwork.h"
 #include "DieselandEnemyAI.h"
 #include "DieselandHighlanderKingBot.h"
+#include "DieselandCharacter.h"
 #include "ParticleDefinitions.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -46,6 +47,10 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 
 	IsKing = true;
 
+	BeamSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Beam Sound"));
+	BeamSound->AttachParent = RootComponent;
+	BeamSound->bAutoActivate = false;
+
 	
 
 }
@@ -67,9 +72,10 @@ void ADieselandHighlanderKingBot::CannonAttack()
 		if (!CurActor->IsValidLowLevel()) continue;
 
 		if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player")))){
-			EditHealth(-1 * CannonAttackDamage, CurActor);
+			Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * CannonAttackDamage, this);
 			//here I check to see if it's hte first time firing for the cannon, if so I activate the particle effect.
 			if (CannonAttackTicks == 0){
+				BeamSound->Play();
 				ServerActivateParticle(BeamParticle);
 			}
 			CannonAttackTicks++;
