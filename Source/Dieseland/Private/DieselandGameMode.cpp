@@ -98,6 +98,15 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
 void ADieselandGameMode::ReceiveBeginPlay()
 {
 	//StartGame();
+	TActorIterator< APlayerStart > ActorItr =
+		TActorIterator< APlayerStart >(GetWorld());
+
+	while (ActorItr)
+	{
+		SpawnArray.Add(*ActorItr);
+
+		++ActorItr;
+	}
 }
 
 void ADieselandGameMode::Tick(float DeltaSeconds)
@@ -152,6 +161,13 @@ void ADieselandGameMode::StartGame_Implementation()
 bool ADieselandGameMode::StartGame_Validate()
 {
 	return true;
+}
+
+APlayerStart* ADieselandGameMode::PickSpawn()
+{
+	int32 RandomSpawnNum = FMath::RandRange(0, SpawnArray.Num());
+
+	return SpawnArray[RandomSpawnNum];
 }
 
 void ADieselandGameMode::RespawnTile(FVector SpawnLocation)

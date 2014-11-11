@@ -15,6 +15,10 @@ class ADieselandGameMode : public AGameMode
     //Array for the Death Tile Locations
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
     TArray<FVector> LocationArray;
+
+	//Array for the Spawn Locations
+	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+	TArray<APlayerStart*> SpawnArray;
     
     //Array for the Boss Spawn Locations
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
@@ -50,6 +54,9 @@ class ADieselandGameMode : public AGameMode
 
 	UFUNCTION(Reliable, Server, WithValidation, BlueprintCallable, Category = Gameplay)
 	void StartGame();
+
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+	APlayerStart* PickSpawn();
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void RespawnTile(FVector SpawnLocation);

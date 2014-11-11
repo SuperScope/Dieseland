@@ -311,6 +311,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	int32 GetTeamNumber();
+    
+    UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+    int32 RandomX;
+    
+    UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+    int32 RandomY;
 
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	float BasicAttackTimer;

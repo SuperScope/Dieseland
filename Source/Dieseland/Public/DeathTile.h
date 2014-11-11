@@ -40,6 +40,10 @@ class DIESELAND_API ADeathTile : public AActor
     //Boolean to determine if enemy was found
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
     bool EnemyFound;
+    
+    //Boolean to determine if tile is inactive
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Death Tile")
+    bool Inactive;
 
 	// Hard limit on tile active state
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death Tile")

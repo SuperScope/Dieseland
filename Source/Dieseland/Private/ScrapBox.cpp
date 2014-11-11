@@ -50,6 +50,7 @@ void AScrapBox::ReceiveActorBeginOverlap(AActor* OtherActor)
 void AScrapBox::DestroyCrate_Implementation(AActor* Causer)
 {
 	Mesh->ApplyDamage(100.0, GetActorLocation(), FVector(0.0f, 0.0f, 0.0f), 1000.0f);
+    Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
 
 	this->SetLifeSpan(2.0f);
 	if (Role == ROLE_Authority)
@@ -65,7 +66,7 @@ void AScrapBox::DestroyCrate_Implementation(AActor* Causer)
 			{
                 RandomX = FMath::RandRange(-30, 30);
                 RandomY = FMath::RandRange(-30, 30);
-				UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(GetActorLocation().X + RandomX, GetActorLocation().Y + RandomY, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f));
+				UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(GetActorLocation().X + RandomX, GetActorLocation().Y + RandomY, GetActorLocation().Z), FRotator(0.0f, 0.0f, 0.0f));
 				
 				//Alternatively used to spawn c++ class
 				//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
