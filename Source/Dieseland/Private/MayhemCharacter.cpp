@@ -3,6 +3,7 @@
 #include "Dieseland.h"
 #include "MayhemCharacter.h"
 #include "DieselandCharacter.h"
+#include "ScrapBox.h"
 #include "DieselandPlayerController.h"
 #include "DieselandEnemyBot.h"
 #include "DieselandEnemyAI.h"
@@ -159,6 +160,14 @@ void AMayhemCharacter::MeleeAttack()
 			{
 				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 			}
+			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+			{
+				Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+			}
+			else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
+			{
+				Cast<AScrapBox>(CurActor)->DestroyCrate(this);
+			}
 		}
 	}
 	PunchSound->Play();
@@ -201,7 +210,11 @@ void AMayhemCharacter::SkillOne()
 				EnemyActor->CharacterMovement->MaxWalkSpeed = 0.0f;
 				EnemyActor->CharacterMovement->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
 			
-				EditHealth(-1 * BasicAttackDamage, CurActor);
+				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+			}
+			else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
+			{
+				Cast<AScrapBox>(CurActor)->DestroyCrate(this);
 			}
 		}
 	}

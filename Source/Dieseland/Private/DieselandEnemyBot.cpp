@@ -107,8 +107,8 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	HealthBar->AddRelativeLocation(FVector(0.0f, 0.0f, 175.0f));
 	HealthBarMatStatic = HealthBarMatRef.Object;
 	HealthBarBackMatStatic = HealthBarBackMatRef.Object;
-	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
-	HealthBar->AddElement(HealthBarMaterial, nullptr, false, 10.0f, 75.0f, nullptr);
+	//HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
+	HealthBar->AddElement(HealthBarMatRef.Object, nullptr, false, 10.0f, 75.0f, nullptr);
 	HealthBar->AddElement(HealthBarBackMatRef.Object, nullptr, false, 10.0f, 75.0f, nullptr);
 
 	// Ensure replication
@@ -148,7 +148,7 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 void ADieselandEnemyBot::ReceiveBeginPlay()
 {
 	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatStatic, this);
-	HealthBar->AddElement(HealthBarMaterial, nullptr, false, 10.0f, 75.0f, nullptr);
+	HealthBar->Elements[0].Material = HealthBarMaterial;
 	HealthBar->AddElement(HealthBarBackMatStatic, nullptr, false, 10.0f, 75.0f, nullptr);
 
 	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.0f, 0.0f));
@@ -163,8 +163,10 @@ void ADieselandEnemyBot::Tick(float DeltaSeconds)
 	HealthLabel->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
 
 	HealthPercentage = ((float)Health / (float)MaxHealth);
-	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
-
+	if (HealthBarMaterial)
+	{
+		Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
+	}
 
 	Super::Tick(DeltaSeconds);
 
