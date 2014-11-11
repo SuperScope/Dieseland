@@ -20,6 +20,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
+	// Numerical display of health value
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
+	TSubobjectPtr<class UTextRenderComponent> HealthLabel;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
 	TSubobjectPtr<class UMaterialBillboardComponent> HealthBar;
 
@@ -43,8 +47,15 @@ public:
 
 	// Called to subtract and/or add health to the target player
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
-	void EditHealth(int32 Amt, AActor* Target);
+	void EditHealth(int32 Amt, AActor* Causer);
 
+	// Called by the server to edit client's health
+	UFUNCTION(reliable, Server, WithValidation)
+	void ServerEditHealth(int32 Amt, AActor* Causer);
+
+	// Called by the server to edit client's health
+	UFUNCTION(reliable, Server, WithValidation)
+	void ServerEditSpeedDamage(int32 Speed, int32 Damage, AActor* Target);
 
 	// Called to adjust movement speed and damage
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
@@ -71,7 +82,7 @@ public:
 
 	// Vector for vector direction
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-		FVector VectorDirection;
+	FVector VectorDirection;
 
 	// Health Regeneration
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -211,6 +222,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	TArray<AActor*> ActorsInAOERange;
 
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = Combat)
+	AActor* LatestDamageCauser;
+
 	//CORE ATTRIBUTES BEGINS HERE
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -283,6 +297,12 @@ public:
 	// Called when AimRotation is replicated
 	UFUNCTION()
 	void OnRep_AimRotation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = Gameplay)
+	void OnHasBeenKilled(AActor* Causer);
+
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+	int32 GetTeamNumber();
 
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	float BasicAttackTimer;

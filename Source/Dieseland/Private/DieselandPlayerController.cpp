@@ -324,7 +324,7 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 
 			//Spawn Scrap pieces here
 			UWorld* const World = GetWorld();
-			if (World)
+			if (World && DieselandPawn->LatestDamageCauser != nullptr && DieselandPawn->LatestDamageCauser->ActorHasTag(FName(TEXT("Player"))))
 			{
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.Owner = this;
@@ -372,9 +372,9 @@ void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FStr
 	APawn* TempPawn = GetPawn();
 
 	//this->UnPossess();
-	if (GetWorld() != nullptr && Role == ROLE_Authority){
+	if (GetWorld() != nullptr && Role == ROLE_Authority && TempPawn != nullptr){
 		//Determine what player is desired and spawn that pawn
-		if (Character == FString(TEXT("Mayhem")))
+		if (Character == FString(TEXT("Mayhem")) && TempPawn != nullptr)
 		{
 			this->UnPossess();
 
@@ -387,7 +387,7 @@ void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FStr
 			//GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::PossessNewPawn, 0.3f, false);
 
 		}
-		else if (Character == FString(TEXT("Engleton")))
+		else if (Character == FString(TEXT("Engleton")) && TempPawn != nullptr)
 		{
 			this->UnPossess();
 
@@ -401,7 +401,7 @@ void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FStr
 
 
 		}
-		else if (Character == FString(TEXT("Stryker")))
+		else if (Character == FString(TEXT("Stryker")) && TempPawn != nullptr)
 		{
 			this->UnPossess();
 
@@ -415,7 +415,7 @@ void ADieselandPlayerController::ServerChangeCharacter_Implementation(const FStr
 
 
 		}
-		else if (Character == FString(TEXT("Fox")))
+		else if (Character == FString(TEXT("Fox")) && TempPawn != nullptr)
 		{
 			this->UnPossess();
 
@@ -775,14 +775,17 @@ bool ADieselandPlayerController::OnComment_Validate()
 
 void ADieselandPlayerController::UpgradeStrength_Implementation()
 {
+	//Calculate Cost First
+	CalculateCost(FString(TEXT("Strength")));
+
 	//here is the real level up function
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3 && !PauseGameInput){
-		DieselandPawn->Scrap -= 3;
-		DieselandPawn->Strength += 3;
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= CostVal && !PauseGameInput){
+		DieselandPawn->Scrap -= CostVal;	//Subtracts current scrap amount by the cost value
+		DieselandPawn->Strength += 3;		//Increments attribute by 3 points
+		StatPlusCount++;		//** Make sure StatPlusCount is called BEFORE calculate stats
 		DieselandPawn->CalculateStats();
 		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Strength!"));
-		StatPlusCount++;
 	}
 }
  
@@ -795,14 +798,17 @@ bool ADieselandPlayerController::UpgradeStrength_Validate()
 
 void ADieselandPlayerController::UpgradeIntelligence_Implementation()
 {
+	//Calculate Cost First
+	CalculateCost(FString(TEXT("Intelligence")));
+
 	//here is the real level up function
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3 && !PauseGameInput){
-		DieselandPawn->Scrap -= 3;
-		DieselandPawn->Intelligence += 3;
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= CostVal && !PauseGameInput){
+		DieselandPawn->Scrap -= CostVal;	//Subtracts current scrap amount by the cost value
+		DieselandPawn->Intelligence += 3;	//Increments attribute by 3 points
+		StatPlusCount++;		//** Make sure StatPlusCount is called BEFORE calculate stats
 		DieselandPawn->CalculateStats();
 		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Intelligence!"));
-		StatPlusCount++;
 	}
 }
 
@@ -812,16 +818,20 @@ bool ADieselandPlayerController::UpgradeIntelligence_Validate()
 }
 void ADieselandPlayerController::UpgradeDexterity_Implementation()
 {
+	//Calculate Cost First
+	CalculateCost(FString(TEXT("Dexterity")));
 	//here is the real level up function
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3 && !PauseGameInput){
-		DieselandPawn->Scrap -= 3;
-		DieselandPawn->Dexterity += 3;
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= CostVal && !PauseGameInput){
+		DieselandPawn->Scrap -= CostVal;	//Subtracts current scrap amount by the cost value
+		DieselandPawn->Dexterity += 3;		//Increments attribute by 3 points
+		StatPlusCount++;		//** Make sure StatPlusCount is called BEFORE calculate stats
 		DieselandPawn->CalculateStats();
 		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Dexterity!"));
-		StatPlusCount++;
 	}
 }
+
+
 
 bool ADieselandPlayerController::UpgradeDexterity_Validate()
 {
@@ -829,20 +839,130 @@ bool ADieselandPlayerController::UpgradeDexterity_Validate()
 }
 void ADieselandPlayerController::UpgradeConstitution_Implementation()
 {
+	//Calculate Cost First
+	CalculateCost(FString(TEXT("Constitution")));
 	//here we upgrade the players constitution
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= 3 && !PauseGameInput){
-		DieselandPawn->Scrap -= 3;
-		DieselandPawn->Constitution += 3;
+	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && DieselandPawn->CharacterLevel < 20 && DieselandPawn->Scrap >= CostVal && !PauseGameInput){
+		DieselandPawn->Scrap -= CostVal;	//Subtracts current scrap amount by the cost value
+		DieselandPawn->Constitution += 3;	//Increments attribute by 3 points
+		StatPlusCount++;		//** Make sure StatPlusCount is called BEFORE calculate stats
 		DieselandPawn->CalculateStats();
 		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString("Upgraded Constitution!"));
-		StatPlusCount++;
+		//Debug Test ///TODO DELETE DEBUGS
+		GEngine->AddOnScreenDebugMessage(5, 5.0f, FColor::Cyan, FString::FromInt(StatPlusCount));
 	}
 }
 
 bool ADieselandPlayerController::UpgradeConstitution_Validate()
 {
 	return true;
+}
+
+bool ADieselandPlayerController::CalculateCost_Validate(const FString& Type)
+{
+	return true;
+}
+
+//This function calculates the cost of the next Attribute Value the player is trying to upgrade
+void ADieselandPlayerController::CalculateCost_Implementation(const FString& Type)
+{
+	//Probably not good casting this all the time
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	//The following conditional statements check the Cost Value for upgrading depending on the current value per attribute
+	if (Type == FString(TEXT("Strength")))
+	{
+		if (DieselandPawn->Strength < 13)
+		{
+			CostVal = 3;
+		}
+		else if (DieselandPawn->Strength < 16)
+		{
+			CostVal = 5;
+		}
+		else if (DieselandPawn->Strength < 18)
+		{
+			CostVal = 9;
+		}
+		else if (DieselandPawn->Strength < 20)
+		{
+			CostVal = 15;
+		}
+		else
+		{
+			CostVal = 20;
+		}
+
+	}
+	else if (Type == FString(TEXT("Constitution")))
+	{
+		if (DieselandPawn->Constitution < 13)
+		{
+			CostVal = 3;
+		}
+		else if (DieselandPawn->Constitution < 16)
+		{
+			CostVal = 5;
+		}
+		else if (DieselandPawn->Constitution < 18)
+		{
+			CostVal = 9;
+		}
+		else if (DieselandPawn->Constitution < 20)
+		{
+			CostVal = 15;
+		}
+		else
+		{
+			CostVal = 20;
+		}
+	}
+	else if (Type == FString(TEXT("Intelligence")))
+	{
+		if (DieselandPawn->Intelligence < 13)
+		{
+			CostVal = 3;
+		}
+		else if (DieselandPawn->Intelligence < 16)
+		{
+			CostVal = 5;
+		}
+		else if (DieselandPawn->Intelligence < 18)
+		{
+			CostVal = 9;
+		}
+		else if (DieselandPawn->Intelligence < 20)
+		{
+			CostVal = 15;
+		}
+		else
+		{
+			CostVal = 20;
+		}
+	}
+	else if (Type == FString(TEXT("Dexterity")))
+	{
+		if (DieselandPawn->Dexterity < 13)
+		{
+			CostVal = 3;
+		}
+		else if (DieselandPawn->Dexterity < 16)
+		{
+			CostVal = 5;
+		}
+		else if (DieselandPawn->Dexterity < 18)
+		{
+			CostVal = 9;
+		}
+		else if (DieselandPawn->Dexterity < 20)
+		{
+			CostVal = 15;
+		}
+		else
+		{
+			CostVal = 20;
+		}
+	}
 }
 
 
@@ -924,4 +1044,5 @@ void ADieselandPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimePro
 	DOREPLIFETIME(ADieselandPlayerController, PauseGameInput);
 	DOREPLIFETIME(ADieselandPlayerController, PawnChosen);
 	DOREPLIFETIME(ADieselandPlayerController, NewPawn);
+	DOREPLIFETIME(ADieselandPlayerController, CostVal);
 }

@@ -5,6 +5,7 @@
 #include "EngletonCharacter.h"
 #include "BaseProjectileOnHitEffect.h"
 #include "DieselandCharacter.h"
+#include "DieselandEnemyBot.h"
 #include "DieselandPlayerController.h"
 #include "UnrealNetwork.h"
 #include "ParticleDefinitions.h"
@@ -53,10 +54,17 @@ void AEngletonMachineGun::ReceiveActorBeginOverlap(AActor* OtherActor)
 
 		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 		{
-			if (OtherActor->ActorHasTag(TEXT("Player")) || (OtherActor->ActorHasTag(TEXT("Enemy"))))
+			if (OtherActor->ActorHasTag(TEXT("Player")))
 			{
 				ABaseProjectileOnHitEffect* const OnHitEffect = World->SpawnActor<ABaseProjectileOnHitEffect>(ABaseProjectileOnHitEffect::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
-				Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->EditHealth(-1 * ProjectileDamage, OtherActor);
+				Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
+				OnHitEffect->ServerActivateProjectile();
+				this->Destroy();
+			}
+			if (OtherActor->ActorHasTag(TEXT("Enemy")))
+			{
+				ABaseProjectileOnHitEffect* const OnHitEffect = World->SpawnActor<ABaseProjectileOnHitEffect>(ABaseProjectileOnHitEffect::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
+				Cast<ADieselandEnemyBot>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
 				OnHitEffect->ServerActivateProjectile();
 				this->Destroy();
 			}

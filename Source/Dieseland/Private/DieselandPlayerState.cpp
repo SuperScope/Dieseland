@@ -9,7 +9,8 @@
 ADieselandPlayerState::ADieselandPlayerState(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	TeamNumber = 0;
+	TeamNumber = 1;
+	Kills = 0;
 }
 
 void ADieselandPlayerState::ClientInitialize(class AController* InController)
@@ -36,12 +37,32 @@ void ADieselandPlayerState::SetTeamNum(int32 NewTeamNumber)
 	}
 }
 
+void ADieselandPlayerState::SetKillNum(int32 NewKillNumber)
+{
+	Kills = NewKillNumber;
+
+	if (Role != ROLE_Authority)
+	{
+		ServerSetTeamNum(NewKillNumber);
+	}
+}
+
 void ADieselandPlayerState::ServerSetTeamNum_Implementation(int32 NewTeamNumber)
 {
 	SetTeamNum(NewTeamNumber);
 }
 	
 bool ADieselandPlayerState::ServerSetTeamNum_Validate(int32 NewTeamNumber)
+{
+	return true;
+}
+
+void ADieselandPlayerState::ServerSetKillNum_Implementation(int32 NewKillNumber)
+{
+	SetKillNum(NewKillNumber);
+}
+
+bool ADieselandPlayerState::ServerSetKillNum_Validate(int32 NewKillNumber)
 {
 	return true;
 }
@@ -61,4 +82,5 @@ void ADieselandPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ADieselandPlayerState, TeamNumber);
+	DOREPLIFETIME(ADieselandPlayerState, Kills);
 }

@@ -15,11 +15,12 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 {
 	GENERATED_UCLASS_BODY()
 
-	// Temporary display of health value
-	// TODO: Remove when UI is ready
+	// Numerical display of health value
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
-	TSubobjectPtr<class UTextRenderComponent> PlayerLabel;
+	TSubobjectPtr<class UTextRenderComponent> HealthLabel;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
+	TSubobjectPtr<class UMaterialBillboardComponent> HealthBar;
 	
 	//this is for the pathfinding variables, specifically the Behavior Tree
 	UPROPERTY(EditAnywhere, Category = Behavior)
@@ -41,13 +42,18 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 		void EditHealth(int32 Amt, AActor* Target);
 
-
 	//public health value of this character
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	int32 Health;
+		int32 Health;
+
+	// Value 0.0f - 1.0f used for health bar display
+	float HealthPercentage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
+		UMaterialInstanceDynamic* HealthBarMaterial;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
-	float LingerTimer;
+		float LingerTimer;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Trap)
 		float StunTimer;
@@ -116,7 +122,7 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 
 	// The range of this character's attack zone radius
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
-	float AttackZone;
+		float AttackZone;
 
 	// The range of this character's attack zone radius
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
@@ -204,6 +210,13 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 
 
 protected:
+
+	UClass* ScrapClass;
+
+	UMaterial* HealthBarMatStatic;
+	UMaterial* HealthBarBackMatStatic;
+
+	virtual void ReceiveBeginPlay() override;
 
 	//timer for updating UI
 	virtual void Tick(float DeltaSeconds) override;

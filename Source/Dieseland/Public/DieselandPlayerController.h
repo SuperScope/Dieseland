@@ -74,6 +74,9 @@ public:
 	void UpgradeConstitution();
 
 	UFUNCTION(Reliable, Server, WithValidation)
+	void CalculateCost( const FString& Type);
+
+	UFUNCTION(Reliable, Server, WithValidation)
 	void OnTaunt();
 
 	UFUNCTION(Reliable, Server, WithValidation)
@@ -121,6 +124,14 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	bool PawnChosen;
 
+	//Cost of next upgrade
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 CostVal;
+
+	//Used for determining the cost of the attribute
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	FString Type;
+
 	// Timer workaround to ensure replication on server
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerPossessNewPawn();
@@ -128,6 +139,8 @@ public:
 	// Timer workaround to ensure replication
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	void PossessNewPawn();
+
+
 
 	// Input events
 	UFUNCTION(Reliable, Server, WithValidation)

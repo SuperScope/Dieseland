@@ -9,6 +9,8 @@
 #include "BaseWalkerProjectile.h"
 #include "UnrealNetwork.h"
 #include "EngletonCrazyLaser.h"
+#include "Scrap.h"
+#include "DieselandStaticLibrary.h"
 
 
 ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializeProperties& PCIP)
@@ -27,12 +29,16 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	BasicAttackDamage = 25;
 	HealthRegeneration = 2;
 
+	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarTextRef(TEXT("Material'/Game/MaterialsDLC/M_HealthText.M_HealthText'"));
+
 	// Create the text component
-	PlayerLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("PlayerLabel"));
-	PlayerLabel->AttachTo(RootComponent);
-	PlayerLabel->AddRelativeLocation(FVector(-80.0f, 0.0f, 0.0f), false);
-	PlayerLabel->AddLocalRotation(FRotator(90.0f, 0.0f, -180.0f));
-	PlayerLabel->Text = FString::FromInt(Health);
+	HealthLabel = PCIP.CreateDefaultSubobject<UTextRenderComponent>(this, TEXT("HealthLabel"));
+	HealthLabel->AttachTo(RootComponent);
+	HealthLabel->AddRelativeLocation(FVector(0.0f, 0.0f, 200.0f), false);
+	HealthLabel->Text = FString::FromInt(Health);
+	HealthLabel->SetMaterial(0, HealthBarTextRef.Object);
+	HealthLabel->VerticalAlignment = EVerticalTextAligment::EVRTA_TextCenter;
+	HealthLabel->HorizontalAlignment = EHorizTextAligment::EHTA_Center;
 
 	// Find the mesh to use for AimMesh component
 	//static ConstructorHelpers::FObjectFinder<UStaticMesh> SkeletalMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube.Shape_Cube'"));
@@ -94,6 +100,18 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	ProjectileZoneCollision->SetCapsuleRadius(ProjectileZone / 2.0f);
 	ProjectileZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarMatRef(TEXT("Material'/Game/UserInterfaceAssets/HUD/Materials/M_HUD_Health_Bar.M_HUD_Health_Bar'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarBackMatRef(TEXT("Material'/Game/MaterialsDLC/Material_BasicDarkGrey.Material_BasicDarkGrey'"));
+
+	HealthBar = PCIP.CreateDefaultSubobject<UMaterialBillboardComponent>(this, TEXT("HealthBar"));
+	HealthBar->AttachParent = RootComponent;
+	HealthBar->AddRelativeLocation(FVector(0.0f, 0.0f, 175.0f));
+	HealthBarMatStatic = HealthBarMatRef.Object;
+	HealthBarBackMatStatic = HealthBarBackMatRef.Object;
+	//HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
+	HealthBar->AddElement(HealthBarMatRef.Object, nullptr, false, 10.0f, 75.0f, nullptr);
+	HealthBar->AddElement(HealthBarBackMatRef.Object, nullptr, false, 10.0f, 75.0f, nullptr);
+
 	// Ensure replication
 	bReplicates = true;
 	bReplicateMovement = true;
@@ -120,6 +138,13 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	this->CharacterMovement->RotationRate = FRotator(0.0f, 360.0f, 0.0f);
 	this->CharacterMovement->MaxWalkSpeed = 300;
 
+	static ConstructorHelpers::FObjectFinder<UClass> ScrapBlueprint(TEXT("Class'/Game/Blueprints/Scrap_BP.Scrap_BP_C'"));
+
+	if (ScrapBlueprint.Object)
+	{
+		ScrapClass = (UClass*)ScrapBlueprint.Object;
+	}
+
 	WalkerCannon = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Walker Cannon Sound"));
 	WalkerCannon->AttachParent = RootComponent;
 	WalkerCannon->bAutoActivate = false;
@@ -134,11 +159,28 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 }
 
 
+void ADieselandEnemyBot::ReceiveBeginPlay()
+{
+	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatStatic, this);
+	HealthBar->Elements[0].Material = HealthBarMaterial;
+	HealthBar->AddElement(HealthBarBackMatStatic, nullptr, false, 10.0f, 75.0f, nullptr);
+
+	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.0f, 0.0f));
+
+	Super::ReceiveBeginPlay();
+}
+
 void ADieselandEnemyBot::Tick(float DeltaSeconds)
 {
 	// Every frame set the health display
-	// TODO: Remove when UI is completed
-	PlayerLabel->SetText(FString::FromInt(Health));
+	HealthLabel->SetText(FString::FromInt(Health));
+	HealthLabel->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
+
+	HealthPercentage = ((float)Health / (float)MaxHealth);
+	if (HealthBarMaterial)
+	{
+		Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
+	}
 
 	Super::Tick(DeltaSeconds);
 
@@ -258,18 +300,38 @@ void ADieselandEnemyBot::ResetStats()
 	this->CharacterMovement->MaxWalkSpeed = 300;
 }
 
-void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Target)
+void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
 {
 	if (this != nullptr){
-		if (Target->ActorHasTag(FName(TEXT("Player"))))
+		if (Causer->ActorHasTag(FName(TEXT("Player"))))
 		{
-			Cast<ADieselandCharacter>(Target)->Health += Amt;
-			PlayerLabel->SetText(FString::FromInt(Health));
+			Health += Amt;
+			HealthLabel->SetText(FString::FromInt(Health));
 
 			//i Don't think we need this function for the AI
 			if (Role < ROLE_Authority)
 			{
-				Cast<ADieselandPlayerController>(Controller)->ServerEditHealth(Amt, Target);
+				//EditHealth(Amt, Causer);
+			}
+		}
+		if (this->Health <= 0 && Causer->ActorHasTag(FName(TEXT("Player"))))
+		{
+			FVector TempEnemyLoc = FVector(Causer->GetActorLocation().X, Causer->GetActorLocation().Y, Causer->GetActorLocation().Z);
+
+			//Spawn Scrap pieces here
+			UWorld* const World = GetWorld();
+			if (World && Causer != nullptr && Causer->ActorHasTag(FName(TEXT("Player"))))
+			{
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = this;
+				SpawnParams.Instigator = Instigator;
+				for (int32 x = 0; x < 5; x++)
+				{
+					UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(this->GetActorLocation().X, this->GetActorLocation().Y, this->GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f));
+					this->Destroy();
+					//Alternatively used to spawn c++ class
+					//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+				}
 			}
 		}
 	}
@@ -308,7 +370,7 @@ void ADieselandEnemyBot::MeleeAttack()
 			if (!CurActor->IsValidLowLevel()) continue;
 
 			if (Role == ROLE_Authority){
-				EditHealth(-1 * BasicAttackDamage, CurActor);
+				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 			}
 		}
 	}
