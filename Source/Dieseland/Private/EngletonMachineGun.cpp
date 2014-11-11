@@ -5,6 +5,7 @@
 #include "EngletonCharacter.h"
 #include "BaseProjectileOnHitEffect.h"
 #include "DieselandCharacter.h"
+#include "DieselandPlayerState.h"
 #include "DieselandEnemyBot.h"
 #include "DieselandPlayerController.h"
 #include "UnrealNetwork.h"
@@ -36,6 +37,8 @@ AEngletonMachineGun::AEngletonMachineGun(const class FPostConstructInitializePro
 
 void AEngletonMachineGun::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
+	AActor::ReceiveActorBeginOverlap(OtherActor);
+
 	UWorld* const World = GetWorld();
 	if (World)
 	{
@@ -43,18 +46,11 @@ void AEngletonMachineGun::ReceiveActorBeginOverlap(AActor* OtherActor)
 		SpawnParams.Owner = this;
 		SpawnParams.Instigator = Instigator;
 
-		AActor::ReceiveActorBeginOverlap(OtherActor);
-
-		if (OtherActor == nullptr){
-			return;
-		}
-		if (Cast<ADieselandPlayerController>(GetOwner())->GetPawn() == nullptr){
-			return;
-		}
-
-		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
+		if (Role == ROLE_Authority /*&& Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor*/)
 		{
-			if (OtherActor->ActorHasTag(TEXT("Player")))
+			if (OtherActor->ActorHasTag(TEXT("Player")) &&
+				Cast<ADieselandPlayerState>(Cast<ADieselandCharacter>(OtherActor))->GetTeamNum() !=
+				Cast<ADieselandPlayerState>(Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())))->GetTeamNum())
 			{
 				ABaseProjectileOnHitEffect* const OnHitEffect = World->SpawnActor<ABaseProjectileOnHitEffect>(ABaseProjectileOnHitEffect::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
 				Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
