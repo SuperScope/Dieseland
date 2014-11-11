@@ -104,8 +104,8 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	HealthBar->AddRelativeLocation(FVector(0.0f, 0.0f, 175.0f));
 	HealthBarMatStatic = HealthBarMatRef.Object;
 	HealthBarBackMatStatic = HealthBarBackMatRef.Object;
-	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
-	HealthBar->AddElement(HealthBarMaterial, nullptr, false, 10.0f, 75.0f, nullptr);
+	//HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatRef.Object, this);
+	HealthBar->AddElement(HealthBarMatRef.Object, nullptr, false, 10.0f, 75.0f, nullptr);
 	HealthBar->AddElement(HealthBarBackMatRef.Object, nullptr, false, 10.0f, 75.0f, nullptr);
 
 	// Tag this character as a player
@@ -216,7 +216,8 @@ void ADieselandCharacter::ReceiveBeginPlay()
 {
 	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatStatic, this);
 	HealthBar->AddElement(HealthBarMaterial, nullptr, false, 10.0f, 75.0f, nullptr);
-	HealthBar->AddElement(HealthBarBackMatStatic, nullptr, false, 10.0f, 75.0f, nullptr);
+	HealthBar->Elements[0].Material = HealthBarMaterial;
+	//HealthBar->AddElement(HealthBarBackMatStatic, nullptr, false, 10.0f, 75.0f, nullptr);
 
 	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.000905f, 1.0f, 0.0f));
 	if (PlayerState != nullptr)
@@ -235,12 +236,14 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	HealthLabel->SetText(FString::FromInt(Health));
 	HealthLabel->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
 
-	HealthPercentage = ((float)Health / (float)MaxHealth);
-	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
-	if (PlayerState && GetTeamNumber() != CharacterTeam)
-	{
-		CharacterTeam = GetTeamNumber();
-		UpdateTeamColor();
+	if (HealthBarMaterial){
+		HealthPercentage = ((float)Health / (float)MaxHealth);
+		Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetScalarParameterValue(FName(TEXT("Health percentage")), HealthPercentage);
+		if (PlayerState && GetTeamNumber() != CharacterTeam)
+		{
+			CharacterTeam = GetTeamNumber();
+			UpdateTeamColor();
+		}
 	}
 
 	Super::Tick(DeltaSeconds);
