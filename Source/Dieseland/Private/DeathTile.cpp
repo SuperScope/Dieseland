@@ -73,6 +73,7 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
 	EnemyCheckTimer = EnemyCheckInterval;
 
 	TimeLimit = 300.0f;
+    Inactive = false;
 }
 
 void ADeathTile::SwitchDeathTile()
@@ -147,8 +148,9 @@ void ADeathTile::Tick(float DeltaSeconds)
 	if (TimeLimit > 0.0f){
 		TimeLimit -= DeltaSeconds;
 	}
-	else
-	{
+	else if(TimeLimit <= 0.0 && Inactive == false)
+    {
+        Inactive = true;
 		OnShouldDrop();
 		EnemyDetectionActive = false;
 	}
@@ -165,5 +167,6 @@ void ADeathTile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLif
 	DOREPLIFETIME(ADeathTile, SpotlightArray);
 	DOREPLIFETIME(ADeathTile, DeathTileIndex);
 	DOREPLIFETIME(ADeathTile, EnemyFound);
+    DOREPLIFETIME(ADeathTile, Inactive);
 	DOREPLIFETIME(ADeathTile, EnemyDetectionActive);
 }
