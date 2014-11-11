@@ -47,6 +47,9 @@ class DIESELAND_API ADieselandHighlanderKingBot : public ADieselandEnemyBot
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
 	UParticleSystem* BeamParticle;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+	TSubobjectPtr <UAudioComponent> BeamSound;
+
 	
 	// Damage amount for cannon, important to note this damage is updated once per .2 seconds
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)

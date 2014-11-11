@@ -46,6 +46,10 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 
 	IsKing = true;
 
+	BeamSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Beam Sound"));
+	BeamSound->AttachParent = RootComponent;
+	BeamSound->bAutoActivate = false;
+
 	
 
 }
@@ -68,8 +72,9 @@ void ADieselandHighlanderKingBot::CannonAttack()
 
 		if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player")))){
 			EditHealth(-1 * CannonAttackDamage, CurActor);
-			//here I check to see if it's hte first time firing for the cannon, if so I activate the particle effect.
+			//here I check to see if it's hte first time firing for the cannon, if so I activate the particle effect and beam noise.
 			if (CannonAttackTicks == 0){
+				BeamSound->Play();
 				ServerActivateParticle(BeamParticle);
 			}
 			CannonAttackTicks++;

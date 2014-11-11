@@ -62,11 +62,12 @@ void ADieselandHighlanderKingAI::UpdateCooldownTimers(float DeltaSeconds)
 		}
 		// end of attack patern check for check to see if the cannon is being fired
 		//here I set the isfiringcannons to false for the highlander king
-		else if (DieselandPawn->AttackPatternTimer > 4.0f && DieselandPawn->AttackPatternTimer <= 5.0f){
-			DieselandPawn->CharacterMovement->MaxWalkSpeed = 400;
+		if (DieselandPawn->AttackPatternTimer > 4.0f && DieselandPawn->AttackPatternTimer <= 5.0f){
+			DieselandPawn->CharacterMovement->MaxWalkSpeed = 300;
 			DieselandPawn->CharacterMovement->RotationRate = FRotator(0.0f, 360.0f, 0.0f);
 			DieselandPawn->IsFiringCannons = false;
 			DieselandPawn->CannonAttackTicks = 0;
+			DieselandPawn->BeamSound->Stop();
 		}
 	}//end of cast if statement
 
