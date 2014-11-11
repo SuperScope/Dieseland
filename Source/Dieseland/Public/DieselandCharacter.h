@@ -32,6 +32,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
 	TSubobjectPtr<class UStaticMeshComponent> AimSphere;
+	// Mesh attached to the torso socket which is used to show attack direction - invisible by default
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
+	TSubobjectPtr<class UStaticMeshComponent> MiniMapIcon;
 
 	// Mesh attached to the torso socket which is used to show attack direction - invisible by default
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
@@ -199,6 +204,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
 	UMaterialInstanceDynamic* AimBarMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
+	UMaterialInstanceDynamic* MiniMapMaterial;
 
 
 	//FireTrap Damage Timer
@@ -368,6 +376,7 @@ protected:
 
 	UMaterial* HealthBarMatStatic;
 	UMaterial* AimBarMatStatic;
+	UMaterial* IconMatStatic;
 	UMaterial* HealthBarBackMatStatic;
 
 	int32 CharacterTeam;
