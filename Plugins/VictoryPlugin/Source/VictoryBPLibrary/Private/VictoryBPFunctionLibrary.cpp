@@ -771,7 +771,7 @@ bool UVictoryBPFunctionLibrary::OptionsMenu__GetDisplayAdapterScreenResolutions(
 
 AStaticMeshActor* UVictoryBPFunctionLibrary::Clone__StaticMeshActor(UObject* WorldContextObject, bool&IsValid, AStaticMeshActor* ToClone, FVector LocationOffset,FRotator RotationOffset)
 {
-	IsValid = NULL;
+	IsValid = 0;
 	if(!ToClone) return NULL;
 	if(!ToClone->IsValidLowLevel()) return NULL;
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -790,7 +790,7 @@ AStaticMeshActor* UVictoryBPFunctionLibrary::Clone__StaticMeshActor(UObject* Wor
 	SpawnInfo.bNoCollisionFail 		= true;
 	SpawnInfo.Owner 				= ToClone;
 	SpawnInfo.Instigator				= NULL;
-	SpawnInfo.bDeferConstruction 	= NULL;
+	SpawnInfo.bDeferConstruction 	= 0;
 	
 	AStaticMeshActor* NewSMA = World->SpawnActor<AStaticMeshActor>(SpawnClass, ToClone->GetActorLocation() + FVector(0,0,512) ,ToClone->GetActorRotation(), SpawnInfo );
 	
