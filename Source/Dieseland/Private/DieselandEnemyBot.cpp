@@ -327,7 +327,9 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
 				SpawnParams.Instigator = Instigator;
 				for (int32 x = 0; x < 5; x++)
 				{
-					UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(this->GetActorLocation().X, this->GetActorLocation().Y, this->GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f));
+                    RandomX = FMath::RandRange(-30, 30);
+                    RandomY = FMath::RandRange(-30, 30);
+					UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(this->GetActorLocation().X +RandomX, this->GetActorLocation().Y + RandomY, this->GetActorLocation().Z), FRotator(0.0f, 0.0f, 0.0f));
 					this->Destroy();
 					//Alternatively used to spawn c++ class
 					//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
@@ -448,6 +450,8 @@ void ADieselandEnemyBot::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandEnemyBot, Health);
 	DOREPLIFETIME(ADieselandEnemyBot, AimMesh);
+    DOREPLIFETIME(ADieselandEnemyBot, RandomX);
+    DOREPLIFETIME(ADieselandEnemyBot, RandomY);
 	if (!IsMelee){
 		DOREPLIFETIME(ADieselandEnemyBot, SkeletalMesh);
 	}
