@@ -100,8 +100,11 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	ProjectileZoneCollision->SetCapsuleRadius(ProjectileZone / 2.0f);
 	ProjectileZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	//getting cubes and stuff
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube2.Shape_Cube2'"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarMatRef(TEXT("Material'/Game/UserInterfaceAssets/HUD/Materials/M_HUD_Health_Bar.M_HUD_Health_Bar'"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarBackMatRef(TEXT("Material'/Game/MaterialsDLC/Material_BasicDarkGrey.Material_BasicDarkGrey'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> MiniMapMatRef(TEXT("Material'/Game/Materials/MiniMapIcon2.MiniMapIcon2'"));
 
 	HealthBar = PCIP.CreateDefaultSubobject<UMaterialBillboardComponent>(this, TEXT("HealthBar"));
 	HealthBar->AttachParent = RootComponent;
@@ -156,6 +159,16 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	SwordSwing = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Basic Sword Swing Sound"));
 	SwordSwing->AttachParent = RootComponent;
 	SwordSwing->bAutoActivate = false;
+
+	//used for the minimap
+	MiniMapIcon = PCIP.CreateDefaultSubobject<UStaticMeshComponent >(this, TEXT("MiniMap Icon"));
+	MiniMapIcon->AttachParent = Mesh;
+	MiniMapIcon->SetStaticMesh(CubeMesh.Object);
+	MiniMapIcon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	IconMatStatic = MiniMapMatRef.Object;
+	MiniMapIcon->SetIsReplicated(true);
+
+
 }
 
 
@@ -167,11 +180,25 @@ void ADieselandEnemyBot::ReceiveBeginPlay()
 
 	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.0f, 0.0f));
 
+	MiniMapMaterial = UMaterialInstanceDynamic::Create(IconMatStatic, this);
+	MiniMapIcon->SetWorldScale3D(FVector(13.0f, 13.0, 0.01f));
+	MiniMapIcon->SetWorldRotation(FRotator(0, 90.0f, 0));
+
+	MiniMapIcon->AddRelativeLocation(FVector(0.0f, 0.0f, 700.0f));
+	MiniMapIcon->CastShadow = false;
+	MiniMapIcon->SetVisibility(false);
+
+	if (IsQueen || IsKing)
+	{
+		MiniMapIcon->SetVisibility(true);
+	}
+
 	Super::ReceiveBeginPlay();
 }
 
 void ADieselandEnemyBot::Tick(float DeltaSeconds)
 {
+
 	// Every frame set the health display
 	HealthLabel->SetText(FString::FromInt(Health));
 	HealthLabel->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
