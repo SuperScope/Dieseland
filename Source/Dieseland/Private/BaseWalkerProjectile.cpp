@@ -6,6 +6,7 @@
 #include "DieselandEnemyBot.h"
 #include "DieselandEnemyAI.h"
 #include "DieselandCharacter.h"
+#include "WalkerProjectileOnHitEffect.h"
 #include "DieselandPlayerController.h"
 #include "ParticleDefinitions.h"
 #include "Particles/ParticleSystem.h"
@@ -56,7 +57,7 @@ ABaseWalkerProjectile::ABaseWalkerProjectile(const class FPostConstructInitializ
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/MovingBulletTest_WIP.MovingBulletTest_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_WalkerShot.Unreal_Particle_WalkerShot'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> LaunchParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/TempCrazylaser.TempCrazylaser'"));
 	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	Particle->Template = ParticleSystemAsset.Object;
@@ -92,55 +93,67 @@ void ABaseWalkerProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 	//if (OtherActor == nullptr || OtherActor == NULL || Role == NULL){
 		//return;
 	//}
-	if (IsAI == false)
+	UWorld* const World = GetWorld();
+	if (World)
 	{
-		if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = Instigator;
+
+		if (IsAI == false)
 		{
-			if (OtherActor->ActorHasTag(TEXT("Player")))
+			if (Role == ROLE_Authority && Cast<ADieselandPlayerController>(GetOwner())->GetPawn() != OtherActor)
 			{
-				Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, Cast<ADieselandEnemyAI>(GetOwner())->GetPawn());
-				if (!Piercing)
+				if (OtherActor->ActorHasTag(TEXT("Player")))
+				{
+					Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, Cast<ADieselandEnemyAI>(GetOwner())->GetPawn());
+					if (!Piercing)
+					{
+						this->Destroy();
+					}
+
+				}
+				else if (!OtherActor->ActorHasTag(TEXT("Enemy")))
+				{
+					//Cast<ADieselandEnemyBot>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
+					if (!Piercing)
+					{
+						this->Destroy();
+					}
+				}
+				else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
 				{
 					this->Destroy();
 				}
+			}
+		}//end is AI
 
-			}
-			else if (!OtherActor->ActorHasTag(TEXT("Enemy")))
-			{
-				//Cast<ADieselandEnemyBot>(OtherActor)->EditHealth(-1 * ProjectileDamage, this);
-				if (!Piercing)
-				{
-					this->Destroy();
-				}
-			}
-			else if (!OtherActor->ActorHasTag(TEXT("Projectile")))
-			{
-				this->Destroy();
-			}
-		}
-	}//end is AI
-
-	else if (IsAI)
-	{
-		if (Role == ROLE_Authority && Cast<ADieselandEnemyAI>(GetOwner())->GetPawn() != OtherActor)
+		else if (IsAI)
 		{
-			
-			//UE_LOG(LogClass, Log, TEXT("Log text %s"), *OtherActor->GetName());
-			if (OtherActor->ActorHasTag(TEXT("Player")))
+			if (Role == ROLE_Authority && Cast<ADieselandEnemyAI>(GetOwner())->GetPawn() != OtherActor)
 			{
-				Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, Cast<ADieselandEnemyAI>(GetOwner())->GetPawn());
-				if (!Piercing)
-				{
-					this->Destroy();
-				}
 
+				//UE_LOG(LogClass, Log, TEXT("Log text %s"), *OtherActor->GetName());
+				if (OtherActor->ActorHasTag(TEXT("Player")))
+				{
+					Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, Cast<ADieselandEnemyAI>(GetOwner())->GetPawn());
+					if (!Piercing)
+					{
+						AWalkerProjectileOnHitEffect* const OnHit = World->SpawnActor<AWalkerProjectileOnHitEffect>(AWalkerProjectileOnHitEffect::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
+						OnHit->ServerActivateProjectile();
+						this->Destroy();
+					}
+
+				}/*
+				else if (!OtherActor->ActorHasTag(TEXT("Projectile")) && !OtherActor->ActorHasTag(TEXT("Enemy")))
+				{
+					AWalkerProjectileOnHitEffect* const OnHit = World->SpawnActor<AWalkerProjectileOnHitEffect>(AWalkerProjectileOnHitEffect::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
+					OnHit->ServerActivateProjectile();
+					this->Destroy();
+				}*/
 			}
-			else if (!OtherActor->ActorHasTag(TEXT("Projectile")) && !OtherActor->ActorHasTag(TEXT("Enemy")))
-			{
-				this->Destroy();
-			}
-		}
-	}//end is AI*/
+		}//end is AI*/
+	}
 }
 
 void ABaseWalkerProjectile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

@@ -7,18 +7,24 @@
 AFoxPenetrationRound::AFoxPenetrationRound(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	InitialLifeSpan = 0.8f;
+	InitialLifeSpan = 1.1f;
 
 
 	//the penetration round is meant to be large and move very quickly
-	ProjectileMovement->InitialSpeed = 2500.0f;
+	ProjectileMovement->InitialSpeed = 1900.0f;
 	ProjCollision->SetCapsuleHalfHeight(150.0f);
 	ProjCollision->SetCapsuleRadius(150.0f);
 
 	//temp meshscale
 	FVector MeshScale;
-	MeshScale = FVector(3, 3, 3);
-	
+	MeshScale = FVector(1, 1, 1);
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_FoxPenetratorShot.Unreal_Particle_FoxPenetratorShot'"));
+	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
+	Particle->Template = ParticleSystemAsset.Object;
+
+
+
 	this->Mesh->SetWorldScale3D(MeshScale);
 	///ReplicatedMovement.LinearVelocity.Z = 1000.0f;
 	//ReplicatedMovement.

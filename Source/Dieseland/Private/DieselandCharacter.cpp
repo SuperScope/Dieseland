@@ -257,7 +257,8 @@ void ADieselandCharacter::ReceiveBeginPlay()
 	AimBar->Materials.Add(AimBarMaterial);
 
 	MiniMapMaterial = UMaterialInstanceDynamic::Create(IconMatStatic, this);
-	MiniMapIcon->SetWorldScale3D(FVector(7.0f, 7.0, 0.01f));
+	MiniMapIcon->SetWorldScale3D(FVector(8.0f, 8.0, 0.01f));
+	MiniMapIcon->SetWorldRotation(FRotator(0, 90.0f, 0));
 
 	MiniMapIcon->AddRelativeLocation(FVector(0.0f, 0.0f,1500.0f));
 	MiniMapIcon->CastShadow = false;
