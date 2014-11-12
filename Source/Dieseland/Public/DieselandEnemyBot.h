@@ -160,6 +160,9 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void OnProjectileZoneEnter();
 
+	UFUNCTION(BlueprintNativeEvent, Category = Combat)
+	void OnBasicAttack();
+
 	//One forumla > many <3
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 		void ResetStats();

@@ -318,7 +318,10 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 		{
 			FVector TempEnemyLoc = FVector(DieselandPawn->GetActorLocation().X, DieselandPawn->GetActorLocation().Y, DieselandPawn->GetActorLocation().Z);
 
-			DieselandPawn->SetActorLocation(Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->PickSpawn()->GetActorLocation());
+			FVector TempSpawnLocation = Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->PickSpawn()->GetActorLocation();
+			TempSpawnLocation = FVector(SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z + 100.0f);
+
+			DieselandPawn->SetActorLocation(TempSpawnLocation);
 			DieselandPawn->Health = DieselandPawn->MaxHealth;
 			DieselandPawn->LingerTimer = 0;
 

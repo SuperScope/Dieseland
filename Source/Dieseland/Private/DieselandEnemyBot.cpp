@@ -343,19 +343,7 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
 //here is the basic melee attack for the AI
 void ADieselandEnemyBot::MeleeAttack()
 {
-	if (isAggressive && IsWalker == false)
-	{
-		if (IsKing)
-		{
-
-			KingSwing->Play();
-		}
-		if (!IsKing)
-		{
-			SwordSwing->Play();
-		}
-	}
-
+	
 	//here I do an if check to test and see if the Bot is of melee type, if so then I proceed with the melee attack.
 	if (IsMelee && (StatusEffects.Contains(FString("Stunned")) == false)){
 		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -376,11 +364,30 @@ void ADieselandEnemyBot::MeleeAttack()
 			if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Player")))) continue;
 			if (!CurActor->IsValidLowLevel()) continue;
 
-			if (Role == ROLE_Authority){
+			if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player")))){
 				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+				OnBasicAttack();
+
+				if (isAggressive && IsWalker == false)
+				{
+					if (IsKing)
+					{
+
+						KingSwing->Play();
+					}
+					if (!IsKing)
+					{
+						SwordSwing->Play();
+					}
+				}
 			}
 		}
 	}
+}
+
+void ADieselandEnemyBot::OnBasicAttack_Implementation()
+{
+
 }
 
 //here is the basic ranged attack for the AI
