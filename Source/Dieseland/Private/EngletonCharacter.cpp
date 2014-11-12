@@ -178,6 +178,7 @@ void AEngletonCharacter::SkillOne()
 			}
 		}
 	}
+	OnSkillOne();
 }
 
 //crazy laser
@@ -205,6 +206,7 @@ void AEngletonCharacter::SkillTwo()
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			OnSkillTwo();
 		}
 	}
 }
@@ -283,6 +285,7 @@ void AEngletonCharacter::SkillThree()
 			DieselandPawn->CharacterMovement->DoJump(false);
 		}
 	}
+	OnSkillThree();
 }
 
 void AEngletonCharacter::RangedAttack()
@@ -322,6 +325,7 @@ void AEngletonCharacter::RangedAttack()
 
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
 			Projectile2->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			OnBasicAttack();
 		}
 	}
 }

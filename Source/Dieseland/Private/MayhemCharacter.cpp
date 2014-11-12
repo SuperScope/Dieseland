@@ -163,18 +163,21 @@ void AMayhemCharacter::MeleeAttack()
 			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
 			{
 				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+				PunchSound->Play();
 			}
 			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
 			{
 				Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+				PunchSound->Play();
 			}
 			else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
 			{
 				Cast<AScrapBox>(CurActor)->DestroyCrate(this);
+				PunchSound->Play();
 			}
 		}
 	}
-	PunchSound->Play();
+	OnBasicAttack();
 }
 
 //Smash
@@ -223,6 +226,7 @@ void AMayhemCharacter::SkillOne()
 		}
 	}
 	UltimateSound->Play();
+	OnSkillOne();
 }
 
 //rage
@@ -238,6 +242,7 @@ void AMayhemCharacter::SkillTwo()
 	CharacterMovement->MaxWalkSpeed += RageMoveSpeedBuff;
 
 	RageTimer = RageDuration;
+	OnSkillTwo();
 }
 
 //Mayhem Iron Armor
@@ -253,6 +258,7 @@ void AMayhemCharacter::SkillThree()
 
 	HealthRegeneration += IronArmorRegenBuff;
 	IronArmorSound->Play();
+	OnSkillThree();
 }
 
 void AMayhemCharacter::SkillOneAim()

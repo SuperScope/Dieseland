@@ -718,6 +718,26 @@ void ADieselandCharacter::SkillThree()
 	}
 }
 
+void ADieselandCharacter::OnBasicAttack_Implementation()
+{
+
+}
+
+void ADieselandCharacter::OnSkillOne_Implementation()
+{
+
+}
+
+void ADieselandCharacter::OnSkillTwo_Implementation()
+{
+
+}
+
+void ADieselandCharacter::OnSkillThree_Implementation()
+{
+
+}
+
 //all necessary audio functions
 void ADieselandCharacter::Taunt()
 {

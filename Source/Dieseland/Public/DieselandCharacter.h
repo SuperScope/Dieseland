@@ -302,6 +302,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	virtual void SkillThree();
 
+	UFUNCTION(BlueprintNativeEvent, Category = Combat)
+	void OnBasicAttack();
+
+	UFUNCTION(BlueprintNativeEvent, Category = Combat)
+	void OnSkillOne();
+
+	UFUNCTION(BlueprintNativeEvent, Category = Combat)
+	void OnSkillTwo();
+
+	UFUNCTION(BlueprintNativeEvent, Category = Combat)
+	void OnSkillThree();
+
 	// Called when AimRotation is replicated
 	UFUNCTION()
 	void OnRep_AimRotation();

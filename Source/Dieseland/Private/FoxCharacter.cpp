@@ -112,6 +112,7 @@ void AFoxCharacter::SkillOne()
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			OnSkillOne();
 		}
 	}
 }
@@ -140,6 +141,7 @@ void AFoxCharacter::SkillTwo()
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			OnSkillTwo();
 		}
 	}
 
@@ -169,6 +171,7 @@ void AFoxCharacter::SkillThree()
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			OnSkillThree();
 		}
 	}
 }
@@ -197,6 +200,7 @@ void AFoxCharacter::RangedAttack()
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			OnBasicAttack();
 		}
 	}
 }

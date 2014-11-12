@@ -379,7 +379,7 @@ void AStrykerCharacter::SkillOne()
 		this->StatusEffects.Add(FString("Stunned"));
 		this->CharacterMovement->Velocity += FVector(Direction.X * 12500, Direction.Y * 12500,0);
 		IsAttemptingAssassinate = true;
-
+		OnSkillOne();
 	}
 	/* some sample movement i'm usng to reference
 	DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 600 + (Intelligence * 1.5f), -MoveCharacterY * 600 + (Intelligence * 1.5f), 0); */
@@ -412,6 +412,7 @@ void AStrykerCharacter::SkillTwo()
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			OnSkillTwo();
 		}
 	}
 }
@@ -434,6 +435,7 @@ void AStrykerCharacter::SkillThree()
 		FVector Direction = CharacterRotation.Vector();
 		//this->StatusEffects.Add(FString("Stunned"));
 		this->CharacterMovement->Velocity += FVector(Direction.X * 18000, Direction.Y * 18000, 0);
+		OnSkillThree();
 	}
 }
 
@@ -462,6 +464,7 @@ void AStrykerCharacter::MeleeAttack()
 			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
 			{
 				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+				
 			}
 			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
 			{
@@ -475,6 +478,7 @@ void AStrykerCharacter::MeleeAttack()
 			SlashHitSound->Play();
 		}
 	}
+	OnBasicAttack();
 }
 
 void AStrykerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
