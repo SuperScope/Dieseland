@@ -35,7 +35,7 @@ AScrapBox::AScrapBox(const class FPostConstructInitializeProperties& PCIP)
 		ScrapClass = (UClass*)ScrapBlueprint.Object;
 	}
 
-	ScrapAmt = 5;
+	ScrapAmt = 1;
 
 	Tags.Add(FName(TEXT("ScrapBox")));
 	
@@ -67,8 +67,9 @@ void AScrapBox::DestroyCrate_Implementation(AActor* Causer)
 			{
                 RandomX = FMath::RandRange(-30, 30);
                 RandomY = FMath::RandRange(-30, 30);
-				UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(GetActorLocation().X + RandomX, GetActorLocation().Y + RandomY, GetActorLocation().Z), FRotator(0.0f, 0.0f, 0.0f));
-				
+				AActor* Scrap = UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(GetActorLocation().X + RandomX, GetActorLocation().Y + RandomY, GetActorLocation().Z), FRotator(0.0f, 0.0f, 0.0f));
+				Cast<AScrap>(Scrap)->ScrapValue = FMath::RandRange(20, 30);
+			
 				//Alternatively used to spawn c++ class
 				//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
 			}

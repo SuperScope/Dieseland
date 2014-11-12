@@ -289,6 +289,7 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 	
 		//here we attack the player
 		if (AssasinationDuration > 0.5f){
+			OnBasicAttack();
 		//	FRotator NewRot = (this->GetActorLocation() - AssassinationTarget->GetActorLocation()).Rotation();
 			//this->SetActorRotation(NewRot);
 			ServerActivateParticle(SkillOneParticle);

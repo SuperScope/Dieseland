@@ -181,7 +181,7 @@ void ADieselandEnemyBot::ReceiveBeginPlay()
 	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.0f, 0.0f));
 
 	MiniMapMaterial = UMaterialInstanceDynamic::Create(IconMatStatic, this);
-	MiniMapIcon->SetWorldScale3D(FVector(13.0f, 13.0, 0.01f));
+	MiniMapIcon->SetWorldScale3D(FVector(15.0f, 15.0, 0.01f));
 	MiniMapIcon->SetWorldRotation(FRotator(0, 90.0f, 0));
 
 	MiniMapIcon->AddRelativeLocation(FVector(0.0f, 0.0f, 700.0f));
@@ -352,14 +352,20 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.Owner = this;
 				SpawnParams.Instigator = Instigator;
-				for (int32 x = 0; x < 5; x++)
+				for (int32 x = 0; x < 1; x++)
 				{
+					//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+				
                     RandomX = FMath::RandRange(-30, 30);
                     RandomY = FMath::RandRange(-30, 30);
-					UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(this->GetActorLocation().X +RandomX, this->GetActorLocation().Y + RandomY, this->GetActorLocation().Z), FRotator(0.0f, 0.0f, 0.0f));
+					AActor* Scrap =	UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(this->GetActorLocation().X +RandomX, this->GetActorLocation().Y + RandomY, this->GetActorLocation().Z), FRotator(0.0f, 0.0f, 0.0f));
+					
+					Cast<AScrap>(Scrap)->ScrapValue = FMath::RandRange(30, 60);
+
+
 					this->Destroy();
 					//Alternatively used to spawn c++ class
-					//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+					
 				}
 			}
 		}

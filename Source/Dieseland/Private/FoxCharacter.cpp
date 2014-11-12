@@ -75,6 +75,10 @@ AFoxCharacter::AFoxCharacter(const class FPostConstructInitializeProperties& PCI
 	CharmSound->AttachParent = RootComponent;
 	CharmSound->bAutoActivate = false;
 
+	SmokeBombSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Smoke Bomb Sound"));
+	SmokeBombSound->AttachParent = RootComponent;
+	SmokeBombSound->bAutoActivate = false;
+
 
 	bReplicates = true;
 	bReplicateMovement = true;
@@ -153,6 +157,7 @@ void AFoxCharacter::SkillThree()
 	UWorld* const World = GetWorld();
 	if (World)
 	{
+		SmokeBombSound->Play();
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
 		SpawnParams.Instigator = Instigator;

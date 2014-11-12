@@ -875,95 +875,95 @@ void ADieselandPlayerController::CalculateCost_Implementation(const FString& Typ
 	//The following conditional statements check the Cost Value for upgrading depending on the current value per attribute
 	if (Type == FString(TEXT("Strength")))
 	{
-		if (DieselandPawn->Strength < 13)
+		if (DieselandPawn->Strength < 20)
 		{
-			CostVal = 3;
+			CostVal = 200;
 		}
-		else if (DieselandPawn->Strength < 16)
+		else if (DieselandPawn->Strength < 30)
 		{
-			CostVal = 5;
+			CostVal = 300;
 		}
-		else if (DieselandPawn->Strength < 18)
+		else if (DieselandPawn->Strength < 40)
 		{
-			CostVal = 9;
+			CostVal = 400;
 		}
-		else if (DieselandPawn->Strength < 20)
+		else if (DieselandPawn->Strength < 50)
 		{
-			CostVal = 15;
+			CostVal = 500;
 		}
 		else
 		{
-			CostVal = 20;
+			CostVal = 600;
 		}
 
 	}
 	else if (Type == FString(TEXT("Constitution")))
 	{
-		if (DieselandPawn->Constitution < 13)
+		if (DieselandPawn->Constitution < 20)
 		{
-			CostVal = 3;
+			CostVal = 200;
 		}
-		else if (DieselandPawn->Constitution < 16)
+		else if (DieselandPawn->Constitution < 30)
 		{
-			CostVal = 5;
+			CostVal = 300;
 		}
-		else if (DieselandPawn->Constitution < 18)
+		else if (DieselandPawn->Constitution < 50)
 		{
-			CostVal = 9;
+			CostVal = 400;
 		}
-		else if (DieselandPawn->Constitution < 20)
+		else if (DieselandPawn->Constitution < 60)
 		{
-			CostVal = 15;
+			CostVal = 500;
 		}
 		else
 		{
-			CostVal = 20;
+			CostVal = 600;
 		}
 	}
 	else if (Type == FString(TEXT("Intelligence")))
 	{
-		if (DieselandPawn->Intelligence < 13)
+		if (DieselandPawn->Intelligence < 20)
 		{
-			CostVal = 3;
+			CostVal = 200;
 		}
-		else if (DieselandPawn->Intelligence < 16)
+		else if (DieselandPawn->Intelligence < 30)
 		{
-			CostVal = 5;
+			CostVal = 300;
 		}
-		else if (DieselandPawn->Intelligence < 18)
+		else if (DieselandPawn->Intelligence < 40)
 		{
-			CostVal = 9;
+			CostVal = 400;
 		}
-		else if (DieselandPawn->Intelligence < 20)
+		else if (DieselandPawn->Intelligence < 50)
 		{
-			CostVal = 15;
+			CostVal = 500;
 		}
 		else
 		{
-			CostVal = 20;
+			CostVal = 600;
 		}
 	}
 	else if (Type == FString(TEXT("Dexterity")))
 	{
-		if (DieselandPawn->Dexterity < 13)
+		if (DieselandPawn->Dexterity < 20)
 		{
-			CostVal = 3;
+			CostVal = 200;
 		}
-		else if (DieselandPawn->Dexterity < 16)
+		else if (DieselandPawn->Dexterity < 30)
 		{
-			CostVal = 5;
+			CostVal = 300;
 		}
-		else if (DieselandPawn->Dexterity < 18)
+		else if (DieselandPawn->Dexterity < 40)
 		{
-			CostVal = 9;
+			CostVal = 400;
 		}
-		else if (DieselandPawn->Dexterity < 20)
+		else if (DieselandPawn->Dexterity < 50)
 		{
-			CostVal = 15;
+			CostVal = 500;
 		}
 		else
 		{
-			CostVal = 20;
+			CostVal = 600;
 		}
 	}
 }

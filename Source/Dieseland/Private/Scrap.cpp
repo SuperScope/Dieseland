@@ -16,6 +16,7 @@ AScrap::AScrap(const class FPostConstructInitializeProperties& PCIP)
 	Mesh->SetWorldScale3D(FVector(0.4f, 0.4f, 0.4f));
 	Mesh->SetCollisionProfileName(FName(TEXT("BlockAll")));
 
+
 	Mesh->SetSimulatePhysics(true);
 
 	ScrapCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("ScrapCollision"));
@@ -34,6 +35,8 @@ AScrap::AScrap(const class FPostConstructInitializeProperties& PCIP)
 	ScrapSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Scrap Collection"));
 	ScrapSound->AttachParent = RootComponent;
 	ScrapSound->bAutoActivate = false;
+	ScrapValue = 33.0f;
+
 
 	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true;
@@ -113,7 +116,7 @@ void AScrap::CollectScrap_Implementation(AActor* OtherActor)
 {
 	if (Role == ROLE_Authority)
 	{
-		Cast<ADieselandCharacter>(OtherActor)->Scrap += 1;
+		Cast<ADieselandCharacter>(OtherActor)->Scrap += ScrapValue;
 	}
 
 	Destroy();
@@ -122,4 +125,12 @@ void AScrap::CollectScrap_Implementation(AActor* OtherActor)
 bool AScrap::CollectScrap_Validate(AActor* OtherActor)
 {
 	return true;
+}
+
+void AScrap::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Replicate to everyone
+	DOREPLIFETIME(AScrap, ScrapValue);
 }

@@ -39,5 +39,10 @@ class DIESELAND_API AFoxCharacter : public ADieselandCharacter
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
 		TSubobjectPtr <UAudioComponent> CharmSound;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> SmokeBombSound;
+
 	
 };
