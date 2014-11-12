@@ -35,7 +35,7 @@ AScrap::AScrap(const class FPostConstructInitializeProperties& PCIP)
 	ScrapSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Scrap Collection"));
 	ScrapSound->AttachParent = RootComponent;
 	ScrapSound->bAutoActivate = false;
-	ScrapValue = 33.0f;
+	ScrapValue = 42.0f;
 
 
 	bReplicates = true;
