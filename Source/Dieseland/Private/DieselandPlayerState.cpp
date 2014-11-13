@@ -9,10 +9,10 @@
 ADieselandPlayerState::ADieselandPlayerState(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	CharacterName = FString(TEXT("Engleton"));
-	Username = FString(TEXT("Player"));
-	TeamNumber = 1;
-	Kills = 0;
+	SetCharacterName(FString(TEXT("Engleton")));
+	SetUsername(FString(TEXT("Player")));
+	SetTeamNum(1);
+	SetKillNum(0);
 }
 
 void ADieselandPlayerState::ClientInitialize(class AController* InController)
@@ -32,10 +32,53 @@ void ADieselandPlayerState::UpdateTeamColors()
 void ADieselandPlayerState::SetTeamNum(int32 NewTeamNumber)
 {
 	TeamNumber = NewTeamNumber;
+
+	switch (TeamNumber)
+	{
+	case 0:
+		TeamColor = FVector(0.000905f, 1.0f, 0.0f);
+		break;
+	case 1:
+		TeamColor = FVector(0.035f, 0.005232f, 0.004898f);
+		break;
+	case 2:
+		TeamColor = FVector(0.0f, 0.035871f, 1.0f);
+		break;
+	case 3:
+		TeamColor = FVector(1.0f, 1.0f, 1.0f);
+		break;
+	case 4:
+		TeamColor = FVector(0.0f, 0.828977f, 1.0f);
+		break;
+	case 5:
+		TeamColor = FVector(1.0f, 0.935999f, 0.0f);
+		break;
+	case 6:
+		TeamColor = FVector(0.747108f, 0.0f, 1.0f);
+		break;
+	case 7:
+		TeamColor = FVector(1.0f, 0.305141f, 0.0f);
+		break;
+	case 8:
+		TeamColor = FVector(1.0f, 0.131611f, 0.925403f);
+		break;
+	default:
+		TeamColor = FVector(0.000905f, 1.0f, 0.0f);
+	}
 	
 	if (Role != ROLE_Authority)
 	{
 		ServerSetTeamNum(NewTeamNumber);
+	}
+}
+
+void ADieselandPlayerState::SetTeamColor(FVector NewTeamColor)
+{
+	TeamColor = NewTeamColor;
+
+	if (Role != ROLE_Authority)
+	{
+		ServerSetTeamColor(NewTeamColor);
 	}
 }
 
@@ -99,6 +142,16 @@ bool ADieselandPlayerState::ServerSetTeamNum_Validate(int32 NewTeamNumber)
 	return true;
 }
 
+void ADieselandPlayerState::ServerSetTeamColor_Implementation(FVector NewTeamColor)
+{
+	SetTeamColor(NewTeamColor);
+}
+
+bool ADieselandPlayerState::ServerSetTeamColor_Validate(FVector NewTeamColor)
+{
+	return true;
+}
+
 void ADieselandPlayerState::ServerSetKillNum_Implementation(int32 NewKillNumber)
 {
 	SetKillNum(NewKillNumber);
@@ -111,7 +164,7 @@ bool ADieselandPlayerState::ServerSetKillNum_Validate(int32 NewKillNumber)
 
 void ADieselandPlayerState::OnRep_TeamColor()
 {
-	//UpdateTeamColors();
+	
 }
 
 int32 ADieselandPlayerState::GetTeamNum() const
@@ -119,11 +172,17 @@ int32 ADieselandPlayerState::GetTeamNum() const
 	return TeamNumber;
 }
 
+FVector ADieselandPlayerState::GetTeamColor() const
+{
+	return TeamColor;
+}
+
 void ADieselandPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ADieselandPlayerState, TeamNumber);
+	DOREPLIFETIME(ADieselandPlayerState, TeamColor);
 	DOREPLIFETIME(ADieselandPlayerState, Kills);
 	DOREPLIFETIME(ADieselandPlayerState, Username);
 	DOREPLIFETIME(ADieselandPlayerState, CharacterName);

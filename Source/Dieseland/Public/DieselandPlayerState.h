@@ -22,6 +22,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	int32 GetTeamNum() const;
 
+	/** get current team color*/
+	UFUNCTION(BlueprintCallable, Category = Networking)
+	FVector GetTeamColor() const;
+
 	/**
 	* Set new team and update pawn. Also updates player character team colors.
 	*
@@ -31,25 +35,31 @@ public:
 	void SetTeamNum(int32 NewTeamNumber);
 
 	UFUNCTION(BlueprintCallable, Category = Networking)
+	void SetTeamColor(FVector NewTeamColor);
+
+	UFUNCTION(BlueprintCallable, Category = Networking)
 	void SetKillNum(int32 NewKillNumber);
 
 	UFUNCTION(BlueprintCallable, Category = Networking)
-		void SetUsername(const FString& NewName);
+	void SetUsername(const FString& NewName);
 
 	UFUNCTION(BlueprintCallable, Category = Networking)
-		void SetCharacterName(const FString& NewName);
+	void SetCharacterName(const FString& NewName);
 
 	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
 	void ServerSetTeamNum(int32 NewTeamNumber);
 
 	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
+	void ServerSetTeamColor(FVector NewTeamColor);
+
+	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
 	void ServerSetKillNum(int32 NewKillNumber);
 
 	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
-		void ServerSetUsername(const FString& NewName);
+	void ServerSetUsername(const FString& NewName);
 
 	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
-		void ServerSetCharacterName(const FString& NewName);
+	void ServerSetCharacterName(const FString& NewName);
 
 	/** Set the mesh colors based on the current teamnum variable */
 	UFUNCTION(BlueprintCallable, Category = Networking)
@@ -58,6 +68,10 @@ public:
 	/** team number */
 	UPROPERTY(Replicated, ReplicatedUsing = OnRep_TeamColor)
 	int32 TeamNumber;
+
+	/** team color */
+	UPROPERTY(Replicated)
+	FVector TeamColor;
 
 	/** number of kills */
 	UPROPERTY(Replicated)
