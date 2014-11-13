@@ -139,6 +139,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	MiniMapIcon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	IconMatStatic = MiniMapMatRef.Object;
 	MiniMapIcon->SetIsReplicated(false);
+
 	
 
 	// Tag this character as a player
@@ -199,7 +200,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	AOECollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// Retrieve particle assets
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> BasicAttackParticleAsset(TEXT("ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> BasicAttackParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillTwoParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_StrykerBlinkCloak_WIP.Unreal_Particle_StrykerBlinkCloak_WIP'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillThreeParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse2_WIP.Unreal_Particle_EngletonPulse2_WIP'"));
@@ -257,7 +258,8 @@ void ADieselandCharacter::ReceiveBeginPlay()
 	AimBar->Materials.Add(AimBarMaterial);
 
 	MiniMapMaterial = UMaterialInstanceDynamic::Create(IconMatStatic, this);
-	MiniMapIcon->SetWorldScale3D(FVector(7.0f, 7.0, 0.01f));
+	MiniMapIcon->SetWorldScale3D(FVector(12.0f, 12.0, 0.01f));
+	MiniMapIcon->SetWorldRotation(FRotator(0, 90.0f, 0));
 
 	MiniMapIcon->AddRelativeLocation(FVector(0.0f, 0.0f,1500.0f));
 	MiniMapIcon->CastShadow = false;
@@ -549,14 +551,15 @@ void ADieselandCharacter::ServerDamageEnemy_Implementation(int32 Amt, AActor* Ta
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
 			SpawnParams.Instigator = Instigator;
-			for (int32 x = 0; x < 5; x++)
+			for (int32 x = 0; x < 1; x++)
 			{
-                RandomX = FMath::RandRange(-30, 30);
+               RandomX = FMath::RandRange(-30, 30);
                 RandomY = FMath::RandRange(-30, 30);
-				UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(TempEnemyLoc.X + RandomX, TempEnemyLoc.Y + RandomY, TempEnemyLoc.Z), FRotator(0.0f, 0.0f, 0.0f));
-
+				AActor* Scrap = UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(TempEnemyLoc.X + RandomX, TempEnemyLoc.Y + RandomY, TempEnemyLoc.Z), FRotator(0.0f, 0.0f, 0.0f));
+				Cast<AScrap>(Scrap)->ScrapValue = 250;
 				//Alternatively used to spawn c++ class
 				//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+				// Cast<AScrap>(GetPawn());
 			}
 		}
 	}
@@ -628,6 +631,7 @@ void ADieselandCharacter::MeleeAttack()
 			Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 		}
 	}
+	OnBasicAttack();
 }
 
 void ADieselandCharacter::SkillOne()
@@ -716,6 +720,26 @@ void ADieselandCharacter::SkillThree()
 			Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 		}
 	}
+}
+
+void ADieselandCharacter::OnBasicAttack_Implementation()
+{
+
+}
+
+void ADieselandCharacter::OnSkillOne_Implementation()
+{
+
+}
+
+void ADieselandCharacter::OnSkillTwo_Implementation()
+{
+
+}
+
+void ADieselandCharacter::OnSkillThree_Implementation()
+{
+
 }
 
 //all necessary audio functions

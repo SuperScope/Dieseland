@@ -14,7 +14,7 @@ class DIESELAND_API UDieselandSaveGame : public USaveGame
 	GENERATED_UCLASS_BODY()
 
 	UPROPERTY(VisibleAnywhere, Category = Basic)
-	FString LastCharacter;
+	FString Username;
 
 	UPROPERTY(VisibleAnywhere, Category = Basic)
 	FString SaveSlotName;

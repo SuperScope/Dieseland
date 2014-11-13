@@ -33,11 +33,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	void SetKillNum(int32 NewKillNumber);
 
+	UFUNCTION(BlueprintCallable, Category = Networking)
+		void SetUsername(const FString& NewName);
+
+	UFUNCTION(BlueprintCallable, Category = Networking)
+		void SetCharacterName(const FString& NewName);
+
 	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
 	void ServerSetTeamNum(int32 NewTeamNumber);
 
 	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
 	void ServerSetKillNum(int32 NewKillNumber);
+
+	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
+		void ServerSetUsername(const FString& NewName);
+
+	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
+		void ServerSetCharacterName(const FString& NewName);
 
 	/** Set the mesh colors based on the current teamnum variable */
 	UFUNCTION(BlueprintCallable, Category = Networking)
@@ -48,8 +60,16 @@ public:
 	int32 TeamNumber;
 
 	/** number of kills */
-	UPROPERTY(Replicated, ReplicatedUsing = OnRep_TeamColor)
+	UPROPERTY(Replicated)
 	int32 Kills;
+
+	/** Name of player */
+	UPROPERTY(Replicated)
+	FString Username;
+
+	/** Name of player's character */
+	UPROPERTY(Replicated)
+	FString CharacterName;
 
 	/**
 	* Set the team

@@ -75,6 +75,10 @@ AFoxCharacter::AFoxCharacter(const class FPostConstructInitializeProperties& PCI
 	CharmSound->AttachParent = RootComponent;
 	CharmSound->bAutoActivate = false;
 
+	SmokeBombSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Smoke Bomb Sound"));
+	SmokeBombSound->AttachParent = RootComponent;
+	SmokeBombSound->bAutoActivate = false;
+
 
 	bReplicates = true;
 	bReplicateMovement = true;
@@ -112,6 +116,7 @@ void AFoxCharacter::SkillOne()
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			OnSkillOne();
 		}
 	}
 }
@@ -140,6 +145,7 @@ void AFoxCharacter::SkillTwo()
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			OnSkillTwo();
 		}
 	}
 
@@ -151,6 +157,7 @@ void AFoxCharacter::SkillThree()
 	UWorld* const World = GetWorld();
 	if (World)
 	{
+		SmokeBombSound->Play();
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
 		SpawnParams.Instigator = Instigator;
@@ -169,6 +176,7 @@ void AFoxCharacter::SkillThree()
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			OnSkillThree();
 		}
 	}
 }
@@ -197,6 +205,7 @@ void AFoxCharacter::RangedAttack()
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			OnBasicAttack();
 		}
 	}
 }

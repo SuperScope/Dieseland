@@ -31,6 +31,17 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerRangedAttack();
 
+	UFUNCTION(Unreliable, NetMulticast)
+	virtual void MulticastMeleeAttack();
+	UFUNCTION(Unreliable, NetMulticast)
+	virtual void MulticastRangedAttack();
+	UFUNCTION(NetMulticast, Unreliable, Category = Combat)
+	virtual void MulticastSkillOne();
+	UFUNCTION(NetMulticast, Unreliable, Category = Combat)
+	virtual void MulticastSkillTwo();
+	UFUNCTION(NetMulticast, Unreliable, Category = Combat)
+	virtual void MulticastSkillThree();
+
 	UFUNCTION()
 	void AimOne();
 

@@ -293,6 +293,7 @@ void ADieselandPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Escape", IE_Pressed, this, &ADieselandPlayerController::OnEscape);
 
 	InputComponent->BindAction("Score", IE_Released, this, &ADieselandPlayerController::OnShowScore);
+	
 }
 
 void ADieselandPlayerController::ReceiveBeginPlay()
@@ -318,7 +319,10 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 		{
 			FVector TempEnemyLoc = FVector(DieselandPawn->GetActorLocation().X, DieselandPawn->GetActorLocation().Y, DieselandPawn->GetActorLocation().Z);
 
-			DieselandPawn->SetActorLocation(Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->PickSpawn()->GetActorLocation());
+			FVector TempSpawnLocation = Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->PickSpawn()->GetActorLocation();
+			TempSpawnLocation = FVector(SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z + 100.0f);
+
+			DieselandPawn->SetActorLocation(TempSpawnLocation);
 			DieselandPawn->Health = DieselandPawn->MaxHealth;
 			DieselandPawn->LingerTimer = 0;
 
@@ -670,6 +674,7 @@ void ADieselandPlayerController::ServerSkillOne_Implementation()
 			DieselandPawn->SkillOneTimer = DieselandPawn->SkillOneCooldown;
 		}
 	}
+	MulticastSkillOne();
 }
 
 bool ADieselandPlayerController::ServerSkillOne_Validate()
@@ -687,6 +692,7 @@ void ADieselandPlayerController::ServerSkillTwo_Implementation()
 			DieselandPawn->SkillTwoTimer = DieselandPawn->SkillTwoCooldown;
 		}
 	}
+	MulticastSkillTwo();
 }
 
 bool ADieselandPlayerController::ServerSkillTwo_Validate()
@@ -704,6 +710,7 @@ void ADieselandPlayerController::ServerSkillThree_Implementation()
 			DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
 		}
 	}
+	MulticastSkillThree();
 }
 
 bool ADieselandPlayerController::ServerSkillThree_Validate()
@@ -872,95 +879,95 @@ void ADieselandPlayerController::CalculateCost_Implementation(const FString& Typ
 	//The following conditional statements check the Cost Value for upgrading depending on the current value per attribute
 	if (Type == FString(TEXT("Strength")))
 	{
-		if (DieselandPawn->Strength < 13)
+		if (DieselandPawn->Strength < 20)
 		{
-			CostVal = 3;
+			CostVal = 200;
 		}
-		else if (DieselandPawn->Strength < 16)
+		else if (DieselandPawn->Strength < 30)
 		{
-			CostVal = 5;
+			CostVal = 300;
 		}
-		else if (DieselandPawn->Strength < 18)
+		else if (DieselandPawn->Strength < 40)
 		{
-			CostVal = 9;
+			CostVal = 400;
 		}
-		else if (DieselandPawn->Strength < 20)
+		else if (DieselandPawn->Strength < 50)
 		{
-			CostVal = 15;
+			CostVal = 500;
 		}
 		else
 		{
-			CostVal = 20;
+			CostVal = 600;
 		}
 
 	}
 	else if (Type == FString(TEXT("Constitution")))
 	{
-		if (DieselandPawn->Constitution < 13)
+		if (DieselandPawn->Constitution < 20)
 		{
-			CostVal = 3;
+			CostVal = 200;
 		}
-		else if (DieselandPawn->Constitution < 16)
+		else if (DieselandPawn->Constitution < 30)
 		{
-			CostVal = 5;
+			CostVal = 300;
 		}
-		else if (DieselandPawn->Constitution < 18)
+		else if (DieselandPawn->Constitution < 50)
 		{
-			CostVal = 9;
+			CostVal = 400;
 		}
-		else if (DieselandPawn->Constitution < 20)
+		else if (DieselandPawn->Constitution < 60)
 		{
-			CostVal = 15;
+			CostVal = 500;
 		}
 		else
 		{
-			CostVal = 20;
+			CostVal = 600;
 		}
 	}
 	else if (Type == FString(TEXT("Intelligence")))
 	{
-		if (DieselandPawn->Intelligence < 13)
+		if (DieselandPawn->Intelligence < 20)
 		{
-			CostVal = 3;
+			CostVal = 200;
 		}
-		else if (DieselandPawn->Intelligence < 16)
+		else if (DieselandPawn->Intelligence < 30)
 		{
-			CostVal = 5;
+			CostVal = 300;
 		}
-		else if (DieselandPawn->Intelligence < 18)
+		else if (DieselandPawn->Intelligence < 40)
 		{
-			CostVal = 9;
+			CostVal = 400;
 		}
-		else if (DieselandPawn->Intelligence < 20)
+		else if (DieselandPawn->Intelligence < 50)
 		{
-			CostVal = 15;
+			CostVal = 500;
 		}
 		else
 		{
-			CostVal = 20;
+			CostVal = 600;
 		}
 	}
 	else if (Type == FString(TEXT("Dexterity")))
 	{
-		if (DieselandPawn->Dexterity < 13)
+		if (DieselandPawn->Dexterity < 20)
 		{
-			CostVal = 3;
+			CostVal = 200;
 		}
-		else if (DieselandPawn->Dexterity < 16)
+		else if (DieselandPawn->Dexterity < 30)
 		{
-			CostVal = 5;
+			CostVal = 300;
 		}
-		else if (DieselandPawn->Dexterity < 18)
+		else if (DieselandPawn->Dexterity < 40)
 		{
-			CostVal = 9;
+			CostVal = 400;
 		}
-		else if (DieselandPawn->Dexterity < 20)
+		else if (DieselandPawn->Dexterity < 50)
 		{
-			CostVal = 15;
+			CostVal = 500;
 		}
 		else
 		{
-			CostVal = 20;
+			CostVal = 600;
 		}
 	}
 }
@@ -1007,11 +1014,42 @@ void ADieselandPlayerController::ServerRangedAttack_Implementation()
 	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		DieselandPawn->RangedAttack();
 	}
+	MulticastRangedAttack();
 }
 
 bool ADieselandPlayerController::ServerRangedAttack_Validate()
 {
 	return true;
+}
+
+void ADieselandPlayerController::MulticastMeleeAttack_Implementation()
+{
+	//ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	//DieselandPawn->MeleeAttack();
+}
+
+void ADieselandPlayerController::MulticastRangedAttack_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	DieselandPawn->RangedAttack();
+}
+
+void ADieselandPlayerController::MulticastSkillOne_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	DieselandPawn->SkillOne();
+}
+
+void ADieselandPlayerController::MulticastSkillTwo_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	DieselandPawn->SkillTwo();
+}
+
+void ADieselandPlayerController::MulticastSkillThree_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	DieselandPawn->SkillThree();
 }
 
 bool ADieselandPlayerController::ServerOnAim_Validate(FRotator Rotation)

@@ -122,6 +122,10 @@ void AStrykerCharacter::Tick(float DeltaSeconds)
 
 void AStrykerCharacter::UpdateDurationTimers_Implementation(float DeltaSeconds)
 {
+	AimBar->SetRelativeLocation(FVector(0.f, 300.0f, 0.0f));
+	AimBar->SetWorldRotation(AimRotation.GetNormalized());
+
+
 	if (IsAttemptingAssassinate)
 	{
 		AssasinationAttemptDuration += DeltaSeconds;
@@ -289,6 +293,7 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 	
 		//here we attack the player
 		if (AssasinationDuration > 0.5f){
+			OnBasicAttack();
 		//	FRotator NewRot = (this->GetActorLocation() - AssassinationTarget->GetActorLocation()).Rotation();
 			//this->SetActorRotation(NewRot);
 			ServerActivateParticle(SkillOneParticle);
@@ -361,7 +366,8 @@ bool AStrykerCharacter::SearchForAssassinationTarget_Validate()
 // Stryker Assasinate
 void AStrykerCharacter::SkillOne()
 {
-	
+	if (Role == ROLE_Authority)
+	{
 	ServerActivateParticle(SkillOneParticle);
 
 	//here I ensure the player can't cast this ability when in air as it will cause a bug...
@@ -377,9 +383,13 @@ void AStrykerCharacter::SkillOne()
 		this->SetActorRotation(CharacterRotation);
 		FVector Direction = CharacterRotation.Vector();
 		this->StatusEffects.Add(FString("Stunned"));
+			this->CharacterMovement->Velocity += FVector(Direction.X * 12500, Direction.Y * 12500, 0);
+			IsAttemptingAssassinate = true;
+		this->SetActorRotation(CharacterRotation);
 		this->CharacterMovement->Velocity += FVector(Direction.X * 12500, Direction.Y * 12500,0);
-		IsAttemptingAssassinate = true;
-
+		
+		OnSkillOne();
+	}
 	}
 	/* some sample movement i'm usng to reference
 	DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 600 + (Intelligence * 1.5f), -MoveCharacterY * 600 + (Intelligence * 1.5f), 0); */
@@ -412,6 +422,7 @@ void AStrykerCharacter::SkillTwo()
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			OnSkillTwo();
 		}
 	}
 }
@@ -419,6 +430,8 @@ void AStrykerCharacter::SkillTwo()
 //Stryker Blink
 void AStrykerCharacter::SkillThree()
 {
+	if (Role == ROLE_Authority)
+	{
 	BlinkSound->Play();
 	//here I ensure the player can't cast this ability when in air as it will cause a bug...
 	if (this->CharacterMovement->Velocity.Z > 0 || this->CharacterMovement->Velocity.Z < 0){
@@ -434,7 +447,9 @@ void AStrykerCharacter::SkillThree()
 		FVector Direction = CharacterRotation.Vector();
 		//this->StatusEffects.Add(FString("Stunned"));
 		this->CharacterMovement->Velocity += FVector(Direction.X * 18000, Direction.Y * 18000, 0);
+		OnSkillThree();
 	}
+}
 }
 
 void AStrykerCharacter::RangedAttack()
@@ -445,6 +460,7 @@ void AStrykerCharacter::RangedAttack()
 //stryker basic attack
 void AStrykerCharacter::MeleeAttack()
 {
+	OnBasicAttack();
 	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	MeleeCollision->SetCollisionProfileName(TEXT("OverlapAll"));
 	MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
@@ -459,19 +475,20 @@ void AStrykerCharacter::MeleeAttack()
 		SlashSound->Stop();
 		if (Role == ROLE_Authority && CurActor != this)
 		{
-			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+			if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
 			{
 				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+
 			}
-			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+			else if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Enemy"))))
 			{
 				Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 			}
-			else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
+			else if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
 			{
 				Cast<AScrapBox>(CurActor)->DestroyCrate(this);
 			}
-			
+
 			SlashHitSound->Play();
 		}
 	}
@@ -492,8 +509,14 @@ void AStrykerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > &
 
 void AStrykerCharacter::SkillOneAim()
 {
-	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("Get Jinxed!")), FVector(0.0f, 1.0f, 0.0f));
-
+	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
+	//AimBar->SetWorldLocation(FVector(0, 0, -50));
+	AimBar->SetWorldScale3D(FVector(8.0f, 1.0, 0.01f));
+	AimBar->CastShadow = false;
+	AimBar->Materials.Add(AimBarMaterial);
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.01f, 0.75f, 0.01f));
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetScalarParameterValue(FName(TEXT("Health percentage")), 1.0f);
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetScalarParameterValue(FName(TEXT("Opacity")), 0.15f);
 	AimBar->SetHiddenInGame(false);
 }
 

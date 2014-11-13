@@ -146,113 +146,127 @@ bool AMayhemCharacter::UpdateDurationTimers_Validate(float DeltaSeconds)
 
 void AMayhemCharacter::MeleeAttack()
 {
-	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	MeleeCollision->SetCollisionProfileName(TEXT("OverlapAll"));
-	MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
-	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	AActor* CurActor = NULL;
-	for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)
-	{
-		CurActor = ActorsInMeleeRange[b];
-		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))) || CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))) continue;
-		if (!CurActor->IsValidLowLevel()) continue;
+	OnBasicAttack();
+		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		MeleeCollision->SetCollisionProfileName(TEXT("OverlapAll"));
+		MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
+		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-		if (Role == ROLE_Authority && CurActor != this)
+		AActor* CurActor = NULL;
+		for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)
 		{
-			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+			CurActor = ActorsInMeleeRange[b];
+			if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))) || CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))) continue;
+			if (!CurActor->IsValidLowLevel()) continue;
+
+			if (Role == ROLE_Authority && CurActor != this)
 			{
-				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
-			}
-			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
-			{
-				Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
-			}
-			else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
-			{
-				Cast<AScrapBox>(CurActor)->DestroyCrate(this);
+				if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+				{
+					Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+					PunchSound->Play();
+				}
+				else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+				{
+					Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+					PunchSound->Play();
+				}
+				else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
+				{
+					Cast<AScrapBox>(CurActor)->DestroyCrate(this);
+					PunchSound->Play();
+				}
 			}
 		}
-	}
-	PunchSound->Play();
+		
 }
 
 //Smash
 void AMayhemCharacter::SkillOne()
 {
-	ServerActivateParticle(SkillOneParticle);
+		ServerActivateParticle(SkillOneParticle);
 
-	AOECollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	AOECollision->SetCollisionProfileName(TEXT("OverlapAll"));
-	AOECollision->GetOverlappingActors(ActorsInAOERange);
-	AOECollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		AOECollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		AOECollision->SetCollisionProfileName(TEXT("OverlapAll"));
+		AOECollision->GetOverlappingActors(ActorsInAOERange);
+		AOECollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	AActor* CurActor = NULL;
-	for (int32 b = 0; b < ActorsInAOERange.Num(); b++)
-	{
-		CurActor = ActorsInAOERange[b];
-		if (!CurActor->IsValidLowLevel()) continue;
-
-		if (Role == ROLE_Authority && CurActor != this)
+		AActor* CurActor = NULL;
+		for (int32 b = 0; b < ActorsInAOERange.Num(); b++)
 		{
-			//EditHealth(-1 * BasicAttackDamage, CurActor);
-			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
-			{
-				ADieselandCharacter* PlayerActor = Cast<ADieselandCharacter>(CurActor);
+			CurActor = ActorsInAOERange[b];
+			if (!CurActor->IsValidLowLevel()) continue;
 
-				PlayerActor->StatusEffects.Add(FString("Stunned"));
-				PlayerActor->StunRemaining = StunLength;
-
-				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
-			}
-			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+			if (Role == ROLE_Authority && CurActor != this)
 			{
-				ADieselandEnemyBot* EnemyActor = Cast<ADieselandEnemyBot>(CurActor);
+				//EditHealth(-1 * BasicAttackDamage, CurActor);
+				if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+				{
+					ADieselandCharacter* PlayerActor = Cast<ADieselandCharacter>(CurActor);
 
-				EnemyActor->StatusEffects.Add(FString("Stunned"));
-				EnemyActor->StunRemaining = StunLength;
-				EnemyActor->CharacterMovement->MaxWalkSpeed = 0.0f;
-				EnemyActor->CharacterMovement->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
-			
-				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
-			}
-			else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
-			{
-				Cast<AScrapBox>(CurActor)->DestroyCrate(this);
+					PlayerActor->StatusEffects.Add(FString("Stunned"));
+					PlayerActor->StunRemaining = StunLength;
+
+					Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+				}
+				else if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+				{
+					ADieselandEnemyBot* EnemyActor = Cast<ADieselandEnemyBot>(CurActor);
+
+					EnemyActor->StatusEffects.Add(FString("Stunned"));
+					EnemyActor->StunRemaining = StunLength;
+					EnemyActor->CharacterMovement->MaxWalkSpeed = 0.0f;
+					EnemyActor->CharacterMovement->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
+
+					Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+				}
+				else if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
+				{
+					Cast<AScrapBox>(CurActor)->DestroyCrate(this);
+				}
 			}
 		}
-	}
-	UltimateSound->Play();
+		UltimateSound->Play();
+		OnSkillOne();
 }
 
 //rage
 void AMayhemCharacter::SkillTwo()
 {
-	ServerActivateParticle(SkillTwoParticle);
-	RageSound->Play();
-	RageVoiceOver->Play();
-	RageMoveSpeedBuff = (CharacterMovement->MaxWalkSpeed * .5f) + (Strength * .06f);
-	RageAttkSpeedBuff = (BasicAttackCooldown * .1f) + (Strength * .03f);
+	if (Role == ROLE_Authority)
+	{
+		ServerActivateParticle(SkillTwoParticle);
+		RageSound->Play();
+		RageVoiceOver->Play();
+		RageMoveSpeedBuff = (CharacterMovement->MaxWalkSpeed * .5f) + (Strength * .06f);
+		RageAttkSpeedBuff = (BasicAttackCooldown * .1f) + (Strength * .03f);
 
-	BasicAttackCooldown -= RageAttkSpeedBuff;
-	CharacterMovement->MaxWalkSpeed += RageMoveSpeedBuff;
+		BasicAttackCooldown -= RageAttkSpeedBuff;
+		CharacterMovement->MaxWalkSpeed += RageMoveSpeedBuff;
 
-	RageTimer = RageDuration;
+		RageTimer = RageDuration;
+		OnSkillTwo();
+	}
 }
 
 //Mayhem Iron Armor
 void AMayhemCharacter::SkillThree()
 {
-	IronArmorHealthBuff = (float)MaxHealth * 0.25f + Strength * 0.75f;
-	IronArmorRegenBuff = (float)HealthRegeneration * 0.25f + Strength + 0.03f;
+	if (Role == ROLE_Authority)
+	{
+		IronArmorHealthBuff = (float)MaxHealth * 0.25f + Strength * 0.75f;
+		IronArmorRegenBuff = (float)HealthRegeneration * 0.25f + Strength + 0.03f;
 
-	IronArmorTimer = IronArmorDuration;
+		IronArmorTimer = IronArmorDuration;
 
-	MaxHealth += IronArmorHealthBuff;
-	Health += IronArmorHealthBuff;
+		MaxHealth += IronArmorHealthBuff;
+		Health += IronArmorHealthBuff;
 
-	HealthRegeneration += IronArmorRegenBuff;
-	IronArmorSound->Play();
+		HealthRegeneration += IronArmorRegenBuff;
+		IronArmorSound->Play();
+		OnSkillThree();
+	}
 }
 
 void AMayhemCharacter::SkillOneAim()
