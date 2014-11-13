@@ -49,7 +49,7 @@ void ADieselandPlayerState::SetKillNum(int32 NewKillNumber)
 	}
 }
 
-void ADieselandPlayerState::SetUsername(FString NewName)
+void ADieselandPlayerState::SetUsername(const FString& NewName)
 {
 	Username = NewName;
 
@@ -59,7 +59,7 @@ void ADieselandPlayerState::SetUsername(FString NewName)
 	}
 }
 
-void ADieselandPlayerState::SetCharacterName(FString NewName)
+void ADieselandPlayerState::SetCharacterName(const FString& NewName)
 {
 	Username = NewName;
 
@@ -69,14 +69,24 @@ void ADieselandPlayerState::SetCharacterName(FString NewName)
 	}
 }
 
-void ADieselandPlayerState::ServerSetUsername_Implementation(FString NewName)
+void ADieselandPlayerState::ServerSetUsername_Implementation(const FString& NewName)
 {
 	SetUsername(NewName);
 }
 
-void ADieselandPlayerState::ServerSetCharacterName_Implementation(FString NewName)
+void ADieselandPlayerState::ServerSetCharacterName_Implementation(const FString& NewName)
 {
 	SetCharacterName(NewName);
+}
+
+bool ADieselandPlayerState::ServerSetUsername_Validate(const FString& NewName)
+{
+	return true;
+}
+
+bool ADieselandPlayerState::ServerSetCharacterName_Validate(const FString& NewName)
+{
+	return true;
 }
 
 void ADieselandPlayerState::ServerSetTeamNum_Implementation(int32 NewTeamNumber)

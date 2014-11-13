@@ -146,8 +146,8 @@ bool AMayhemCharacter::UpdateDurationTimers_Validate(float DeltaSeconds)
 
 void AMayhemCharacter::MeleeAttack()
 {
-	if (Role == ROLE_Authority)
-	{
+
+	OnBasicAttack();
 		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		MeleeCollision->SetCollisionProfileName(TEXT("OverlapAll"));
 		MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
@@ -179,15 +179,12 @@ void AMayhemCharacter::MeleeAttack()
 				}
 			}
 		}
-		OnBasicAttack();
-	}
+		
 }
 
 //Smash
 void AMayhemCharacter::SkillOne()
 {
-	if (Role == ROLE_Authority)
-	{
 		ServerActivateParticle(SkillOneParticle);
 
 		AOECollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -204,7 +201,7 @@ void AMayhemCharacter::SkillOne()
 			if (Role == ROLE_Authority && CurActor != this)
 			{
 				//EditHealth(-1 * BasicAttackDamage, CurActor);
-				if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+				if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
 				{
 					ADieselandCharacter* PlayerActor = Cast<ADieselandCharacter>(CurActor);
 
@@ -213,7 +210,7 @@ void AMayhemCharacter::SkillOne()
 
 					Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 				}
-				else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+				else if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Enemy"))))
 				{
 					ADieselandEnemyBot* EnemyActor = Cast<ADieselandEnemyBot>(CurActor);
 
@@ -224,7 +221,7 @@ void AMayhemCharacter::SkillOne()
 
 					Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 				}
-				else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
+				else if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
 				{
 					Cast<AScrapBox>(CurActor)->DestroyCrate(this);
 				}
@@ -232,7 +229,6 @@ void AMayhemCharacter::SkillOne()
 		}
 		UltimateSound->Play();
 		OnSkillOne();
-	}
 }
 
 //rage

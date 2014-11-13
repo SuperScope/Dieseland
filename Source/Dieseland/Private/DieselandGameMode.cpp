@@ -200,13 +200,8 @@ AActor* ADieselandGameMode::SpawnLightArray(UClass* ArrayClass, FVector SpawnLoc
 
 void ADieselandGameMode::EndGame_Implementation()
 {
-	FString WinningName;
-	if (Cast<ADieselandGameState>(GameState)->WinningPlayer != nullptr)
-	{
-		WinningName = Cast<ADieselandGameState>(GameState)->WinningPlayer->GetName();
-	}
 
-	GEngine->AddOnScreenDebugMessage(21, 10.0f, FColor::Yellow, WinningName);
+	GEngine->AddOnScreenDebugMessage(21, 10.0f, FColor::Yellow, FString::FromInt(Cast<ADieselandGameState>(GameState)->WinningTeam));
 }
 
 bool ADieselandGameMode::EndGame_Validate()

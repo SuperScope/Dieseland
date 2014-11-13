@@ -631,6 +631,7 @@ void ADieselandCharacter::MeleeAttack()
 			Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 		}
 	}
+	OnBasicAttack();
 }
 
 void ADieselandCharacter::SkillOne()

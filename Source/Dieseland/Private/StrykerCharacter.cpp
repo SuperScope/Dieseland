@@ -460,8 +460,7 @@ void AStrykerCharacter::RangedAttack()
 //stryker basic attack
 void AStrykerCharacter::MeleeAttack()
 {
-	if (Role == ROLE_Authority)
-	{
+	OnBasicAttack();
 	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	MeleeCollision->SetCollisionProfileName(TEXT("OverlapAll"));
 	MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
@@ -476,25 +475,23 @@ void AStrykerCharacter::MeleeAttack()
 		SlashSound->Stop();
 		if (Role == ROLE_Authority && CurActor != this)
 		{
-			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+			if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
 			{
 				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
-				
+
 			}
-			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+			else if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Enemy"))))
 			{
 				Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 			}
-			else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
+			else if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
 			{
 				Cast<AScrapBox>(CurActor)->DestroyCrate(this);
 			}
-			
+
 			SlashHitSound->Play();
 		}
 	}
-	OnBasicAttack();
-}
 }
 
 void AStrykerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
