@@ -40,17 +40,7 @@ AFoxSmokeGrenadeProjectile::AFoxSmokeGrenadeProjectile(const class FPostConstruc
 	this->Mesh->SetWorldScale3D(MeshScale);
 
 }
-void ADieselandCharacter::ReceiveBeginPlay()
-{
-	Grenade
-	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
 
-	//AimBar->SetWorldLocation(FVector(0, 0, -50));
-	AimBar->SetWorldScale3D(FVector(4.0f, 1.0, 0.01));
-	AimBar->CastShadow = false;
-	AimBar->Materials.Add(AimBarMaterial);
-
-}
 void AFoxSmokeGrenadeProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
 	UWorld* const World = GetWorld();

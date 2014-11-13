@@ -362,25 +362,27 @@ bool AStrykerCharacter::SearchForAssassinationTarget_Validate()
 // Stryker Assasinate
 void AStrykerCharacter::SkillOne()
 {
-	
-	ServerActivateParticle(SkillOneParticle);
+	if (Role == ROLE_Authority)
+	{
+		ServerActivateParticle(SkillOneParticle);
 
-	//here I ensure the player can't cast this ability when in air as it will cause a bug...
-	if (this->CharacterMovement->Velocity.Z > 0 || this->CharacterMovement->Velocity.Z < 0){
-		SkillOneCooldown = 0;
-		return;
-	}
-	UWorld* const World = GetWorld();
-	if (World){
-		UltimateVoice->Play();
-		FRotator CharacterRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
-		CharacterRotation = FRotator(CharacterRotation.Pitch, CharacterRotation.Yaw + 90.0f, CharacterRotation.Roll);
-		this->SetActorRotation(CharacterRotation);
-		FVector Direction = CharacterRotation.Vector();
-		this->StatusEffects.Add(FString("Stunned"));
-		this->CharacterMovement->Velocity += FVector(Direction.X * 12500, Direction.Y * 12500,0);
-		IsAttemptingAssassinate = true;
-		OnSkillOne();
+		//here I ensure the player can't cast this ability when in air as it will cause a bug...
+		if (this->CharacterMovement->Velocity.Z > 0 || this->CharacterMovement->Velocity.Z < 0){
+			SkillOneCooldown = 0;
+			return;
+		}
+		UWorld* const World = GetWorld();
+		if (World){
+			UltimateVoice->Play();
+			FRotator CharacterRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
+			CharacterRotation = FRotator(CharacterRotation.Pitch, CharacterRotation.Yaw + 90.0f, CharacterRotation.Roll);
+			this->SetActorRotation(CharacterRotation);
+			FVector Direction = CharacterRotation.Vector();
+			this->StatusEffects.Add(FString("Stunned"));
+			this->CharacterMovement->Velocity += FVector(Direction.X * 12500, Direction.Y * 12500, 0);
+			IsAttemptingAssassinate = true;
+			OnSkillOne();
+		}
 	}
 	/* some sample movement i'm usng to reference
 	DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 600 + (Intelligence * 1.5f), -MoveCharacterY * 600 + (Intelligence * 1.5f), 0); */
@@ -421,22 +423,25 @@ void AStrykerCharacter::SkillTwo()
 //Stryker Blink
 void AStrykerCharacter::SkillThree()
 {
-	BlinkSound->Play();
-	//here I ensure the player can't cast this ability when in air as it will cause a bug...
-	if (this->CharacterMovement->Velocity.Z > 0 || this->CharacterMovement->Velocity.Z < 0){
-		SkillThreeCooldown = 0;
-		return;
-	}
-	UWorld* const World = GetWorld();
-	if (World){
-		ServerActivateParticle(SkillThreeParticle);
-		FRotator CharacterRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
-		CharacterRotation = FRotator(CharacterRotation.Pitch, CharacterRotation.Yaw + 90.0f, CharacterRotation.Roll);
-		this->SetActorRotation(CharacterRotation);
-		FVector Direction = CharacterRotation.Vector();
-		//this->StatusEffects.Add(FString("Stunned"));
-		this->CharacterMovement->Velocity += FVector(Direction.X * 18000, Direction.Y * 18000, 0);
-		OnSkillThree();
+	if (Role == ROLE_Authority)
+	{
+		BlinkSound->Play();
+		//here I ensure the player can't cast this ability when in air as it will cause a bug...
+		if (this->CharacterMovement->Velocity.Z > 0 || this->CharacterMovement->Velocity.Z < 0){
+			SkillThreeCooldown = 0;
+			return;
+		}
+		UWorld* const World = GetWorld();
+		if (World){
+			ServerActivateParticle(SkillThreeParticle);
+			FRotator CharacterRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
+			CharacterRotation = FRotator(CharacterRotation.Pitch, CharacterRotation.Yaw + 90.0f, CharacterRotation.Roll);
+			this->SetActorRotation(CharacterRotation);
+			FVector Direction = CharacterRotation.Vector();
+			//this->StatusEffects.Add(FString("Stunned"));
+			this->CharacterMovement->Velocity += FVector(Direction.X * 18000, Direction.Y * 18000, 0);
+			OnSkillThree();
+		}
 	}
 }
 
@@ -448,38 +453,41 @@ void AStrykerCharacter::RangedAttack()
 //stryker basic attack
 void AStrykerCharacter::MeleeAttack()
 {
-	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	MeleeCollision->SetCollisionProfileName(TEXT("OverlapAll"));
-	MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
-	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SlashSound->Play();
-	AActor* CurActor = NULL;
-	for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)
+	if (Role == ROLE_Authority)
 	{
-		CurActor = ActorsInMeleeRange[b];
-		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))) || CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))) continue;
-		if (!CurActor->IsValidLowLevel()) continue;
-		SlashSound->Stop();
-		if (Role == ROLE_Authority && CurActor != this)
+		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		MeleeCollision->SetCollisionProfileName(TEXT("OverlapAll"));
+		MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
+		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		SlashSound->Play();
+		AActor* CurActor = NULL;
+		for (int32 b = 0; b < ActorsInMeleeRange.Num(); b++)
 		{
-			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+			CurActor = ActorsInMeleeRange[b];
+			if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))) || CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))) continue;
+			if (!CurActor->IsValidLowLevel()) continue;
+			SlashSound->Stop();
+			if (Role == ROLE_Authority && CurActor != this)
 			{
-				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
-				
+				if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+				{
+					Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+
+				}
+				else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+				{
+					Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+				}
+				else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
+				{
+					Cast<AScrapBox>(CurActor)->DestroyCrate(this);
+				}
+
+				SlashHitSound->Play();
 			}
-			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
-			{
-				Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
-			}
-			else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
-			{
-				Cast<AScrapBox>(CurActor)->DestroyCrate(this);
-			}
-			
-			SlashHitSound->Play();
 		}
+		OnBasicAttack();
 	}
-	OnBasicAttack();
 }
 
 void AStrykerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

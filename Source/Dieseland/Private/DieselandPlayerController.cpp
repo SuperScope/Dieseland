@@ -293,6 +293,7 @@ void ADieselandPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Escape", IE_Pressed, this, &ADieselandPlayerController::OnEscape);
 
 	InputComponent->BindAction("Score", IE_Released, this, &ADieselandPlayerController::OnShowScore);
+	
 }
 
 void ADieselandPlayerController::ReceiveBeginPlay()
@@ -673,6 +674,7 @@ void ADieselandPlayerController::ServerSkillOne_Implementation()
 			DieselandPawn->SkillOneTimer = DieselandPawn->SkillOneCooldown;
 		}
 	}
+	MulticastSkillOne();
 }
 
 bool ADieselandPlayerController::ServerSkillOne_Validate()
@@ -690,6 +692,7 @@ void ADieselandPlayerController::ServerSkillTwo_Implementation()
 			DieselandPawn->SkillTwoTimer = DieselandPawn->SkillTwoCooldown;
 		}
 	}
+	MulticastSkillTwo();
 }
 
 bool ADieselandPlayerController::ServerSkillTwo_Validate()
@@ -707,6 +710,7 @@ void ADieselandPlayerController::ServerSkillThree_Implementation()
 			DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
 		}
 	}
+	MulticastSkillThree();
 }
 
 bool ADieselandPlayerController::ServerSkillThree_Validate()
@@ -1010,11 +1014,42 @@ void ADieselandPlayerController::ServerRangedAttack_Implementation()
 	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		DieselandPawn->RangedAttack();
 	}
+	MulticastRangedAttack();
 }
 
 bool ADieselandPlayerController::ServerRangedAttack_Validate()
 {
 	return true;
+}
+
+void ADieselandPlayerController::MulticastMeleeAttack_Implementation()
+{
+	//ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	//DieselandPawn->MeleeAttack();
+}
+
+void ADieselandPlayerController::MulticastRangedAttack_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	DieselandPawn->RangedAttack();
+}
+
+void ADieselandPlayerController::MulticastSkillOne_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	DieselandPawn->SkillOne();
+}
+
+void ADieselandPlayerController::MulticastSkillTwo_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	DieselandPawn->SkillTwo();
+}
+
+void ADieselandPlayerController::MulticastSkillThree_Implementation()
+{
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	DieselandPawn->SkillThree();
 }
 
 bool ADieselandPlayerController::ServerOnAim_Validate(FRotator Rotation)
