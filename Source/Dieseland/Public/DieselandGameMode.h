@@ -27,10 +27,6 @@ class ADieselandGameMode : public AGameMode
 	//Array for the Death Tiles
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	TArray<AActor*> DeathTileArray;
-
-	// Timer to keep track of the duration of the match
-	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
-	float GameTimer;
     
     // Timer used to determined when boss should be spawned
     UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)

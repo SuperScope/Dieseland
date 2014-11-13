@@ -25,12 +25,17 @@ class DIESELAND_API ADieselandGameState : public AGameState
 	int32 KillGoal;
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	int32 WinningTeam;
+	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+	float GameDuration;
 
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	TArray<int32> TeamScores;
 	
 	UFUNCTION(BlueprintCallable, Category = Score)
 	void CalculateScore();
+
+	UFUNCTION(BlueprintCallable, Category = Score)
+	void GameTimerEnded();
 
 	virtual void ReceiveBeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;

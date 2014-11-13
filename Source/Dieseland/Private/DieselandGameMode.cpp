@@ -85,8 +85,6 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
     LocationArray.Add(FVector(-3902.357666, -730.476562, -1500.0));
     LocationArray.Add(FVector(-3902.357666, -4332.289062, -1500.0));
 
-    
-	GameTimer = 9999.0f;
     BossTimer = 300.0f;
     CanSpawn = true;
     StartBossTimer = false;
@@ -111,7 +109,6 @@ void ADieselandGameMode::ReceiveBeginPlay()
 
 void ADieselandGameMode::Tick(float DeltaSeconds)
 {
-	GameTimer -= DeltaSeconds;
     
     //If time to start timer, start timer
     if(StartBossTimer == true)
@@ -129,11 +126,6 @@ void ADieselandGameMode::Tick(float DeltaSeconds)
         
         //Spawning is done is BossTiles.cpp
     }
-
-	if (GameTimer <= 0.0f)
-	{
-		EndGame();
-	}
 
 	Super::Tick(DeltaSeconds);
 }
@@ -201,7 +193,7 @@ AActor* ADieselandGameMode::SpawnLightArray(UClass* ArrayClass, FVector SpawnLoc
 void ADieselandGameMode::EndGame_Implementation()
 {
 
-	GEngine->AddOnScreenDebugMessage(21, 10.0f, FColor::Yellow, FString::FromInt(Cast<ADieselandGameState>(GameState)->WinningTeam));
+	GEngine->AddOnScreenDebugMessage(21, 10.0f, FColor::Yellow, FString(TEXT("Winning Team: ")) + FString::FromInt(Cast<ADieselandGameState>(GameState)->WinningTeam));
 }
 
 bool ADieselandGameMode::EndGame_Validate()
@@ -236,7 +228,6 @@ void ADieselandGameMode::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	// Replicate to everyone
-	DOREPLIFETIME(ADieselandGameMode, GameTimer);
     DOREPLIFETIME(ADieselandGameMode, BossTimer);
     DOREPLIFETIME(ADieselandGameMode, CanSpawn);
     DOREPLIFETIME(ADieselandGameMode, RandomBossIndex);

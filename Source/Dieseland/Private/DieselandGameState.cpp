@@ -16,11 +16,14 @@ ADieselandGameState::ADieselandGameState(const class FPostConstructInitializePro
 	WinningScore = 0;
 	KillGoal = 5;
 	WinningTeam = 0;
+	GameDuration = 60.0f;
 }
 
 void ADieselandGameState::ReceiveBeginPlay()
 {
-	GetWorldTimerManager().SetTimer(this, &ADieselandGameState::CalculateScore, 1.0f, true);
+	GetWorldTimerManager().SetTimer(this, &ADieselandGameState::CalculateScore, .2f, true);
+
+	GetWorldTimerManager().SetTimer(this, &ADieselandGameState::GameTimerEnded, GameDuration, false);
 }
 
 void ADieselandGameState::Tick(float DeltaSeconds)
@@ -52,20 +55,9 @@ void ADieselandGameState::CalculateScore()
 		{
 			if (Players[x] != nullptr)
 			{
-
-
 				int32 TempPlayerTeamNum = Cast<ADieselandPlayerState>(Players[x]->PlayerState)->TeamNumber;
 
 				TempTeamScores[TempPlayerTeamNum] += Cast<ADieselandPlayerState>(Players[x]->PlayerState)->Kills;
-
-				/*if (Cast<ADieselandPlayerState>(Cast<ADieselandCharacter>(Players[x])->PlayerState)->Kills > WinningScore)
-				{
-				WinningScore = Players[x]->Kills;
-				if (WinningScore >= KillGoal && Role == ROLE_Authority)
-				{
-				Cast<ADieselandGameMode>(AuthorityGameMode)->EndGame();
-				}
-				}*/
 			}
 			else
 			{
@@ -91,6 +83,14 @@ void ADieselandGameState::CalculateScore()
 	}
 }
 
+void ADieselandGameState::GameTimerEnded()
+{
+	if (Role == ROLE_Authority)
+	{
+		Cast<ADieselandGameMode>(AuthorityGameMode)->EndGame();
+	}
+}
+
 void ADieselandGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -100,5 +100,6 @@ void ADieselandGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandGameState, WinningScore);
 	DOREPLIFETIME(ADieselandGameState, WinningTeam);
 	DOREPLIFETIME(ADieselandGameState, TeamScores);
+	DOREPLIFETIME(ADieselandGameState, GameDuration);
 	DOREPLIFETIME(ADieselandGameState, Players);
 }

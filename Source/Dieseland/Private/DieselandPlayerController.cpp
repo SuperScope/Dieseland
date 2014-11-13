@@ -672,10 +672,9 @@ void ADieselandPlayerController::ServerSkillOne_Implementation()
 		{
 			DieselandPawn->SkillOne();
 			DieselandPawn->SkillOneTimer = DieselandPawn->SkillOneCooldown;
-		}
-		MulticastSkillOne();
-	}
-	
+			MulticastSkillOne();
+		}		
+	}	
 }
 
 bool ADieselandPlayerController::ServerSkillOne_Validate()
@@ -691,10 +690,9 @@ void ADieselandPlayerController::ServerSkillTwo_Implementation()
 		{
 			DieselandPawn->SkillTwo();
 			DieselandPawn->SkillTwoTimer = DieselandPawn->SkillTwoCooldown;
+			MulticastSkillTwo();
 		}
-		MulticastSkillTwo();
-	}
-	
+	}	
 }
 
 bool ADieselandPlayerController::ServerSkillTwo_Validate()
@@ -710,10 +708,9 @@ void ADieselandPlayerController::ServerSkillThree_Implementation()
 		{
 			DieselandPawn->SkillThree();
 			DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
+			MulticastSkillThree();
 		}
-		MulticastSkillThree();
 	}
-	
 }
 
 bool ADieselandPlayerController::ServerSkillThree_Validate()
