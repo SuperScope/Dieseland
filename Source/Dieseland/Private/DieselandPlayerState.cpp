@@ -9,6 +9,8 @@
 ADieselandPlayerState::ADieselandPlayerState(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
+	CharacterName = FString(TEXT("Engleton"));
+	Username = FString(TEXT("Player"));
 	TeamNumber = 1;
 	Kills = 0;
 }
@@ -47,6 +49,36 @@ void ADieselandPlayerState::SetKillNum(int32 NewKillNumber)
 	}
 }
 
+void ADieselandPlayerState::SetUsername(FString NewName)
+{
+	Username = NewName;
+
+	if (Role != ROLE_Authority)
+	{
+		ServerSetUsername(NewName);
+	}
+}
+
+void ADieselandPlayerState::SetCharacterName(FString NewName)
+{
+	Username = NewName;
+
+	if (Role != ROLE_Authority)
+	{
+		ServerSetUsername(NewName);
+	}
+}
+
+void ADieselandPlayerState::ServerSetUsername_Implementation(FString NewName)
+{
+	SetUsername(NewName);
+}
+
+void ADieselandPlayerState::ServerSetCharacterName_Implementation(FString NewName)
+{
+	SetCharacterName(NewName);
+}
+
 void ADieselandPlayerState::ServerSetTeamNum_Implementation(int32 NewTeamNumber)
 {
 	SetTeamNum(NewTeamNumber);
@@ -83,4 +115,6 @@ void ADieselandPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty
 
 	DOREPLIFETIME(ADieselandPlayerState, TeamNumber);
 	DOREPLIFETIME(ADieselandPlayerState, Kills);
+	DOREPLIFETIME(ADieselandPlayerState, Username);
+	DOREPLIFETIME(ADieselandPlayerState, CharacterName);
 }
