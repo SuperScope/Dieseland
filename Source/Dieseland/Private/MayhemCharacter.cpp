@@ -18,7 +18,7 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 	//here I set his base values
 	BaseMoveSpeed = 410;
 	BaseHealth = 400;
-	BaseDamage = 33;
+	BaseDamage = 39;
 	BaseCooldownSpeed = 1.7;
 	//here I set his base stats
 	Strength = 16;
@@ -41,8 +41,8 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 	BasicAttackDamage = BaseDamage + (Strength * 1.5f) + (Dexterity * .5f) + (Intelligence * .5f);
 
 	BaseSkillOneCooldown = 25.0f;
-	BaseSkillTwoCooldown = 16.0f;
-	BaseSkillThreeCooldown = 12.0f;
+	BaseSkillTwoCooldown = 14.0f;
+	BaseSkillThreeCooldown = 16.0f;
 
 	//adjusments for attackspeed
 	BasicAttackCooldown = BaseCooldownSpeed / (1 + (Dexterity / 50));
@@ -239,7 +239,7 @@ void AMayhemCharacter::SkillTwo()
 		ServerActivateParticle(SkillTwoParticle);
 		RageSound->Play();
 		RageVoiceOver->Play();
-		RageMoveSpeedBuff = (CharacterMovement->MaxWalkSpeed * .5f) + (Strength * .06f);
+		RageMoveSpeedBuff = (CharacterMovement->MaxWalkSpeed * .3f) + (Strength * .06f);
 		RageAttkSpeedBuff = (BasicAttackCooldown * .1f) + (Strength * .03f);
 
 		BasicAttackCooldown -= RageAttkSpeedBuff;

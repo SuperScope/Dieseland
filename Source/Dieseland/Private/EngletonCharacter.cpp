@@ -20,8 +20,8 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	//here I set his base values
 	BaseMoveSpeed = 375;
 	BaseHealth = 350;
-	BaseDamage = 15;
-	BaseCooldownSpeed = 1.2;
+	BaseDamage = 27;
+	BaseCooldownSpeed = 1.25;
 	//here I set his base stats
 	Strength = 10;
 	Intelligence = 18;

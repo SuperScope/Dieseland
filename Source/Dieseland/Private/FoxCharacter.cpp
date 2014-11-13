@@ -44,9 +44,9 @@ AFoxCharacter::AFoxCharacter(const class FPostConstructInitializeProperties& PCI
 	this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
 
 	//base cooldowns
-	BaseSkillOneCooldown = 1.0f;
-	BaseSkillTwoCooldown = 1.0f;
-	BaseSkillThreeCooldown = 1.0f;
+	BaseSkillOneCooldown = 1.0f; //23
+	BaseSkillTwoCooldown = 1.0f; //9
+	BaseSkillThreeCooldown = 1.0f; //13
 
 	//adjustments for cooldowns
 	SkillOneCooldown = BaseSkillOneCooldown / (1 + Intelligence / 100);
@@ -110,7 +110,7 @@ void AFoxCharacter::SkillOne()
 		AFoxPenetrationRound* const Projectile = World->SpawnActor<AFoxPenetrationRound>(AFoxPenetrationRound::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 		if (Projectile)
 		{
-			Projectile->ProjectileDamage = 175 + (Dexterity * 6);
+			Projectile->ProjectileDamage = 150 + (Dexterity * 5);
 			// Start the particle effect
 			Projectile->ServerActivateProjectile();
 
