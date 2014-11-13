@@ -122,6 +122,10 @@ void AStrykerCharacter::Tick(float DeltaSeconds)
 
 void AStrykerCharacter::UpdateDurationTimers_Implementation(float DeltaSeconds)
 {
+	AimBar->SetRelativeLocation(FVector(0.f, 300.0f, 0.0f));
+	AimBar->SetWorldRotation(AimRotation.GetNormalized());
+
+
 	if (IsAttemptingAssassinate)
 	{
 		AssasinationAttemptDuration += DeltaSeconds;
@@ -378,8 +382,9 @@ void AStrykerCharacter::SkillOne()
 		this->SetActorRotation(CharacterRotation);
 		FVector Direction = CharacterRotation.Vector();
 		this->StatusEffects.Add(FString("Stunned"));
+		this->SetActorRotation(CharacterRotation);
 		this->CharacterMovement->Velocity += FVector(Direction.X * 12500, Direction.Y * 12500,0);
-		IsAttemptingAssassinate = true;
+		
 		OnSkillOne();
 	}
 	/* some sample movement i'm usng to reference
@@ -497,8 +502,14 @@ void AStrykerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > &
 
 void AStrykerCharacter::SkillOneAim()
 {
-	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("Get Jinxed!")), FVector(0.0f, 1.0f, 0.0f));
-
+	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
+	//AimBar->SetWorldLocation(FVector(0, 0, -50));
+	AimBar->SetWorldScale3D(FVector(8.0f, 1.0, 0.01f));
+	AimBar->CastShadow = false;
+	AimBar->Materials.Add(AimBarMaterial);
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.01f, 0.75f, 0.01f));
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetScalarParameterValue(FName(TEXT("Health percentage")), 1.0f);
+	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetScalarParameterValue(FName(TEXT("Opacity")), 0.15f);
 	AimBar->SetHiddenInGame(false);
 }
 
