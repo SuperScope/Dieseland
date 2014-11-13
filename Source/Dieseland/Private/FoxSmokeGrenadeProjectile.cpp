@@ -48,7 +48,6 @@ void AFoxSmokeGrenadeProjectile::ReceiveBeginPlay()
 	//GrenadeMesh->Materials.Add(GrenadeMeshMaterial);
 	GrenadeMesh->SetVisibility(true);
 
-}
 void AFoxSmokeGrenadeProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
 	UWorld* const World = GetWorld();

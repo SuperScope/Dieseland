@@ -366,7 +366,8 @@ bool AStrykerCharacter::SearchForAssassinationTarget_Validate()
 // Stryker Assasinate
 void AStrykerCharacter::SkillOne()
 {
-	
+	if (Role == ROLE_Authority)
+	{
 	ServerActivateParticle(SkillOneParticle);
 
 	//here I ensure the player can't cast this ability when in air as it will cause a bug...
@@ -382,10 +383,13 @@ void AStrykerCharacter::SkillOne()
 		this->SetActorRotation(CharacterRotation);
 		FVector Direction = CharacterRotation.Vector();
 		this->StatusEffects.Add(FString("Stunned"));
+			this->CharacterMovement->Velocity += FVector(Direction.X * 12500, Direction.Y * 12500, 0);
+			IsAttemptingAssassinate = true;
 		this->SetActorRotation(CharacterRotation);
 		this->CharacterMovement->Velocity += FVector(Direction.X * 12500, Direction.Y * 12500,0);
 		
 		OnSkillOne();
+	}
 	}
 	/* some sample movement i'm usng to reference
 	DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 600 + (Intelligence * 1.5f), -MoveCharacterY * 600 + (Intelligence * 1.5f), 0); */
@@ -426,6 +430,8 @@ void AStrykerCharacter::SkillTwo()
 //Stryker Blink
 void AStrykerCharacter::SkillThree()
 {
+	if (Role == ROLE_Authority)
+	{
 	BlinkSound->Play();
 	//here I ensure the player can't cast this ability when in air as it will cause a bug...
 	if (this->CharacterMovement->Velocity.Z > 0 || this->CharacterMovement->Velocity.Z < 0){
@@ -444,6 +450,7 @@ void AStrykerCharacter::SkillThree()
 		OnSkillThree();
 	}
 }
+}
 
 void AStrykerCharacter::RangedAttack()
 {
@@ -453,6 +460,8 @@ void AStrykerCharacter::RangedAttack()
 //stryker basic attack
 void AStrykerCharacter::MeleeAttack()
 {
+	if (Role == ROLE_Authority)
+	{
 	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	MeleeCollision->SetCollisionProfileName(TEXT("OverlapAll"));
 	MeleeCollision->GetOverlappingActors(ActorsInMeleeRange);
@@ -485,6 +494,7 @@ void AStrykerCharacter::MeleeAttack()
 		}
 	}
 	OnBasicAttack();
+}
 }
 
 void AStrykerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

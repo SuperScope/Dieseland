@@ -256,6 +256,7 @@ void AEngletonCharacter::SkillThree()
 			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 6000 + (Intelligence * 20.0f), -MoveCharacterY * 6000 + (Intelligence * 20.0f), 0);
 			DieselandPawn->CharacterMovement->JumpZVelocity = 400 + (Intelligence * 10);
 			DieselandPawn->CharacterMovement->DoJump(false);
+			OnSkillThree();
 		}
 		//here we do it for enemies
 		if (Role == ROLE_Authority && CurActor != this && (CurActor->ActorHasTag(FName(TEXT("Enemy")))))
@@ -283,9 +284,10 @@ void AEngletonCharacter::SkillThree()
 			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 1500, -MoveCharacterY * 1500, 0);
 			DieselandPawn->CharacterMovement->JumpZVelocity = 550 + (Intelligence * 5);
 			DieselandPawn->CharacterMovement->DoJump(false);
+			OnSkillThree();
 		}
 	}
-	OnSkillThree();
+	
 }
 
 void AEngletonCharacter::RangedAttack()
@@ -293,19 +295,19 @@ void AEngletonCharacter::RangedAttack()
 	UWorld* const World = GetWorld();
 	if (World)
 	{
-		 MachineGunSound->Play();
+		MachineGunSound->Play();
 		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
+		SpawnParams.Owner = this->Controller;
 		SpawnParams.Instigator = Instigator;
 
 		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
 
-		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw, ProjectileRotation.Roll);
+		FVector ProjectileLocation = Mesh->GetSocketLocation(FName(TEXT("AimSocket")));
 		
 
 		// spawn the projectile at the muzzle
-		AEngletonMachineGun* const Projectile = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
-		AEngletonMachineGun* const Projectile2 = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), ProjectileRotation, SpawnParams);
+		AEngletonMachineGun* const Projectile = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), AimRotation, SpawnParams);
+		AEngletonMachineGun* const Projectile2 = World->SpawnActor<AEngletonMachineGun>(AEngletonMachineGun::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), AimRotation, SpawnParams);
 	//	AEngletonMachineGunSpark* const ProjectileLaunch = World->SpawnActor<AEngletonMachineGunSpark>(AEngletonMachineGunSpark::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 	//	AEngletonMachineGunSpark* const ProjectileLaunch2 = World->SpawnActor<AEngletonMachineGunSpark>(AEngletonMachineGunSpark::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket2"))), ProjectileRotation, SpawnParams);
 
@@ -318,14 +320,17 @@ void AEngletonCharacter::RangedAttack()
 			Projectile->ProjectileDamage = BasicAttackDamage / 2;
 			Projectile2->ProjectileDamage = BasicAttackDamage / 2;
 			// Start the particle effect
+			
+
 			Projectile->ServerActivateProjectile();
 			Projectile2->ServerActivateProjectile();
+			Projectile->Particle->ActivateSystem();
 
 			// Add the character's velocity to the projectile
-
-			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
-			Projectile2->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
+			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * AimRotation.Vector()) + (GetVelocity().GetAbs() * AimRotation.GetNormalized().Vector()));
+			Projectile2->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * AimRotation.Vector()) + (GetVelocity().GetAbs() * AimRotation.GetNormalized().Vector()));
 			OnBasicAttack();
+
 		}
 	}
 }

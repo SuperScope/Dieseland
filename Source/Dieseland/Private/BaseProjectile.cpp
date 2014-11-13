@@ -38,6 +38,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	Mesh->SetHiddenInGame(true);
 	Mesh->SetIsReplicated(true);
 
+
 	ProjCollision = PCIP.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("ProjectileCollision"));
 	ProjCollision->SetCapsuleHalfHeight(50.0f);
 	ProjCollision->SetCapsuleRadius(50.0f);
@@ -54,7 +55,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	
 
 	ProjectileMovement = PCIP.CreateDefaultSubobject<UProjectileMovementComponent>(this, TEXT("ProjectileMovement"));
-	ProjectileMovement->SetIsReplicated(true);
+	ProjectileMovement->SetIsReplicated(false);
 	ProjectileMovement->InitialSpeed = 800.0f;
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 	ProjectileMovement->bInitialVelocityInLocalSpace = false;
@@ -69,15 +70,17 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	Particle->AttachTo(Mesh);
 	Particle->bAutoActivate = false;
 	Particle->SetHiddenInGame(false);
+	Particle->SetOwnerNoSee(false);
+	Particle->SetOnlyOwnerSee(false);
 
 	ProjectileDamage = 10;
 
 	InitialLifeSpan = 10.0f;
 	Tags.Add(FName("Projectile"));
 
-	bReplicates = true;
-	bReplicateMovement = true;
-	Particle->SetIsReplicated(true);
+	bReplicates = false;
+	bReplicateMovement = false;
+	Particle->SetIsReplicated(false);
 	//ReplicatedMovement.LinearVelocity.Z ;
 	
 }
