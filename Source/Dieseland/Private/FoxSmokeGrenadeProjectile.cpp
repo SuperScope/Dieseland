@@ -16,18 +16,41 @@ AFoxSmokeGrenadeProjectile::AFoxSmokeGrenadeProjectile(const class FPostConstruc
 	ProjCollision->SetCapsuleHalfHeight(150.0f);
 	ProjCollision->SetCapsuleRadius(150.0f);
 
+	//getting the smoke grenade mesh
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> SmokeGrenadeMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube.Shape_Cube'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> GrenadeMatRef(TEXT("Material'/Game/UserInterfaceAssets/HUD/Materials/M_HUD_Health_Bar.M_HUD_Health_Bar'"));
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
 	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	Particle->Template = ParticleSystemAsset.Object;
+	this->Particle->SetVisibility(false);
+
 
 	//temp meshscale
 	FVector MeshScale;
 	MeshScale = FVector(1.0f, 1.0f, 1.0f);
+	//for the aim bar and aim sphere stuff
+	GrenadeMesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent >(this, TEXT("GrenadeMesh"));
+	GrenadeMesh->AttachParent = Mesh;
+	GrenadeMesh->SetStaticMesh(SmokeGrenadeMesh.Object);
+	GrenadeMeshMatStatic = GrenadeMatRef.Object;
+
+
 
 	this->Mesh->SetWorldScale3D(MeshScale);
-}
 
+}
+void ADieselandCharacter::ReceiveBeginPlay()
+{
+	Grenade
+	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
+
+	//AimBar->SetWorldLocation(FVector(0, 0, -50));
+	AimBar->SetWorldScale3D(FVector(4.0f, 1.0, 0.01));
+	AimBar->CastShadow = false;
+	AimBar->Materials.Add(AimBarMaterial);
+
+}
 void AFoxSmokeGrenadeProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
 	UWorld* const World = GetWorld();
