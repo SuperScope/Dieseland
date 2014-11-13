@@ -20,7 +20,7 @@ ADieselandHighlanderKingBot::ADieselandHighlanderKingBot(const class FPostConstr
 	ProjectileZone = 700.0f;
 	CannonRange = 800;
 	CannonAttackDamage = 40;
-	BaseAttackDamage = 60;
+	BaseAttackDamage = 100;
 	HealthRegeneration = 6;
 	BasicAttackDamage = BaseAttackDamage;
 	MaxHealth = 1500;

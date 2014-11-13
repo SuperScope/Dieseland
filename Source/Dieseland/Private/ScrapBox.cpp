@@ -35,26 +35,25 @@ AScrapBox::AScrapBox(const class FPostConstructInitializeProperties& PCIP)
 		ScrapClass = (UClass*)ScrapBlueprint.Object;
 	}
 
-	ScrapAmt = 5;
+	ScrapAmt = 1;
 
 	Tags.Add(FName(TEXT("ScrapBox")));
 	
 	bReplicates = true;
 }
 
-void AScrapBox::ReceiveActorBeginOverlap(AActor* OtherActor)
-{
-
-}
-
 void AScrapBox::DestroyCrate_Implementation(AActor* Causer)
 {
 	Mesh->ApplyDamage(100.0, GetActorLocation(), FVector(0.0f, 0.0f, 0.0f), 1000.0f);
-    Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
+	//Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+	//Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 
-	this->SetLifeSpan(2.0f);
+//	this->InitialLifeSpan = 2.0f;
+//	this->SetLifeSpan(2.0f);
+
 	if (Role == ROLE_Authority)
 	{
+		this->SetLifeSpan(2.0f);
 		//Spawn Scrap pieces here
 		UWorld* const World = GetWorld();
 		if (World)
@@ -66,8 +65,9 @@ void AScrapBox::DestroyCrate_Implementation(AActor* Causer)
 			{
                 RandomX = FMath::RandRange(-30, 30);
                 RandomY = FMath::RandRange(-30, 30);
-				UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(GetActorLocation().X + RandomX, GetActorLocation().Y + RandomY, GetActorLocation().Z), FRotator(0.0f, 0.0f, 0.0f));
-				
+				AActor* Scrap = UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(GetActorLocation().X + RandomX, GetActorLocation().Y + RandomY, GetActorLocation().Z), FRotator(0.0f, 0.0f, 0.0f));
+				Cast<AScrap>(Scrap)->ScrapValue = FMath::RandRange(20, 30);
+			
 				//Alternatively used to spawn c++ class
 				//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
 			}
@@ -87,4 +87,6 @@ void AScrapBox::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLife
 	// Replicate to everyone
 	DOREPLIFETIME(AScrapBox, Particle);
 	DOREPLIFETIME(AScrapBox, ScrapAmt);
+	DOREPLIFETIME(AScrapBox, RandomX);
+	DOREPLIFETIME(AScrapBox, RandomY);
 }

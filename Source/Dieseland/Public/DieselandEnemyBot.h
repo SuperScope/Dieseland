@@ -111,6 +111,11 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		int32 MaxHealth;
 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
+		TSubobjectPtr<class UStaticMeshComponent> MiniMapIcon;
+
+
 	// Health Regeneration
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		float HealthRegeneration;
@@ -160,6 +165,9 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void OnProjectileZoneEnter();
 
+	UFUNCTION(BlueprintNativeEvent, Category = Combat)
+	void OnBasicAttack();
+
 	//One forumla > many <3
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 		void ResetStats();
@@ -200,6 +208,9 @@ class DIESELAND_API ADieselandEnemyBot : public ACharacter
 	UFUNCTION(Reliable, NetMulticast, WithValidation)
 		void ServerActivateParticle(UParticleSystem* Particle);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
+		UMaterialInstanceDynamic* MiniMapMaterial;
+
 	//this grabs the particle system
 	UPROPERTY(Replicated, Category = Visual, BlueprintReadOnly, VisibleAnywhere)
 		TSubobjectPtr<class UParticleSystemComponent> ParticleSystem;
@@ -221,6 +232,7 @@ protected:
 
 	UMaterial* HealthBarMatStatic;
 	UMaterial* HealthBarBackMatStatic;
+	UMaterial* IconMatStatic;
 
 	virtual void ReceiveBeginPlay() override;
 

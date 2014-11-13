@@ -19,7 +19,6 @@ class DIESELAND_API AFoxCharacter : public ADieselandCharacter
 	virtual void MeleeAttack() override;
 	virtual void RangedAttack() override;
 
-
 	virtual void SkillOneAim() override;
 	virtual void SkillTwoAim() override;
 	virtual void SkillThreeAim() override;
@@ -39,5 +38,10 @@ class DIESELAND_API AFoxCharacter : public ADieselandCharacter
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
 		TSubobjectPtr <UAudioComponent> CharmSound;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> SmokeBombSound;
+
 	
 };

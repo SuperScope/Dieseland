@@ -23,6 +23,9 @@ class DIESELAND_API AScrap : public AActor
 	/*UPROPERTY(Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UCapsuleComponent> ScrapCollectionArea;*/
 
+	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+	int32 ScrapValue;
+
 	UFUNCTION(BlueprintCallable, Reliable, WithValidation, NetMulticast, Category = Gameplay)
 	void CollectScrap(AActor* OtherActor);
 

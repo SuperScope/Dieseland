@@ -12,7 +12,8 @@ ADieselandGameState::ADieselandGameState(const class FPostConstructInitializePro
 {
 	PrimaryActorTick.bCanEverTick = true;
 	WinningScore = 0;
-	KillGoal = 2;
+	KillGoal = 25;
+	WinningTeam = 0;
 }
 
 void ADieselandGameState::ReceiveBeginPlay()
@@ -42,7 +43,6 @@ void ADieselandGameState::Tick(float DeltaSeconds)
 			}
 			if (Cast<ADieselandCharacter>(Players[x])->Kills > WinningScore)
 			{
-				WinningPlayer = Players[x];
 				WinningScore = Players[x]->Kills;
 				if (WinningScore >= KillGoal && Role == ROLE_Authority)
 				{
@@ -61,6 +61,6 @@ void ADieselandGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	// Replicate to everyone
 	DOREPLIFETIME(ADieselandGameState, KillGoal);
 	DOREPLIFETIME(ADieselandGameState, WinningScore);
-	DOREPLIFETIME(ADieselandGameState, WinningPlayer);
+	DOREPLIFETIME(ADieselandGameState, WinningTeam);
 	DOREPLIFETIME(ADieselandGameState, Players);
 }

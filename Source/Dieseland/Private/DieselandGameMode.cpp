@@ -165,7 +165,7 @@ bool ADieselandGameMode::StartGame_Validate()
 
 APlayerStart* ADieselandGameMode::PickSpawn()
 {
-	int32 RandomSpawnNum = FMath::RandRange(0, SpawnArray.Num());
+	int32 RandomSpawnNum = FMath::RandRange(0, (SpawnArray.Num() - 1));
 
 	return SpawnArray[RandomSpawnNum];
 }

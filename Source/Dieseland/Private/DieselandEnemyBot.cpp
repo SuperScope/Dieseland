@@ -100,8 +100,11 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	ProjectileZoneCollision->SetCapsuleRadius(ProjectileZone / 2.0f);
 	ProjectileZoneCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	//getting cubes and stuff
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube2.Shape_Cube2'"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarMatRef(TEXT("Material'/Game/UserInterfaceAssets/HUD/Materials/M_HUD_Health_Bar.M_HUD_Health_Bar'"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> HealthBarBackMatRef(TEXT("Material'/Game/MaterialsDLC/Material_BasicDarkGrey.Material_BasicDarkGrey'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> MiniMapMatRef(TEXT("Material'/Game/Materials/MiniMapIcon2.MiniMapIcon2'"));
 
 	HealthBar = PCIP.CreateDefaultSubobject<UMaterialBillboardComponent>(this, TEXT("HealthBar"));
 	HealthBar->AttachParent = RootComponent;
@@ -156,6 +159,16 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 	SwordSwing = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Basic Sword Swing Sound"));
 	SwordSwing->AttachParent = RootComponent;
 	SwordSwing->bAutoActivate = false;
+
+	//used for the minimap
+	MiniMapIcon = PCIP.CreateDefaultSubobject<UStaticMeshComponent >(this, TEXT("MiniMap Icon"));
+	MiniMapIcon->AttachParent = Mesh;
+	MiniMapIcon->SetStaticMesh(CubeMesh.Object);
+	MiniMapIcon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	IconMatStatic = MiniMapMatRef.Object;
+	MiniMapIcon->SetIsReplicated(true);
+
+
 }
 
 
@@ -167,11 +180,25 @@ void ADieselandEnemyBot::ReceiveBeginPlay()
 
 	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.0f, 0.0f));
 
+	MiniMapMaterial = UMaterialInstanceDynamic::Create(IconMatStatic, this);
+	MiniMapIcon->SetWorldScale3D(FVector(15.0f, 15.0, 0.01f));
+	MiniMapIcon->SetWorldRotation(FRotator(0, 90.0f, 0));
+
+	MiniMapIcon->AddRelativeLocation(FVector(0.0f, 0.0f, 700.0f));
+	MiniMapIcon->CastShadow = false;
+	MiniMapIcon->SetVisibility(false);
+
+	if (IsQueen || IsKing)
+	{
+		MiniMapIcon->SetVisibility(true);
+	}
+
 	Super::ReceiveBeginPlay();
 }
 
 void ADieselandEnemyBot::Tick(float DeltaSeconds)
 {
+
 	// Every frame set the health display
 	HealthLabel->SetText(FString::FromInt(Health));
 	HealthLabel->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
@@ -325,14 +352,20 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.Owner = this;
 				SpawnParams.Instigator = Instigator;
-				for (int32 x = 0; x < 5; x++)
+				for (int32 x = 0; x < 1; x++)
 				{
+					//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+				
                     RandomX = FMath::RandRange(-30, 30);
                     RandomY = FMath::RandRange(-30, 30);
-					UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(this->GetActorLocation().X +RandomX, this->GetActorLocation().Y + RandomY, this->GetActorLocation().Z), FRotator(0.0f, 0.0f, 0.0f));
+					AActor* Scrap =	UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(this->GetActorLocation().X +RandomX, this->GetActorLocation().Y + RandomY, this->GetActorLocation().Z), FRotator(0.0f, 0.0f, 0.0f));
+					
+					Cast<AScrap>(Scrap)->ScrapValue = FMath::RandRange(30, 60);
+
+
 					this->Destroy();
 					//Alternatively used to spawn c++ class
-					//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+					
 				}
 			}
 		}
@@ -343,19 +376,7 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
 //here is the basic melee attack for the AI
 void ADieselandEnemyBot::MeleeAttack()
 {
-	if (isAggressive && IsWalker == false)
-	{
-		if (IsKing)
-		{
-
-			KingSwing->Play();
-		}
-		if (!IsKing)
-		{
-			SwordSwing->Play();
-		}
-	}
-
+	
 	//here I do an if check to test and see if the Bot is of melee type, if so then I proceed with the melee attack.
 	if (IsMelee && (StatusEffects.Contains(FString("Stunned")) == false)){
 		MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -376,11 +397,30 @@ void ADieselandEnemyBot::MeleeAttack()
 			if (!CurActor && CurActor->ActorHasTag(FName(TEXT("Player")))) continue;
 			if (!CurActor->IsValidLowLevel()) continue;
 
-			if (Role == ROLE_Authority){
+			if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player")))){
 				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+				OnBasicAttack();
+
+				if (isAggressive && IsWalker == false)
+				{
+					if (IsKing)
+					{
+
+						KingSwing->Play();
+					}
+					if (!IsKing)
+					{
+						SwordSwing->Play();
+					}
+				}
 			}
 		}
 	}
+}
+
+void ADieselandEnemyBot::OnBasicAttack_Implementation()
+{
+
 }
 
 //here is the basic ranged attack for the AI

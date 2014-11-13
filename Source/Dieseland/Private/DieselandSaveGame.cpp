@@ -7,7 +7,7 @@
 UDieselandSaveGame::UDieselandSaveGame(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	LastCharacter = TEXT("BasicCharacter");
+	Username = TEXT("Player");
 
 	SaveSlotName = TEXT("SaveSlot0");
 	UserIndex = 0;

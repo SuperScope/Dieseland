@@ -24,7 +24,7 @@ class DIESELAND_API ADieselandGameState : public AGameState
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	int32 KillGoal;
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
-	ADieselandCharacter* WinningPlayer;
+	int32 WinningTeam;
 	
 	virtual void ReceiveBeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;

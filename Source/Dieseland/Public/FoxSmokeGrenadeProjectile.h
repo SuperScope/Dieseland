@@ -14,5 +14,15 @@ class DIESELAND_API AFoxSmokeGrenadeProjectile : public ABaseProjectile
 	GENERATED_UCLASS_BODY()
 
 	virtual void ReceiveActorBeginOverlap(AActor* OtherActor) override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interface)
+		TSubobjectPtr<class UStaticMeshComponent> GrenadeMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
+		UMaterialInstanceDynamic* GrenadeMeshMaterial;
+
+protected:
+	UMaterial* GrenadeMeshMatStatic;
+	virtual void ReceiveBeginPlay() override;
 	
 };
