@@ -42,20 +42,18 @@ AScrapBox::AScrapBox(const class FPostConstructInitializeProperties& PCIP)
 	bReplicates = true;
 }
 
-void AScrapBox::ReceiveActorBeginOverlap(AActor* OtherActor)
-{
-
-}
-
 void AScrapBox::DestroyCrate_Implementation(AActor* Causer)
 {
 	Mesh->ApplyDamage(100.0, GetActorLocation(), FVector(0.0f, 0.0f, 0.0f), 1000.0f);
-	Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+	//Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+	//Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 
-	this->InitialLifeSpan = 2.0f;
+//	this->InitialLifeSpan = 2.0f;
 //	this->SetLifeSpan(2.0f);
+
 	if (Role == ROLE_Authority)
 	{
+		this->SetLifeSpan(2.0f);
 		//Spawn Scrap pieces here
 		UWorld* const World = GetWorld();
 		if (World)
@@ -89,4 +87,6 @@ void AScrapBox::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLife
 	// Replicate to everyone
 	DOREPLIFETIME(AScrapBox, Particle);
 	DOREPLIFETIME(AScrapBox, ScrapAmt);
+	DOREPLIFETIME(AScrapBox, RandomX);
+	DOREPLIFETIME(AScrapBox, RandomY);
 }

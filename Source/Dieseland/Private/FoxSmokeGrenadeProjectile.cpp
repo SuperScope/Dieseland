@@ -17,8 +17,8 @@ AFoxSmokeGrenadeProjectile::AFoxSmokeGrenadeProjectile(const class FPostConstruc
 	ProjCollision->SetCapsuleRadius(150.0f);
 
 	//getting the smoke grenade mesh
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> SmokeGrenadeMesh(TEXT("StaticMesh'/Game/Shapes/Shape_Cube.Shape_Cube'"));
-	static ConstructorHelpers::FObjectFinder<UMaterial> GrenadeMatRef(TEXT("Material'/Game/UserInterfaceAssets/HUD/Materials/M_HUD_Health_Bar.M_HUD_Health_Bar'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> SmokeGrenadeMesh(TEXT("StaticMesh'/Game/Particles/Test/Custom/model_smokegrenade.model_smokegrenade'"));
+	//static ConstructorHelpers::FObjectFinder<UMaterial> GrenadeMatRef(TEXT("Material'/Game/UserInterfaceAssets/HUD/Materials/M_HUD_Health_Bar.M_HUD_Health_Bar'"));
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
 	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
@@ -33,22 +33,20 @@ AFoxSmokeGrenadeProjectile::AFoxSmokeGrenadeProjectile(const class FPostConstruc
 	GrenadeMesh = PCIP.CreateDefaultSubobject<UStaticMeshComponent >(this, TEXT("GrenadeMesh"));
 	GrenadeMesh->AttachParent = Mesh;
 	GrenadeMesh->SetStaticMesh(SmokeGrenadeMesh.Object);
-	GrenadeMeshMatStatic = GrenadeMatRef.Object;
+	//GrenadeMeshMatStatic = GrenadeMatRef.Object;
 
 
 
 	this->Mesh->SetWorldScale3D(MeshScale);
 
 }
-void ADieselandCharacter::ReceiveBeginPlay()
+void AFoxSmokeGrenadeProjectile::ReceiveBeginPlay()
 {
-	Grenade
-	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
-
-	//AimBar->SetWorldLocation(FVector(0, 0, -50));
-	AimBar->SetWorldScale3D(FVector(4.0f, 1.0, 0.01));
-	AimBar->CastShadow = false;
-	AimBar->Materials.Add(AimBarMaterial);
+	GrenadeMesh->AddWorldRotation(FRotator(90.0f, 0.0f, 0.0f));
+	//GrenadeMesh->AddLocalRotation(FRotator(0.0f, 0.0f, 90.0f));
+	//GrenadeMeshMaterial = UMaterialInstanceDynamic::Create(GrenadeMeshMatStatic, this);
+	//GrenadeMesh->Materials.Add(GrenadeMeshMaterial);
+	GrenadeMesh->SetVisibility(true);
 
 }
 void AFoxSmokeGrenadeProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)

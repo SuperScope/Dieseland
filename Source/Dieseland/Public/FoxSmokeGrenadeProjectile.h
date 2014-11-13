@@ -21,7 +21,8 @@ class DIESELAND_API AFoxSmokeGrenadeProjectile : public ABaseProjectile
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
 		UMaterialInstanceDynamic* GrenadeMeshMaterial;
 
-
+protected:
 	UMaterial* GrenadeMeshMatStatic;
+	virtual void ReceiveBeginPlay() override;
 	
 };

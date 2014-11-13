@@ -29,11 +29,10 @@ class DIESELAND_API AScrapBox : public AActor
     UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
     int32 RandomY;
 
-	UFUNCTION(Reliable, NetMulticast, WithValidation, BlueprintCallable, Category = Gameplay)
+	UFUNCTION(Reliable, Server, WithValidation, BlueprintCallable, Category = Gameplay)
 	void DestroyCrate(AActor* Causer);
 
 	UClass* ScrapClass;
 
-	virtual void ReceiveActorBeginOverlap(AActor* OtherActor) override;
 
 };
