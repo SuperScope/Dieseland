@@ -673,8 +673,9 @@ void ADieselandPlayerController::ServerSkillOne_Implementation()
 			DieselandPawn->SkillOne();
 			DieselandPawn->SkillOneTimer = DieselandPawn->SkillOneCooldown;
 		}
+		MulticastSkillOne();
 	}
-	MulticastSkillOne();
+	
 }
 
 bool ADieselandPlayerController::ServerSkillOne_Validate()
@@ -691,8 +692,9 @@ void ADieselandPlayerController::ServerSkillTwo_Implementation()
 			DieselandPawn->SkillTwo();
 			DieselandPawn->SkillTwoTimer = DieselandPawn->SkillTwoCooldown;
 		}
+		MulticastSkillTwo();
 	}
-	MulticastSkillTwo();
+	
 }
 
 bool ADieselandPlayerController::ServerSkillTwo_Validate()
@@ -709,8 +711,9 @@ void ADieselandPlayerController::ServerSkillThree_Implementation()
 			DieselandPawn->SkillThree();
 			DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
 		}
+		MulticastSkillThree();
 	}
-	MulticastSkillThree();
+	
 }
 
 bool ADieselandPlayerController::ServerSkillThree_Validate()
@@ -999,7 +1002,9 @@ void ADieselandPlayerController::ServerMeleeAttack_Implementation()
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		DieselandPawn->MeleeAttack();
+		MulticastMeleeAttack();
 	}
+	
 }
 
 bool ADieselandPlayerController::ServerMeleeAttack_Validate()
@@ -1013,8 +1018,9 @@ void ADieselandPlayerController::ServerRangedAttack_Implementation()
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		DieselandPawn->RangedAttack();
+		MulticastRangedAttack();
 	}
-	MulticastRangedAttack();
+	
 }
 
 bool ADieselandPlayerController::ServerRangedAttack_Validate()
@@ -1024,8 +1030,8 @@ bool ADieselandPlayerController::ServerRangedAttack_Validate()
 
 void ADieselandPlayerController::MulticastMeleeAttack_Implementation()
 {
-	//ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	//DieselandPawn->MeleeAttack();
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+	DieselandPawn->MeleeAttack();
 }
 
 void ADieselandPlayerController::MulticastRangedAttack_Implementation()

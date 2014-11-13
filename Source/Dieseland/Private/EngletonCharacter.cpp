@@ -292,6 +292,7 @@ void AEngletonCharacter::SkillThree()
 
 void AEngletonCharacter::RangedAttack()
 {
+	
 	UWorld* const World = GetWorld();
 	if (World)
 	{
@@ -314,6 +315,7 @@ void AEngletonCharacter::RangedAttack()
 		if (Projectile && Projectile2)
 		{
 
+
 		//	ProjectileLaunch->ServerActivateProjectile();
 		//	ProjectileLaunch2->ServerActivateProjectile();
 
@@ -322,9 +324,9 @@ void AEngletonCharacter::RangedAttack()
 			// Start the particle effect
 			
 
-			Projectile->ServerActivateProjectile();
-			Projectile2->ServerActivateProjectile();
-			Projectile->Particle->ActivateSystem();
+			//Projectile->ServerActivateProjectile();
+			//Projectile2->ServerActivateProjectile();
+			//Projectile->Particle->ActivateSystem();
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * AimRotation.Vector()) + (GetVelocity().GetAbs() * AimRotation.GetNormalized().Vector()));

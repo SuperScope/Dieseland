@@ -51,7 +51,7 @@ void AEngletonMachineGun::ReceiveActorBeginOverlap(AActor* OtherActor)
 		{
 			if (OtherActor->ActorHasTag(TEXT("Player")) &&
 				Cast<ADieselandCharacter>(OtherActor)->GetTeamNumber() !=
-				Cast<ADieselandCharacter>(GetOwner())->GetTeamNumber())
+				Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn())->GetTeamNumber())
 			{
 				ABaseProjectileOnHitEffect* const OnHitEffect = World->SpawnActor<ABaseProjectileOnHitEffect>(ABaseProjectileOnHitEffect::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
 				Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * ProjectileDamage, Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(GetOwner())->GetPawn()));

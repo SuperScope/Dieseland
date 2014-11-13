@@ -68,7 +68,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	Particle->Template = ParticleSystemAsset.Object;
 	
 	Particle->AttachTo(Mesh);
-	Particle->bAutoActivate = false;
+	Particle->bAutoActivate = true;
 	Particle->SetHiddenInGame(false);
 	Particle->SetOwnerNoSee(false);
 	Particle->SetOnlyOwnerSee(false);
