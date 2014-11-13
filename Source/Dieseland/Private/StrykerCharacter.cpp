@@ -379,14 +379,14 @@ void AStrykerCharacter::SkillOne()
 	if (World){
 		UltimateVoice->Play();
 		FRotator CharacterRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
-		CharacterRotation = FRotator(CharacterRotation.Pitch, CharacterRotation.Yaw + 90.0f, CharacterRotation.Roll);
-		this->SetActorRotation(CharacterRotation);
+	//	CharacterRotation = FRotator(CharacterRotation.Pitch, CharacterRotation.Yaw, CharacterRotation.Roll);
+	//	this->SetActorRotation(CharacterRotation);
 		FVector Direction = CharacterRotation.Vector();
 		this->StatusEffects.Add(FString("Stunned"));
 			this->CharacterMovement->Velocity += FVector(Direction.X * 12500, Direction.Y * 12500, 0);
 			IsAttemptingAssassinate = true;
-		this->SetActorRotation(CharacterRotation);
-		this->CharacterMovement->Velocity += FVector(Direction.X * 12500, Direction.Y * 12500,0);
+		//this->SetActorRotation(CharacterRotation);
+		this->CharacterMovement->Velocity += FVector(Direction.X * 20000, Direction.Y * 20000,0);
 		
 		OnSkillOne();
 	}
@@ -442,11 +442,11 @@ void AStrykerCharacter::SkillThree()
 	if (World){
 		ServerActivateParticle(SkillThreeParticle);
 		FRotator CharacterRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
-		CharacterRotation = FRotator(CharacterRotation.Pitch, CharacterRotation.Yaw + 90.0f, CharacterRotation.Roll);
-		this->SetActorRotation(CharacterRotation);
+		//CharacterRotation = FRotator(CharacterRotation.Pitch, CharacterRotation.Yaw + 90.0f, CharacterRotation.Roll);
+		//this->SetActorRotation(CharacterRotation);
 		FVector Direction = CharacterRotation.Vector();
 		//this->StatusEffects.Add(FString("Stunned"));
-		this->CharacterMovement->Velocity += FVector(Direction.X * 18000, Direction.Y * 18000, 0);
+		this->CharacterMovement->Velocity += FVector(Direction.X * 60000, Direction.Y * 60000, 0);
 		OnSkillThree();
 	}
 }
