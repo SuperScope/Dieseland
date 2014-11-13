@@ -32,7 +32,8 @@ AEngletonMachineGun::AEngletonMachineGun(const class FPostConstructInitializePro
 	//temp meshscale
 	FVector MeshScale;
 	MeshScale = FVector(0.4f, 0.4f, 0.4f);
-
+	this->bReplicates =true;
+	this->bReplicateMovement = true;
 	this->Mesh->SetWorldScale3D(MeshScale);
 }
 
