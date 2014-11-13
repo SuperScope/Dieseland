@@ -5,7 +5,7 @@
 #include "GameFramework/GameState.h"
 #include "DieselandGameState.generated.h"
 
-class ADieselandCharacter;
+class ADieselandPlayerController;
 
 /**
  * 
@@ -17,7 +17,7 @@ class DIESELAND_API ADieselandGameState : public AGameState
 
 	// Array of all of the players
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
-	TArray<ADieselandCharacter*> Players;
+	TArray<ADieselandPlayerController*> Players;
 
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	int32 WinningScore;
@@ -25,7 +25,13 @@ class DIESELAND_API ADieselandGameState : public AGameState
 	int32 KillGoal;
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	int32 WinningTeam;
+
+	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+	TArray<int32> TeamScores;
 	
+	UFUNCTION(BlueprintCallable, Category = Score)
+	void CalculateScore();
+
 	virtual void ReceiveBeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 };

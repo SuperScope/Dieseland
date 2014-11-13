@@ -293,6 +293,11 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 	}
 
 
+	if (Health <= 0)
+	{
+		OnHasBeenKilled(LatestDamageCauser);
+	}
+
 	// Every frame set the health display
 	HealthLabel->SetText(FString::FromInt(Health));
 	HealthLabel->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
@@ -478,7 +483,7 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Causer)
 		if (Role < ROLE_Authority)
 		{
 			ServerEditHealth(Amt, Causer);
-	}
+		}
 
 		/*else if (Target->ActorHasTag(FName(TEXT("Enemy"))))
 	{
@@ -501,7 +506,7 @@ bool ADieselandCharacter::ServerEditHealth_Validate(int32 Amt, AActor* Causer)
 	return true;
 }
 
-void ADieselandCharacter::OnHasBeenKilled_Implementation(AActor* Causer)
+void ADieselandCharacter::OnHasBeenKilled(AActor* Causer)
 {
 	if (Role == ROLE_Authority)
 	{
@@ -509,9 +514,11 @@ void ADieselandCharacter::OnHasBeenKilled_Implementation(AActor* Causer)
 		{
 			ADieselandPlayerState* TempPlayerState = Cast<ADieselandPlayerState>((Cast<ADieselandCharacter>(Causer)->PlayerState));
 			TempPlayerState->SetKillNum(TempPlayerState->Kills += 1);
+			
+		}
+		Cast<ADieselandPlayerController>(Controller)->RespawnPawn();
 	}
-	}
-	Cast<ADieselandPlayerController>(Controller)->RespawnPawn();
+	
 }
 
 //function for adjusting speed and health, currently using this for strykers posions, I put the function here so it is extendable to other characters in case

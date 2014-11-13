@@ -318,7 +318,7 @@ public:
 	UFUNCTION()
 	void OnRep_AimRotation();
 
-	UFUNCTION(BlueprintNativeEvent, Category = Gameplay)
+	//UFUNCTION(BlueprintCallable,Category = Gameplay)
 	void OnHasBeenKilled(AActor* Causer);
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
