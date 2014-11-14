@@ -42,6 +42,10 @@ class DIESELAND_API ABossTiles : public AActor
     //Tag used to determine which boss to spawn (king or queen)
     UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
     FName BossTag;
+    UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+    TArray<AActor*> PlayerArray;
+    UFUNCTION(BlueprintCallable, Category = Gameplay)
+    void TeleportPlayers();
     //GameMode reference
     ADieselandGameMode* GameMode;
     

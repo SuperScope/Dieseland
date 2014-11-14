@@ -94,6 +94,19 @@ void ABossTiles::Tick(float DeltaSeconds)
     Super::Tick(DeltaSeconds);
 }
 
+void ABossTiles::TeleportPlayers()
+{
+    for(int32 i = 0; i < PlayerArray.Num(); i++)
+    {
+        if(PlayerArray[i]->ActorHasTag(FName(TEXT("Player"))))
+        {
+            APlayerStart* RandomSpawn = GameMode->PickSpawn();
+            FVector SpawnLocation = RandomSpawn->GetActorLocation();
+            PlayerArray[i]->SetActorLocation(SpawnLocation);
+        }
+    }
+}
+
 void ABossTiles::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -107,6 +120,7 @@ void ABossTiles::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLif
 	DOREPLIFETIME(ABossTiles, BossStart);
     DOREPLIFETIME(ABossTiles, BossFinish);
     DOREPLIFETIME(ABossTiles, Spawn);
+    DOREPLIFETIME(ABossTiles, PlayerArray);
 }
 
 
