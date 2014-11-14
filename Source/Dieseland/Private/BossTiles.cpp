@@ -121,6 +121,7 @@ void ABossTiles::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLif
     DOREPLIFETIME(ABossTiles, BossFinish);
     DOREPLIFETIME(ABossTiles, Spawn);
     DOREPLIFETIME(ABossTiles, PlayerArray);
+    DOREPLIFETIME(ABossTiles, Teleport);
 }
 
 
