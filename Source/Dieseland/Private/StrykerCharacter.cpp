@@ -408,7 +408,7 @@ void AStrykerCharacter::SkillTwo()
 
 		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
 
-		ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
+		//ProjectileRotation = FRotator(ProjectileRotation.Pitch, ProjectileRotation.Yaw + 90.0f, ProjectileRotation.Roll);
 
 		// spawn the projectile at the muzzle
 		AStrykerPoisionProjectile* const Projectile = World->SpawnActor<AStrykerPoisionProjectile>(AStrykerPoisionProjectile::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);

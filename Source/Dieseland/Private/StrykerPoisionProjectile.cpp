@@ -27,7 +27,7 @@ AStrykerPoisionProjectile::AStrykerPoisionProjectile(const class FPostConstructI
 
 	//TODO the correct particle effect here
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/TempCrazylaser.TempCrazylaser'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/unreal_particle_strykerthrowingknife.unreal_particle_strykerthrowingknife'"));
 	Particle->Template = ParticleSystemAsset.Object;
 }
 

@@ -17,12 +17,12 @@ AFoxBasicAttack::AFoxBasicAttack(const class FPostConstructInitializeProperties&
 
 	//temp meshscale
 	FVector MeshScale;
-	MeshScale = FVector(0.75f, 0.75f, 0.75f);
+	MeshScale = FVector(0.1f, 0.1f, 0.1f);
 
 
 	this->Mesh->SetWorldScale3D(MeshScale);
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Effects/ParticleSystems/P_AssaultRifle_Trail.P_AssaultRifle_Trail'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/MovingBulletTest_WIP.MovingBulletTest_WIP'"));
 	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	Particle->Template = ParticleSystemAsset.Object;
 
