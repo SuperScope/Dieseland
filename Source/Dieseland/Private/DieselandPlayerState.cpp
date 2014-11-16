@@ -127,7 +127,7 @@ void ADieselandPlayerState::SetUsername(const FString& NewName)
 
 void ADieselandPlayerState::SetCharacterName(const FString& NewName)
 {
-	Username = NewName;
+	CharacterName = NewName;
 
 	if (Role != ROLE_Authority)
 	{
