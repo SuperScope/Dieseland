@@ -14,6 +14,7 @@ ADieselandPlayerState::ADieselandPlayerState(const class FPostConstructInitializ
 	SetUsername(FString(TEXT("Player")));
 	SetTeamNum(1);
 	SetKillNum(0);
+	SetDeaths(0);
 }
 
 void ADieselandPlayerState::ClientInitialize(class AController* InController)
@@ -103,6 +104,16 @@ void ADieselandPlayerState::SetKillNum(int32 NewKillNumber)
 	}
 }
 
+void ADieselandPlayerState::SetDeaths(int32 NewDeaths)
+{
+	Deaths = NewDeaths;
+
+	if (Role != ROLE_Authority)
+	{
+		ServerSetDeaths(NewDeaths);
+	}
+}
+
 void ADieselandPlayerState::SetUsername(const FString& NewName)
 {
 	Username = NewName;
@@ -183,6 +194,16 @@ bool ADieselandPlayerState::ServerSetIsReady_Validate(bool NewReadyState)
 	return true;
 }
 
+void ADieselandPlayerState::ServerSetDeaths_Implementation(int32 NewDeaths)
+{
+	SetDeaths(NewDeaths);
+}
+
+bool ADieselandPlayerState::ServerSetDeaths_Validate(int32 NewDeaths)
+{
+	return true;
+}
+
 void ADieselandPlayerState::OnRep_TeamColor()
 {
 	
@@ -203,9 +224,25 @@ int32 ADieselandPlayerState::GetKills()
 	return Kills;
 }
 
+
+int32 ADieselandPlayerState::GetDeaths()
+{
+	return Deaths;
+}
+
 bool ADieselandPlayerState::GetIsReady()
 {
 	return IsReady;
+}
+
+FString ADieselandPlayerState::GetUsername()
+{
+	return Username;
+}
+
+FString ADieselandPlayerState::GetCharacterName()
+{
+	return CharacterName;
 }
 
 void ADieselandPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

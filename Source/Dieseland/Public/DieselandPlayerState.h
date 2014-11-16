@@ -34,6 +34,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	int32 GetKills();
 
+	/** get the player deaths*/
+	UFUNCTION(BlueprintCallable, Category = Networking)
+	int32 GetDeaths();
+
+	/** get the player's username*/
+	UFUNCTION(BlueprintCallable, Category = Networking)
+	FString GetUsername();
+
+	/** get the player's selected character name*/
+	UFUNCTION(BlueprintCallable, Category = Networking)
+	FString GetCharacterName();
+
 	/**
 	* Set new team and update pawn. Also updates player character team colors.
 	*
@@ -57,6 +69,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	void SetIsReady(bool NewReadyState);
 
+	UFUNCTION(BlueprintCallable, Category = Networking)
+	void SetDeaths(int32 NewDeaths);
+
 	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
 	void ServerSetTeamNum(int32 NewTeamNumber);
 
@@ -74,6 +89,9 @@ public:
 
 	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
 	void ServerSetIsReady(bool NewReadyState);
+
+	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
+	void ServerSetDeaths(int32 NewDeaths);
 
 	/** Set the mesh colors based on the current teamnum variable */
 	UFUNCTION(BlueprintCallable, Category = Networking)
@@ -94,6 +112,10 @@ public:
 	/** number of kills */
 	UPROPERTY(Replicated)
 	int32 Kills;
+
+	/** number of death */
+	UPROPERTY(Replicated)
+	int32 Deaths;
 
 	/** Name of player */
 	UPROPERTY(Replicated)

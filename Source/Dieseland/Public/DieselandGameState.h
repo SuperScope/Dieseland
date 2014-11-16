@@ -32,6 +32,9 @@ class DIESELAND_API ADieselandGameState : public AGameState
 	TArray<int32> TeamScores;
 	
 	UFUNCTION(BlueprintCallable, Category = Score)
+	TArray<ADieselandPlayerController*> GetPlayers();
+
+	UFUNCTION(BlueprintCallable, Category = Score)
 	void CalculateScore();
 
 	UFUNCTION(BlueprintCallable, Category = Score)
