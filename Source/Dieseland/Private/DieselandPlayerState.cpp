@@ -303,6 +303,7 @@ void ADieselandPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty
 	DOREPLIFETIME(ADieselandPlayerState, TeamNumber);
 	DOREPLIFETIME(ADieselandPlayerState, TeamColor);
 	DOREPLIFETIME(ADieselandPlayerState, Kills);
+	DOREPLIFETIME(ADieselandPlayerState, Deaths);
 	DOREPLIFETIME(ADieselandPlayerState, Username);
 	DOREPLIFETIME(ADieselandPlayerState, CharacterName);
 	DOREPLIFETIME(ADieselandPlayerState, CharacterLevel);
