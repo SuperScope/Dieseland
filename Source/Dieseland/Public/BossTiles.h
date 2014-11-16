@@ -36,12 +36,19 @@ class DIESELAND_API ABossTiles : public AActor
     //Used for checking is boss is alive or not
     UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
     bool IsBossAlive;
+    //Used for checking is boss is alive or not
+    UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+    bool Teleport;
     //Tag used to determine which tile to spawn boss to
     UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
     FName ZoneTag;
     //Tag used to determine which boss to spawn (king or queen)
     UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
     FName BossTag;
+    UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+    TArray<AActor*> PlayerArray;
+    UFUNCTION(BlueprintCallable, Category = Gameplay)
+    void TeleportPlayers();
     //GameMode reference
     ADieselandGameMode* GameMode;
     
