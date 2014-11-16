@@ -137,44 +137,47 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 
 //Engleton Bombardment
 void AEngletonCharacter::SkillOne()
-{	
-	//here I activate Bombardment if it's not already activated
-	if (BombardmentTimer == 0)
+{
+	if (Role == ROLE_Authority)
 	{
-		BombardmentSound->Play();
-		UltimateSound->Play();
-		BombardmentActivated = true;
-	}
+		//here I activate Bombardment if it's not already activated
+		if (BombardmentTimer == 0)
+		{
+			BombardmentSound->Play();
+			UltimateSound->Play();
+			BombardmentActivated = true;
+		}
 
-	//here we will play the particle effect as soon as the ability begins
-	if (BombardmentHitCounter == 0){
-		ServerActivateParticle(BombardmentParticle);
-	}
-	BombardmentCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	BombardmentCollision->SetCollisionProfileName(TEXT("OverlapAll"));
-	BombardmentCollision->GetOverlappingActors(ActorsInBombardmentRange);
-	BombardmentCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		//here we will play the particle effect as soon as the ability begins
+		if (BombardmentHitCounter == 0){
+			ServerActivateParticle(BombardmentParticle);
+		}
+		BombardmentCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		BombardmentCollision->SetCollisionProfileName(TEXT("OverlapAll"));
+		BombardmentCollision->GetOverlappingActors(ActorsInBombardmentRange);
+		BombardmentCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 
-	AActor* CurActor = NULL;
-	for (int32 b = 0; b < ActorsInBombardmentRange.Num(); b++)
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
-		CurActor = ActorsInBombardmentRange[b];
-		if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
-		if (!CurActor->IsValidLowLevel()) continue;
+		AActor* CurActor = NULL;
+		for (int32 b = 0; b < ActorsInBombardmentRange.Num(); b++)
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
+			CurActor = ActorsInBombardmentRange[b];
+			if (!CurActor && (CurActor->ActorHasTag(FName(TEXT("Player"))) || CurActor->ActorHasTag(FName(TEXT("Enemy"))))) continue;
+			if (!CurActor->IsValidLowLevel()) continue;
 
-		if (Role == ROLE_Authority && CurActor != this)
-		{	
-			if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+			if (Role == ROLE_Authority && CurActor != this)
 			{
-				//because this damage is applied every half and a second and not every second, the damage is halved. 
-				//I apply the damage every half a second so that damage is more realisticly applied from the ability
-				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * (30 + (Intelligence * 1.5f)), this);
-			}
-			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
-			{
-				Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * (30 + (Intelligence * 1.5f)), this);
+				if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+				{
+					//because this damage is applied every half and a second and not every second, the damage is halved. 
+					//I apply the damage every half a second so that damage is more realisticly applied from the ability
+					Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * (30 + (Intelligence * 1.5f)), this);
+				}
+				else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+				{
+					Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * (30 + (Intelligence * 1.5f)), this);
+				}
 			}
 		}
 	}
@@ -184,10 +187,12 @@ void AEngletonCharacter::SkillOne()
 //crazy laser
 void AEngletonCharacter::SkillTwo()
 {
+	CrazyLaserSound->Play();
+
 	UWorld* const World = GetWorld();
-	if (World)
+	if (World && Role == ROLE_Authority)
 	{
-		CrazyLaserSound->Play();
+		
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = Cast<ADieselandPlayerController>(this->Controller);
 		SpawnParams.Instigator = Instigator;
@@ -292,13 +297,14 @@ void AEngletonCharacter::SkillThree()
 
 void AEngletonCharacter::RangedAttack()
 {
-	
+	MachineGunSound->Play();
+
 	UWorld* const World = GetWorld();
-	if (World)
+	if (World && Role == ROLE_Authority)
 	{
-		MachineGunSound->Play();
+		
 		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = this->Controller;
+		SpawnParams.Owner = this->GetController();
 		SpawnParams.Instigator = Instigator;
 
 		FRotator ProjectileRotation = Mesh->GetSocketRotation(FName(TEXT("AimSocket")));
@@ -322,7 +328,6 @@ void AEngletonCharacter::RangedAttack()
 			Projectile->ProjectileDamage = BasicAttackDamage / 2;
 			Projectile2->ProjectileDamage = BasicAttackDamage / 2;
 			// Start the particle effect
-			
 
 			//Projectile->ServerActivateProjectile();
 			//Projectile2->ServerActivateProjectile();
@@ -332,6 +337,9 @@ void AEngletonCharacter::RangedAttack()
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * AimRotation.Vector()) + (GetVelocity().GetAbs() * AimRotation.GetNormalized().Vector()));
 			Projectile2->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed * AimRotation.Vector()) + (GetVelocity().GetAbs() * AimRotation.GetNormalized().Vector()));
 			OnBasicAttack();
+
+			Projectile->SetReplicates(true);
+			Projectile->SetReplicates(true);
 
 		}
 	}

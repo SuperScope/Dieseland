@@ -72,6 +72,7 @@ ABaseProjectile::ABaseProjectile(const class FPostConstructInitializeProperties&
 	Particle->SetHiddenInGame(false);
 	Particle->SetOwnerNoSee(false);
 	Particle->SetOnlyOwnerSee(false);
+	bNetLoadOnClient = true;
 
 	ProjectileDamage = 10;
 
@@ -190,6 +191,5 @@ void ABaseProjectile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	// Replicate to everyone
 	DOREPLIFETIME(ABaseProjectile, ProjectileMovement);
 	DOREPLIFETIME(ABaseProjectile, Particle);
-
 
 }

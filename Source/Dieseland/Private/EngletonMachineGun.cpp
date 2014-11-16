@@ -28,7 +28,7 @@ AEngletonMachineGun::AEngletonMachineGun(const class FPostConstructInitializePro
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
 	Particle->Template = ParticleSystemAsset.Object;
 	Particle->SetIsReplicated(true);
-
+	
 	//temp meshscale
 	FVector MeshScale;
 	MeshScale = FVector(0.4f, 0.4f, 0.4f);
@@ -47,7 +47,7 @@ void AEngletonMachineGun::ReceiveActorBeginOverlap(AActor* OtherActor)
 		SpawnParams.Owner = this;
 		SpawnParams.Instigator = Instigator;
 
-		if (Role == ROLE_Authority && GetOwner() != OtherActor)
+		if (Role == ROLE_Authority && GetOwner() != nullptr && GetOwner() != OtherActor)
 		{
 			if (OtherActor->ActorHasTag(TEXT("Player")) &&
 				Cast<ADieselandCharacter>(OtherActor)->GetTeamNumber() !=

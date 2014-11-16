@@ -25,6 +25,12 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerOnAim(FRotator Rotation);
 
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void MeleeAttack();
+
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void RangedAttack();
+
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerMeleeAttack();
 
@@ -32,15 +38,15 @@ public:
 	void ServerRangedAttack();
 
 	UFUNCTION(Unreliable, NetMulticast)
-	virtual void MulticastMeleeAttack();
+	void MulticastMeleeAttack();
 	UFUNCTION(Unreliable, NetMulticast)
-	virtual void MulticastRangedAttack();
+	void MulticastRangedAttack();
 	UFUNCTION(NetMulticast, Unreliable, Category = Combat)
-	virtual void MulticastSkillOne();
+	void MulticastSkillOne();
 	UFUNCTION(NetMulticast, Unreliable, Category = Combat)
-	virtual void MulticastSkillTwo();
+	void MulticastSkillTwo();
 	UFUNCTION(NetMulticast, Unreliable, Category = Combat)
-	virtual void MulticastSkillThree();
+	void MulticastSkillThree();
 
 	UFUNCTION()
 	void AimOne();
@@ -158,9 +164,6 @@ public:
 	void OnAttackPress();
 	UFUNCTION(Reliable, Server, WithValidation)
 	void OnAttackRelease();
-
-	UFUNCTION(Reliable, Server, WithValidation)
-	void SwapMelee();
 
 	UFUNCTION(Reliable, Server, WithValidation, BlueprintCallable, Category = Gameplay)
 	void RespawnPawn();

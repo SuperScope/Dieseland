@@ -204,12 +204,12 @@ void ADieselandPlayerController::UpdateCooldownTimers_Implementation(float Delta
 		{
 			if (DieselandPawn->IsMelee)
 			{
-				ServerMeleeAttack();
+				MeleeAttack();
 				DieselandPawn->BasicAttackTimer = DieselandPawn->BasicAttackCooldown;
 			}
 			else
 			{
-				ServerRangedAttack();
+				RangedAttack();
 				DieselandPawn->BasicAttackTimer = DieselandPawn->BasicAttackCooldown;
 				DieselandPawn->BasicAttackAmmo -= 1;
 				if (DieselandPawn->BasicAttackAmmo <= 0){
@@ -670,7 +670,7 @@ void ADieselandPlayerController::ServerSkillOne_Implementation()
 	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		if (DieselandPawn->SkillOneTimer <= 0.0f)
 		{
-			DieselandPawn->SkillOne();
+			//DieselandPawn->SkillOne();
 			DieselandPawn->SkillOneTimer = DieselandPawn->SkillOneCooldown;
 			MulticastSkillOne();
 		}		
@@ -688,7 +688,7 @@ void ADieselandPlayerController::ServerSkillTwo_Implementation()
 	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		if (DieselandPawn->SkillTwoTimer <= 0.0f)
 		{
-			DieselandPawn->SkillTwo();
+			//DieselandPawn->SkillTwo();
 			DieselandPawn->SkillTwoTimer = DieselandPawn->SkillTwoCooldown;
 			MulticastSkillTwo();
 		}
@@ -706,7 +706,7 @@ void ADieselandPlayerController::ServerSkillThree_Implementation()
 	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
 		if (DieselandPawn->SkillThreeTimer <= 0.0f)
 		{
-			DieselandPawn->SkillThree();
+			//DieselandPawn->SkillThree();
 			DieselandPawn->SkillThreeTimer = DieselandPawn->SkillThreeCooldown;
 			MulticastSkillThree();
 		}
@@ -972,34 +972,39 @@ void ADieselandPlayerController::CalculateCost_Implementation(const FString& Typ
 	}
 }
 
-
-void ADieselandPlayerController::SwapMelee_Implementation()
+void ADieselandPlayerController::MeleeAttack()
 {
-	//Uncomment only if you need to test melee/ranged swapping
-	/*if (Cast<ADieselandCharacter>(GetPawn())->IsMelee)
+	if (Role != ROLE_Authority)
 	{
-		Cast<ADieselandCharacter>(GetPawn())->IsMelee = false;
-		GEngine->AddOnScreenDebugMessage(6, 10.0f, FColor::Cyan, FString("Now using ranged attack"));
+		ServerMeleeAttack();
 	}
 	else
 	{
-		Cast<ADieselandCharacter>(GetPawn())->IsMelee = true;
-		GEngine->AddOnScreenDebugMessage(6, 10.0f, FColor::Cyan, FString("Now using melee attack"));
-	}*/
-	
+		MulticastMeleeAttack();
+	}
 }
 
-bool ADieselandPlayerController::SwapMelee_Validate()
+void ADieselandPlayerController::RangedAttack()
 {
-	return true;
+	if (Role != ROLE_Authority)
+	{
+		ServerRangedAttack();
+	}
+	else
+	{
+		MulticastRangedAttack();
+	}
 }
 
 void ADieselandPlayerController::ServerMeleeAttack_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
-		DieselandPawn->MeleeAttack();
-		MulticastMeleeAttack();
+		//DieselandPawn->MeleeAttack();
+		if (Role == ROLE_Authority)
+		{
+			MulticastMeleeAttack();
+		}
 	}
 	
 }
@@ -1014,10 +1019,12 @@ void ADieselandPlayerController::ServerRangedAttack_Implementation()
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 	if (DieselandPawn != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
-		DieselandPawn->RangedAttack();
-		MulticastRangedAttack();
+		//DieselandPawn->RangedAttack();
+		if (Role == ROLE_Authority)
+		{
+			MulticastRangedAttack();
+		}
 	}
-	
 }
 
 bool ADieselandPlayerController::ServerRangedAttack_Validate()
@@ -1033,8 +1040,11 @@ void ADieselandPlayerController::MulticastMeleeAttack_Implementation()
 
 void ADieselandPlayerController::MulticastRangedAttack_Implementation()
 {
-	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
-	DieselandPawn->RangedAttack();
+	if (HasNetOwner())
+	{
+		ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+		DieselandPawn->RangedAttack();
+	}
 }
 
 void ADieselandPlayerController::MulticastSkillOne_Implementation()
