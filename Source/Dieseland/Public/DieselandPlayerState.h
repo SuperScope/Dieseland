@@ -20,15 +20,19 @@ public:
 
 	/** get current team */
 	UFUNCTION(BlueprintCallable, Category = Networking)
-	int32 GetTeamNum() const;
+	int32 GetTeamNum();
 
 	/** get current team color*/
 	UFUNCTION(BlueprintCallable, Category = Networking)
-	FVector GetTeamColor() const;
+	FVector GetTeamColor();
 
 	/** get if the player is ready*/
 	UFUNCTION(BlueprintCallable, Category = Networking)
-	bool GetIsReady() const;
+	bool GetIsReady();
+
+	/** get the player kills*/
+	UFUNCTION(BlueprintCallable, Category = Networking)
+	int32 GetKills();
 
 	/**
 	* Set new team and update pawn. Also updates player character team colors.

@@ -188,17 +188,22 @@ void ADieselandPlayerState::OnRep_TeamColor()
 	
 }
 
-int32 ADieselandPlayerState::GetTeamNum() const
+int32 ADieselandPlayerState::GetTeamNum()
 {
 	return TeamNumber;
 }
 
-FVector ADieselandPlayerState::GetTeamColor() const
+FVector ADieselandPlayerState::GetTeamColor()
 {
 	return TeamColor;
 }
 
-bool ADieselandPlayerState::GetIsReady() const
+int32 ADieselandPlayerState::GetKills()
+{
+	return Kills;
+}
+
+bool ADieselandPlayerState::GetIsReady()
 {
 	return IsReady;
 }
