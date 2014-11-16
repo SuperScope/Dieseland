@@ -20,11 +20,19 @@ public:
 
 	/** get current team */
 	UFUNCTION(BlueprintCallable, Category = Networking)
-	int32 GetTeamNum() const;
+	int32 GetTeamNum();
 
 	/** get current team color*/
 	UFUNCTION(BlueprintCallable, Category = Networking)
-	FVector GetTeamColor() const;
+	FVector GetTeamColor();
+
+	/** get if the player is ready*/
+	UFUNCTION(BlueprintCallable, Category = Networking)
+	bool GetIsReady();
+
+	/** get the player kills*/
+	UFUNCTION(BlueprintCallable, Category = Networking)
+	int32 GetKills();
 
 	/**
 	* Set new team and update pawn. Also updates player character team colors.
@@ -46,6 +54,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	void SetCharacterName(const FString& NewName);
 
+	UFUNCTION(BlueprintCallable, Category = Networking)
+	void SetIsReady(bool NewReadyState);
+
 	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
 	void ServerSetTeamNum(int32 NewTeamNumber);
 
@@ -61,6 +72,9 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
 	void ServerSetCharacterName(const FString& NewName);
 
+	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
+	void ServerSetIsReady(bool NewReadyState);
+
 	/** Set the mesh colors based on the current teamnum variable */
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	void UpdateTeamColors();
@@ -72,6 +86,10 @@ public:
 	/** team color */
 	UPROPERTY(Replicated)
 	FVector TeamColor;
+
+	/** Whether the play is ready to play or not */
+	UPROPERTY(Replicated)
+	bool IsReady;
 
 	/** number of kills */
 	UPROPERTY(Replicated)

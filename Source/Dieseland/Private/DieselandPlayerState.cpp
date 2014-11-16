@@ -9,6 +9,7 @@
 ADieselandPlayerState::ADieselandPlayerState(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
+	SetIsReady(false);
 	SetCharacterName(FString(TEXT("Engleton")));
 	SetUsername(FString(TEXT("Player")));
 	SetTeamNum(1);
@@ -79,6 +80,16 @@ void ADieselandPlayerState::SetTeamColor(FVector NewTeamColor)
 	if (Role != ROLE_Authority)
 	{
 		ServerSetTeamColor(NewTeamColor);
+	}
+}
+
+void ADieselandPlayerState::SetIsReady(bool NewReadyState)
+{
+	IsReady = NewReadyState;
+
+	if (Role != ROLE_Authority)
+	{
+		ServerSetIsReady(NewReadyState);
 	}
 }
 
@@ -162,19 +173,39 @@ bool ADieselandPlayerState::ServerSetKillNum_Validate(int32 NewKillNumber)
 	return true;
 }
 
+void ADieselandPlayerState::ServerSetIsReady_Implementation(bool NewReadyState)
+{
+	SetIsReady(NewReadyState);
+}
+
+bool ADieselandPlayerState::ServerSetIsReady_Validate(bool NewReadyState)
+{
+	return true;
+}
+
 void ADieselandPlayerState::OnRep_TeamColor()
 {
 	
 }
 
-int32 ADieselandPlayerState::GetTeamNum() const
+int32 ADieselandPlayerState::GetTeamNum()
 {
 	return TeamNumber;
 }
 
-FVector ADieselandPlayerState::GetTeamColor() const
+FVector ADieselandPlayerState::GetTeamColor()
 {
 	return TeamColor;
+}
+
+int32 ADieselandPlayerState::GetKills()
+{
+	return Kills;
+}
+
+bool ADieselandPlayerState::GetIsReady()
+{
+	return IsReady;
 }
 
 void ADieselandPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -186,4 +217,5 @@ void ADieselandPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty
 	DOREPLIFETIME(ADieselandPlayerState, Kills);
 	DOREPLIFETIME(ADieselandPlayerState, Username);
 	DOREPLIFETIME(ADieselandPlayerState, CharacterName);
+	DOREPLIFETIME(ADieselandPlayerState, IsReady);
 }
