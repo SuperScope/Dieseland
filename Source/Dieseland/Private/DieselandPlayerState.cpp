@@ -16,6 +16,7 @@ ADieselandPlayerState::ADieselandPlayerState(const class FPostConstructInitializ
 	SetKillNum(0);
 	SetDeaths(0);
 	SetNetIndex(0);
+	SetCharacterLevel(1);
 }
 
 void ADieselandPlayerState::ClientInitialize(class AController* InController)
