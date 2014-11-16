@@ -38,6 +38,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	int32 GetDeaths();
 
+	/** get the player index*/
+	UFUNCTION(BlueprintCallable, Category = Networking)
+	int32 GetNetIndex();
+
 	/** get the player's username*/
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	FString GetUsername();
@@ -45,6 +49,10 @@ public:
 	/** get the player's selected character name*/
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	FString GetCharacterName();
+
+	/** get the player's level*/
+	UFUNCTION(BlueprintCallable, Category = Networking)
+	int32 GetCharacterLevel();
 
 	/**
 	* Set new team and update pawn. Also updates player character team colors.
@@ -72,6 +80,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	void SetDeaths(int32 NewDeaths);
 
+	UFUNCTION(BlueprintCallable, Category = Networking)
+	void SetNetIndex(int32 NewNetIndex);
+
+	UFUNCTION(BlueprintCallable, Category = Networking)
+	void SetCharacterLevel(int32 NewLevel);
+
 	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
 	void ServerSetTeamNum(int32 NewTeamNumber);
 
@@ -92,6 +106,13 @@ public:
 
 	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
 	void ServerSetDeaths(int32 NewDeaths);
+
+	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
+	void ServerSetNetIndex(int32 NewNetIndex);
+
+	UFUNCTION(Server, Reliable, WithValidation, Category = Networking)
+	void ServerSetCharacterLevel(int32 NewLevel);
+
 
 	/** Set the mesh colors based on the current teamnum variable */
 	UFUNCTION(BlueprintCallable, Category = Networking)
@@ -117,6 +138,10 @@ public:
 	UPROPERTY(Replicated)
 	int32 Deaths;
 
+	/** The player's index in regards to the server player list */
+	UPROPERTY(Replicated)
+	int32 NetIndex;
+
 	/** Name of player */
 	UPROPERTY(Replicated)
 	FString Username;
@@ -124,6 +149,10 @@ public:
 	/** Name of player's character */
 	UPROPERTY(Replicated)
 	FString CharacterName;
+
+	/** Character's current level */
+	UPROPERTY(Replicated)
+	int32 CharacterLevel;
 
 	/**
 	* Set the team

@@ -65,6 +65,7 @@ void ADieselandGameState::CalculateScore()
 					int32 TempPlayerTeamNum = Cast<ADieselandPlayerState>(Players[x]->PlayerState)->TeamNumber;
 
 					TempTeamScores[TempPlayerTeamNum] += Cast<ADieselandPlayerState>(Players[x]->PlayerState)->Kills;
+					Cast<ADieselandPlayerState>(Players[x]->PlayerState)->SetNetIndex(x);
 				}
 				else
 				{

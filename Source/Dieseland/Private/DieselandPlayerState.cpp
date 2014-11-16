@@ -15,12 +15,13 @@ ADieselandPlayerState::ADieselandPlayerState(const class FPostConstructInitializ
 	SetTeamNum(1);
 	SetKillNum(0);
 	SetDeaths(0);
+	SetNetIndex(0);
 }
 
 void ADieselandPlayerState::ClientInitialize(class AController* InController)
 {
-	Super::ClientInitialize(InController);
 
+	Super::ClientInitialize(InController);
 }
 
 void ADieselandPlayerState::UpdateTeamColors()
@@ -134,6 +135,26 @@ void ADieselandPlayerState::SetCharacterName(const FString& NewName)
 	}
 }
 
+void ADieselandPlayerState::SetNetIndex(int32 NewNetIndex)
+{
+	NetIndex = NewNetIndex;
+
+	if (Role != ROLE_Authority)
+	{
+		ServerSetNetIndex(NewNetIndex);
+	}
+}
+
+void ADieselandPlayerState::SetCharacterLevel(int32 NewLevel)
+{
+	CharacterLevel = NewLevel;
+
+	if (Role != ROLE_Authority)
+	{
+		ServerSetCharacterLevel(NewLevel);
+	}
+}
+
 void ADieselandPlayerState::ServerSetUsername_Implementation(const FString& NewName)
 {
 	SetUsername(NewName);
@@ -204,6 +225,26 @@ bool ADieselandPlayerState::ServerSetDeaths_Validate(int32 NewDeaths)
 	return true;
 }
 
+void ADieselandPlayerState::ServerSetNetIndex_Implementation(int32 NewNetIndex)
+{
+	SetNetIndex(NewNetIndex);
+}
+
+bool ADieselandPlayerState::ServerSetNetIndex_Validate(int32 NewNetIndex)
+{
+	return true;
+}
+
+void ADieselandPlayerState::ServerSetCharacterLevel_Implementation(int32 NewLevel)
+{
+	SetCharacterLevel(NewLevel);
+}
+
+bool ADieselandPlayerState::ServerSetCharacterLevel_Validate(int32 NewLevel)
+{
+	return true;
+}
+
 void ADieselandPlayerState::OnRep_TeamColor()
 {
 	
@@ -245,6 +286,16 @@ FString ADieselandPlayerState::GetCharacterName()
 	return CharacterName;
 }
 
+int32 ADieselandPlayerState::GetNetIndex()
+{
+	return NetIndex;
+}
+
+int32 ADieselandPlayerState::GetCharacterLevel()
+{
+	return CharacterLevel;
+}
+
 void ADieselandPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -254,5 +305,7 @@ void ADieselandPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty
 	DOREPLIFETIME(ADieselandPlayerState, Kills);
 	DOREPLIFETIME(ADieselandPlayerState, Username);
 	DOREPLIFETIME(ADieselandPlayerState, CharacterName);
+	DOREPLIFETIME(ADieselandPlayerState, CharacterLevel);
 	DOREPLIFETIME(ADieselandPlayerState, IsReady);
+	DOREPLIFETIME(ADieselandPlayerState, NetIndex);
 }
