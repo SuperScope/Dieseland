@@ -27,6 +27,8 @@ class DIESELAND_API ADieselandGameState : public AGameState
 	int32 WinningTeam;
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	float GameDuration;
+	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+	float GameTimer;
 
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	TArray<int32> TeamScores;

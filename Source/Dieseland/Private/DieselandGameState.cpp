@@ -17,6 +17,7 @@ ADieselandGameState::ADieselandGameState(const class FPostConstructInitializePro
 	KillGoal = 5;
 	WinningTeam = 0;
 	GameDuration = 60.0f;
+	GameTimer = GameDuration;
 }
 
 void ADieselandGameState::ReceiveBeginPlay()
@@ -28,6 +29,10 @@ void ADieselandGameState::ReceiveBeginPlay()
 
 void ADieselandGameState::Tick(float DeltaSeconds)
 {
+	if (Role == ROLE_Authority)
+	{
+		GameTimer = GetWorldTimerManager().GetTimerRemaining(this, &ADieselandGameState::GameTimerEnded);
+	}
 	Super::Tick(DeltaSeconds);
 }
 
@@ -110,5 +115,6 @@ void ADieselandGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandGameState, WinningTeam);
 	DOREPLIFETIME(ADieselandGameState, TeamScores);
 	DOREPLIFETIME(ADieselandGameState, GameDuration);
+	DOREPLIFETIME(ADieselandGameState, GameTimer);
 	DOREPLIFETIME(ADieselandGameState, Players);
 }
