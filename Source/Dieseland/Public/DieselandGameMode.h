@@ -60,8 +60,11 @@ class ADieselandGameMode : public AGameMode
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	AActor* SpawnLightArray(UClass* ArrayClass, FVector SpawnLocation);
 
-	UFUNCTION(Reliable, Server, WithValidation, Category = Gameplay)
+	UFUNCTION(Reliable, NetMulticast, WithValidation, Category = Gameplay)
 	void EndGame();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Gameplay)
+	void OnGameEnded();
 
 	UClass* MayhemClass;
 	UClass* EngletonClass;

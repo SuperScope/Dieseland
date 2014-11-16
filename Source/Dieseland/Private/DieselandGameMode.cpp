@@ -192,7 +192,7 @@ AActor* ADieselandGameMode::SpawnLightArray(UClass* ArrayClass, FVector SpawnLoc
 
 void ADieselandGameMode::EndGame_Implementation()
 {
-
+	OnGameEnded();
 	GEngine->AddOnScreenDebugMessage(21, 10.0f, FColor::Yellow, FString(TEXT("Winning Team: ")) + FString::FromInt(Cast<ADieselandGameState>(GameState)->WinningTeam));
 }
 
