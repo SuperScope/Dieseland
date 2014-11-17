@@ -79,6 +79,16 @@ AFoxCharacter::AFoxCharacter(const class FPostConstructInitializeProperties& PCI
 	SmokeBombSound->AttachParent = RootComponent;
 	SmokeBombSound->bAutoActivate = false;
 
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> BasicAttackParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/MovingBulletTest_WIP.MovingBulletTest_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_FoxPenetratorShot.Unreal_Particle_FoxPenetratorShot'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillTwoParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_FoxCharm_WIP3.Unreal_Particle_FoxCharm_WIP3'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillThreeParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
+
+
+	this->BasicAttackParticle = BasicAttackParticleAsset.Object;
+	this->SkillOneParticle = SkillOneParticleAsset.Object;
+	this->SkillTwoParticle = SkillTwoParticleAsset.Object;
+	this->SkillThreeParticle = SkillThreeParticleAsset.Object;
 
 	bReplicates = true;
 	bReplicateMovement = true;
@@ -93,6 +103,8 @@ AFoxCharacter::AFoxCharacter(const class FPostConstructInitializeProperties& PCI
 // To do fox penetration round
 void AFoxCharacter::SkillOne()
 {
+	ServerActivateParticle(SkillOneParticle);
+
 	UWorld* const World = GetWorld();
 	if (World)
 	{
@@ -112,7 +124,7 @@ void AFoxCharacter::SkillOne()
 		{
 			Projectile->ProjectileDamage = 150 + (Dexterity * 5);
 			// Start the particle effect
-			Projectile->ServerActivateProjectile();
+			//Projectile->ServerActivateProjectile();
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
@@ -124,6 +136,8 @@ void AFoxCharacter::SkillOne()
 //To do fox charm
 void AFoxCharacter::SkillTwo()
 {
+	ServerActivateParticle(SkillTwoParticle);
+
 	UWorld* const World = GetWorld();
 	if (World)
 	{
@@ -141,7 +155,7 @@ void AFoxCharacter::SkillTwo()
 		{
 			Projectile->ProjectileDamage = 0;
 			// Start the particle effect
-			Projectile->ServerActivateProjectile();
+			//Projectile->ServerActivateProjectile();
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
@@ -154,6 +168,8 @@ void AFoxCharacter::SkillTwo()
 //To do fox smoke bomb
 void AFoxCharacter::SkillThree()
 {
+	ServerActivateParticle(SkillThreeParticle);
+
 	UWorld* const World = GetWorld();
 	if (World)
 	{
@@ -172,7 +188,7 @@ void AFoxCharacter::SkillThree()
 		{
 			Projectile->ProjectileDamage = 0;
 			// Start the particle effect
-			Projectile->ServerActivateProjectile();
+			//Projectile->ServerActivateProjectile();
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
@@ -183,6 +199,8 @@ void AFoxCharacter::SkillThree()
 
 void AFoxCharacter::RangedAttack()
 {
+	ServerActivateParticle(BasicAttackParticle);
+
 	UWorld* const World = GetWorld();
 	if (World)
 	{
@@ -201,7 +219,7 @@ void AFoxCharacter::RangedAttack()
 		{
 			Projectile->ProjectileDamage = BasicAttackDamage;
 			// Start the particle effect
-			Projectile->ServerActivateProjectile();
+			//Projectile->ServerActivateProjectile();
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));

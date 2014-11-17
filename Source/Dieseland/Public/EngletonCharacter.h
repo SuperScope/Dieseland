@@ -91,6 +91,9 @@ class DIESELAND_API AEngletonCharacter : public ADieselandCharacter
 
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
 		UParticleSystem* MachineGunTrailParticle;
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+		UParticleSystem* CrazyLaserParticle;
 	
 
 	// Mesh attached to the torso socket which is used to show attack direction - invisible by default

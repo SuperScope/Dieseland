@@ -88,7 +88,9 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> MachineGunFireParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonMachineGun_WIP.Unreal_Particle_EngletonMachineGun_WIP'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> PulseParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse2_WIP.Unreal_Particle_EngletonPulse2_WIP'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> MachineGunTrailParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
-
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> CrazyLaserParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/CrazyLaser2_WIP.CrazyLaser2_WIP'"));
+	
+	this->CrazyLaserParticle = CrazyLaserParticleAsset.Object;
 	this->BombardmentParticle = BombardmentParticleAsset.Object;
 	this->MachineGunFireParticle = MachineGunFireParticleAsset.Object;
 	this->PulseParticle = PulseParticleAsset.Object;
@@ -191,6 +193,7 @@ void AEngletonCharacter::SkillOne()
 void AEngletonCharacter::SkillTwo()
 {
 	CrazyLaserSound->Play();
+	ServerActivateParticle(CrazyLaserParticle);
 
 	UWorld* const World = GetWorld();
 	if (World && Role == ROLE_Authority)
@@ -210,7 +213,7 @@ void AEngletonCharacter::SkillTwo()
 		{
 			Projectile->ProjectileDamage = 100 + (Intelligence * 3);
 			// Start the particle effect
-			Projectile->ServerActivateProjectile();
+			//Projectile->ServerActivateProjectile();
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));
