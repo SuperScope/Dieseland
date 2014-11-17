@@ -74,7 +74,8 @@ AStrykerCharacter::AStrykerCharacter(const class FPostConstructInitializePropert
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> BlinkParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_StrykerBlinkCloak_WIP.Unreal_Particle_StrykerBlinkCloak_WIP'"));
 	this->SkillThreeParticle = BlinkParticleAsset.Object;
 
-
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> PoisonParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/unreal_particle_strykerthrowingknife.unreal_particle_strykerthrowingknife'"));
+	this->SkillTwoParticle = PoisonParticleAsset.Object;
 
 	bReplicates = true;
 	bReplicateMovement = true;
@@ -399,6 +400,9 @@ void AStrykerCharacter::SkillOne()
 void AStrykerCharacter::SkillTwo()
 {
 	PoisonSound->Play();
+	ServerActivateParticle(SkillTwoParticle);
+
+
 	UWorld* const World = GetWorld();
 	if (World)
 	{
@@ -418,7 +422,7 @@ void AStrykerCharacter::SkillTwo()
 			Projectile->PoisionSlowAmount = int(75 - Dexterity / 2);
 			Projectile->PoisionDamageReductionAmount = int(75 - Dexterity / 2);
 			// Start the particle effect
-			Projectile->ServerActivateProjectile();
+			//Projectile->ServerActivateProjectile();
 
 			// Add the character's velocity to the projectile
 			Projectile->ProjectileMovement->SetVelocityInLocalSpace((Projectile->ProjectileMovement->InitialSpeed  * ProjectileRotation.Vector()) + (GetVelocity().GetAbs() * Mesh->GetSocketRotation(FName(TEXT("AimSocket"))).GetNormalized().Vector()));

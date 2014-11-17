@@ -17,6 +17,7 @@ ADieselandGameState::ADieselandGameState(const class FPostConstructInitializePro
 	KillGoal = 5;
 	WinningTeam = 0;
 	GameDuration = 60.0f;
+	GameTimer = GameDuration;
 }
 
 void ADieselandGameState::ReceiveBeginPlay()
@@ -28,58 +29,71 @@ void ADieselandGameState::ReceiveBeginPlay()
 
 void ADieselandGameState::Tick(float DeltaSeconds)
 {
+	if (Role == ROLE_Authority)
+	{
+		GameTimer = GetWorldTimerManager().GetTimerRemaining(this, &ADieselandGameState::GameTimerEnded);
+	}
 	Super::Tick(DeltaSeconds);
+}
+
+TArray<ADieselandPlayerController*> ADieselandGameState::GetPlayers()
+{
+	return Players;
 }
 
 void ADieselandGameState::CalculateScore()
 {
-	TArray<int32> TempTeamScores;
-
-	for (int32 a = 0; a < 9; a++)
+	if (Role == ROLE_Authority)
 	{
-		TempTeamScores.Add(0);
-	}
+		TArray<int32> TempTeamScores;
 
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-	{
-		APlayerController* PlayerController = *Iterator;
-		if (!Players.Contains(Cast<ADieselandPlayerController>(PlayerController)))
+		for (int32 a = 0; a < 9; a++)
 		{
-			Players.Add(Cast<ADieselandPlayerController>(PlayerController));
+			TempTeamScores.Add(0);
 		}
-	}
 
-	if (Players.Num() > 0)
-	{
-		for (int32 x = 0; x < Players.Num(); x++)
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 		{
-			if (Players[x] != nullptr)
+			APlayerController* PlayerController = *Iterator;
+			if (!Players.Contains(Cast<ADieselandPlayerController>(PlayerController)))
 			{
-				int32 TempPlayerTeamNum = Cast<ADieselandPlayerState>(Players[x]->PlayerState)->TeamNumber;
-
-				TempTeamScores[TempPlayerTeamNum] += Cast<ADieselandPlayerState>(Players[x]->PlayerState)->Kills;
-			}
-			else
-			{
-				Players.RemoveAt(x, 1);
+				Players.Add(Cast<ADieselandPlayerController>(PlayerController));
 			}
 		}
-	}
-	TeamScores = TempTeamScores;
 
-	for (int32 i = 0; i < TeamScores.Num(); i++)
-	{
-		if (TeamScores[i] > WinningScore)
+		if (Players.Num() > 0)
 		{
-			WinningScore = TeamScores[i];
-			WinningTeam = i;
-
-			if (WinningScore >= KillGoal && Role == ROLE_Authority)
+			for (int32 x = 0; x < Players.Num(); x++)
 			{
-				Cast<ADieselandGameMode>(AuthorityGameMode)->EndGame();
+				if (Players[x] != nullptr)
+				{
+					int32 TempPlayerTeamNum = Cast<ADieselandPlayerState>(Players[x]->PlayerState)->TeamNumber;
+
+					TempTeamScores[TempPlayerTeamNum] += Cast<ADieselandPlayerState>(Players[x]->PlayerState)->Kills;
+					Cast<ADieselandPlayerState>(Players[x]->PlayerState)->SetNetIndex(x);
+				}
+				else
+				{
+					Players.RemoveAt(x, 1);
+				}
 			}
 		}
-		GEngine->AddOnScreenDebugMessage(i, 100.0f, FColor::Green, FString::FromInt(TeamScores[i]));
+		TeamScores = TempTeamScores;
+
+		for (int32 i = 0; i < TeamScores.Num(); i++)
+		{
+			if (TeamScores[i] > WinningScore)
+			{
+				WinningScore = TeamScores[i];
+				WinningTeam = i;
+
+				if (WinningScore >= KillGoal && Role == ROLE_Authority)
+				{
+					Cast<ADieselandGameMode>(AuthorityGameMode)->EndGame();
+				}
+			}
+			GEngine->AddOnScreenDebugMessage(i, 100.0f, FColor::Green, FString::FromInt(TeamScores[i]));
+		}
 	}
 }
 
@@ -101,5 +115,6 @@ void ADieselandGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandGameState, WinningTeam);
 	DOREPLIFETIME(ADieselandGameState, TeamScores);
 	DOREPLIFETIME(ADieselandGameState, GameDuration);
+	DOREPLIFETIME(ADieselandGameState, GameTimer);
 	DOREPLIFETIME(ADieselandGameState, Players);
 }
