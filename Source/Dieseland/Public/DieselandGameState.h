@@ -32,6 +32,9 @@ class DIESELAND_API ADieselandGameState : public AGameState
 
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	TArray<int32> TeamScores;
+
+	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+	TArray<FVector> TeamColors;
 	
 	UFUNCTION(BlueprintCallable, Category = Score)
 	TArray<ADieselandPlayerController*> GetPlayers();
