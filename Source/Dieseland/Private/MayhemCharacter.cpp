@@ -185,7 +185,7 @@ void AMayhemCharacter::MeleeAttack()
 //Smash
 void AMayhemCharacter::SkillOne()
 {
-		ServerActivateParticle(SkillOneParticle);
+		ServerActivateAOEParticle(SkillOneParticle);
 
 		AOECollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		AOECollision->SetCollisionProfileName(TEXT("OverlapAll"));
@@ -236,7 +236,7 @@ void AMayhemCharacter::SkillTwo()
 {
 	if (Role == ROLE_Authority)
 	{
-		ServerActivateParticle(SkillTwoParticle);
+		ServerActivateAOEParticle(SkillTwoParticle);
 		RageSound->Play();
 		RageVoiceOver->Play();
 		RageMoveSpeedBuff = (CharacterMovement->MaxWalkSpeed * .3f) + (Strength * .06f);

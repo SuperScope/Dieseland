@@ -219,6 +219,13 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	ParticleSystem->SetHiddenInGame(false);
 	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	AOEParticleSystem = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("AOEParticleSystem"));
+	AOEParticleSystem->Template = SkillThreeParticle;
+	AOEParticleSystem->AttachTo(RootComponent);
+	AOEParticleSystem->bAutoActivate = false;
+	AOEParticleSystem->SetHiddenInGame(false);
+	AOEParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	TauntSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Taunt Sound"));
 	TauntSound->AttachParent = RootComponent;
 	TauntSound->bAutoActivate = false;
@@ -794,6 +801,17 @@ void ADieselandCharacter::ServerActivateParticle_Implementation(UParticleSystem*
 }
 
 bool ADieselandCharacter::ServerActivateParticle_Validate(UParticleSystem* Particle)
+{
+	return true;
+}
+
+void ADieselandCharacter::ServerActivateAOEParticle_Implementation(UParticleSystem* Particle)
+{
+	AOEParticleSystem->SetTemplate(Particle);
+	AOEParticleSystem->ActivateSystem();
+}
+
+bool ADieselandCharacter::ServerActivateAOEParticle_Validate(UParticleSystem* Particle)
 {
 	return true;
 }

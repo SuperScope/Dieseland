@@ -354,8 +354,14 @@ public:
 	UPROPERTY(Replicated, Category = Visual, BlueprintReadOnly, VisibleAnywhere)
 	TSubobjectPtr<class UParticleSystemComponent> ParticleSystem;
 
+	UPROPERTY(Replicated, Category = Visual, BlueprintReadOnly, VisibleAnywhere)
+	TSubobjectPtr<class UParticleSystemComponent> AOEParticleSystem;
+
 	UFUNCTION(Reliable, NetMulticast, WithValidation)
 	void ServerActivateParticle(UParticleSystem* Particle);
+
+	UFUNCTION(Reliable, NetMulticast, WithValidation)
+	void ServerActivateAOEParticle(UParticleSystem* Particle);
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerDamageEnemy(int32 Amt, AActor* Target);

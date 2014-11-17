@@ -155,7 +155,7 @@ void AEngletonCharacter::SkillOne()
 
 		//here we will play the particle effect as soon as the ability begins
 		if (BombardmentHitCounter == 0){
-			ServerActivateParticle(BombardmentParticle);
+			ServerActivateAOEParticle(BombardmentParticle);
 		}
 		BombardmentCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		BombardmentCollision->SetCollisionProfileName(TEXT("OverlapAll"));
@@ -231,7 +231,7 @@ void AEngletonCharacter::SkillThree()
 	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	PulseSound->Play();
 	PulseActivated = true;
-	ServerActivateParticle(PulseParticle);
+	ServerActivateAOEParticle(PulseParticle);
 
 	AActor* CurActor = NULL;
 	for (int32 b = 0; b < ActorsInPulseRange.Num(); b++)
