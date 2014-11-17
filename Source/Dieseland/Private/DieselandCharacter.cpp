@@ -213,7 +213,8 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 	ParticleSystem = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
 	ParticleSystem->Template = SkillThreeParticle;
-	ParticleSystem->AttachTo(RootComponent);
+	ParticleSystem->AttachTo(Mesh);
+	ParticleSystem->AttachSocketName = FName(TEXT("AimSocket"));
 	ParticleSystem->bAutoActivate = false;
 	ParticleSystem->SetHiddenInGame(false);
 	ParticleSystem->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -417,6 +418,7 @@ void ADieselandCharacter::CalculateStats_Implementation()
 		//This increases the character level for every 3 stat points accrewed
 		if (Cast<ADieselandPlayerController>(Controller)->StatPlusCount >= 3){
 			CharacterLevel++;
+			Cast<ADieselandPlayerState>(PlayerState)->SetCharacterLevel(CharacterLevel);
 			Cast<ADieselandPlayerController>(Controller)->StatPlusCount = 0;
 		}
 		if (IsPoisoned == false){

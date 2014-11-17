@@ -341,7 +341,7 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 					//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
 				}
 			}
-			
+			Cast<ADieselandPlayerState>(PlayerState)->SetDeaths(Cast<ADieselandPlayerState>(PlayerState)->GetDeaths() + 1);
 		}
 
 		

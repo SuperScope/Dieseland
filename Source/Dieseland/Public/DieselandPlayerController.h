@@ -157,8 +157,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	void PossessNewPawn();
 
-
-
 	// Input events
 	UFUNCTION(Reliable, Server, WithValidation)
 	void OnAttackPress();
