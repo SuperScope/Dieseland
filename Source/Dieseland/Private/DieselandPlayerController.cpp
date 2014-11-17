@@ -326,6 +326,8 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 			DieselandPawn->Health = DieselandPawn->MaxHealth;
 			DieselandPawn->LingerTimer = 0;
 
+			DieselandPawn->MoveSpeed = DieselandPawn->BaseMoveSpeed + (DieselandPawn->Dexterity * 3);
+
 			//Spawn Scrap pieces here
 			UWorld* const World = GetWorld();
 			if (World && DieselandPawn->LatestDamageCauser != nullptr && DieselandPawn->LatestDamageCauser->ActorHasTag(FName(TEXT("Player"))))

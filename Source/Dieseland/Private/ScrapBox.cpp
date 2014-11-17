@@ -15,12 +15,12 @@
 AScrapBox::AScrapBox(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	static ConstructorHelpers::FObjectFinder<UDestructibleMesh> DestructibleMesh(TEXT("DestructibleMesh'/Game/Shapes/Shape_Cube_DM.Shape_Cube_DM'"));
+	static ConstructorHelpers::FObjectFinder<UDestructibleMesh> DestructibleMesh(TEXT("DestructibleMesh'/Game/PropsDLC/Mesh_Environment_Crate_WIP_DM.Mesh_Environment_Crate_WIP_DM'"));
 
 	Mesh = PCIP.CreateDefaultSubobject<UDestructibleComponent>(this, TEXT("Mesh"));
 	Mesh->SetDestructibleMesh(DestructibleMesh.Object);
 	RootComponent = Mesh;
-	Mesh->SetCollisionProfileName(FName(TEXT("BlockAll")));
+	//Mesh->SetCollisionProfileName(FName(TEXT("BlockAll")));
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'"));
 	Particle = PCIP.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("ParticleSystem"));
@@ -66,8 +66,10 @@ void AScrapBox::DestroyCrate_Implementation(AActor* Causer)
                 RandomX = FMath::RandRange(-30, 30);
                 RandomY = FMath::RandRange(-30, 30);
 				AActor* Scrap = UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(GetActorLocation().X + RandomX, GetActorLocation().Y + RandomY, GetActorLocation().Z), FRotator(0.0f, 0.0f, 0.0f));
-				Cast<AScrap>(Scrap)->ScrapValue = FMath::RandRange(20, 30);
-			
+				if (Scrap != nullptr)
+				{
+					Cast<AScrap>(Scrap)->ScrapValue = FMath::RandRange(20, 30);
+				}
 				//Alternatively used to spawn c++ class
 				//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
 			}
