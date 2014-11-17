@@ -88,6 +88,11 @@ class DIESELAND_API AEngletonCharacter : public ADieselandCharacter
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
 		UParticleSystem* MachineGunFireParticle;
 
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+		UParticleSystem* MachineGunTrailParticle;
+	
+
 	// Mesh attached to the torso socket which is used to show attack direction - invisible by default
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadOnly, VisibleAnywhere)
 		TSubobjectPtr<class UStaticMeshComponent> AimMesh2;
