@@ -96,7 +96,7 @@ AFoxCharacter::AFoxCharacter(const class FPostConstructInitializeProperties& PCI
 	//here I set melee to false so that Fox only uses ranged attacks
 	IsMelee = false;
 
-
+	this->ParticleSystem->AddLocalRotation(FRotator(0.0f, 90.0f, 0.0f));
 
 }
 
