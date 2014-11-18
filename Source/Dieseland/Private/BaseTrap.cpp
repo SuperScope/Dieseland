@@ -31,7 +31,12 @@ void ABaseTrap::ReceiveActorBeginOverlap(AActor* OtherActor)
 	{
 		if (OtherActor->ActorHasTag(TEXT("Player")))
 		{
-			Cast<ADieselandCharacter>(OtherActor)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandCharacter>(OtherActor)->CharacterMovement->MaxWalkSpeed / TrapSlow;
+            if(this->ActorHasTag(TEXT("Oil")))
+            {
+                Cast<ADieselandCharacter>(OtherActor)->StatusEffects.Add(FString("Slowed"));
+                Cast<ADieselandCharacter>(OtherActor)->SlowRemaining = 3.0f;
+                Cast<ADieselandCharacter>(OtherActor)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandCharacter>(OtherActor)->MoveSpeed * 0.30f;
+            }
 			// TODO: Replace with better damage handling
 			Cast<ADieselandCharacter>(OtherActor)->Health -= TrapDamage;
 
@@ -59,7 +64,6 @@ void ABaseTrap::ReceiveActorEndOverlap(AActor* OtherActor)
 		{
 			Cast<ADieselandCharacter>(OtherActor)->LingerTimer = LingerCoolDown;
 			Cast<ADieselandCharacter>(OtherActor)->LingerDamage = LingerDamage;
-			Cast<ADieselandCharacter>(OtherActor)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandCharacter>(OtherActor)->CharacterMovement->MaxWalkSpeed * TrapSlow;
 		}
 		/*if (OtherActor->ActorHasTag(FName(TEXT("Enemy"))))
 		{
