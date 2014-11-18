@@ -16,8 +16,7 @@ ADieselandGameState::ADieselandGameState(const class FPostConstructInitializePro
 	WinningScore = 0;
 	KillGoal = 20;
 	WinningTeam = 0;
-	//GameDuration = 600.0f;
-	GameDuration = 10.0f;
+	GameDuration = 600.0f;
 	GameHasEnded = false;
 	GameHasStarted = false;
 	GameTimer = GameDuration;
