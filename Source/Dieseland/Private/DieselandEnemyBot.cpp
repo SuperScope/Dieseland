@@ -223,7 +223,7 @@ void ADieselandEnemyBot::ReceiveBeginPlay()
 	Cast<UMaterialInstanceDynamic>(HealthBarMaterial)->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(1.0f, 0.0f, 0.0f));
 
 	MiniMapMaterial = UMaterialInstanceDynamic::Create(IconMatStatic, this);
-	MiniMapIcon->SetWorldScale3D(FVector(15.0f, 15.0, 0.01f));
+	MiniMapIcon->SetWorldScale3D(FVector(17.0f, 17.0, 0.01f));
 	MiniMapIcon->SetWorldRotation(FRotator(0, 90.0f, 0));
 
 	MiniMapIcon->AddRelativeLocation(FVector(0.0f, 0.0f, 700.0f));
