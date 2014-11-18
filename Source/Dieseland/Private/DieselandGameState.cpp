@@ -120,7 +120,7 @@ void ADieselandGameState::CalculateScore()
 					//Cast<ADieselandGameMode>(AuthorityGameMode)->EndGame();
 				}
 			}
-			GEngine->AddOnScreenDebugMessage(i, 100.0f, FColor::Green, FString::FromInt(TeamScores[i]));
+			//GEngine->AddOnScreenDebugMessage(i, 100.0f, FColor::Green, FString::FromInt(TeamScores[i]));
 		}
 	}
 }
