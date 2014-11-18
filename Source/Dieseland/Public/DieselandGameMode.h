@@ -70,6 +70,10 @@ class ADieselandGameMode : public AGameMode
 	UClass* EngletonClass;
 	UClass* StrykerClass;
 	UClass* FoxClass;
+    
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+    TSubobjectPtr <UAudioComponent> CountdownSound;
+    USoundBase* CountdownSoundBase;
 
 	uint8 PlayersSpawned;
 

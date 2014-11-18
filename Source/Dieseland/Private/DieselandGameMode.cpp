@@ -47,6 +47,12 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
 	static ConstructorHelpers::FObjectFinder<UClass> EngletonBPClass(TEXT("Class'/Game/Blueprints/Engleton.Engleton_C'"));
 	static ConstructorHelpers::FObjectFinder<UClass> StrykerBPClass(TEXT("Class'/Game/Blueprints/Players/Stryker_BP.Stryker_BP_C'"));
 	static ConstructorHelpers::FObjectFinder<UClass> FoxBPClass(TEXT("Class'/Game/Blueprints/Players/Fox_BP.Fox_BP_C'"));
+    static ConstructorHelpers::FObjectFinder<USoundBase> CountdownSoundCue(TEXT("SoundBase'/Game/AudioDLC/Announcer/Sound_Announcer_Countdown_Cue.Sound_Announcer_Countdown_Cue'"));
+    
+    CountdownSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("CountdownSound"));
+    CountdownSound->bAutoActivate = false;
+    CountdownSoundBase =  CountdownSoundCue.Object;
+    CountdownSound->SetSound(CountdownSoundBase);
     
 
 	if (MayhemBPClass.Object)
@@ -86,8 +92,10 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
     LocationArray.Add(FVector(-3902.357666, -4332.289062, -1500.0));
 
     BossTimer = 300.0f;
+
     CanSpawn = true;
     StartBossTimer = false;
+    //CountdownSound->bAutoActivate = false;
 
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
@@ -109,7 +117,6 @@ void ADieselandGameMode::ReceiveBeginPlay()
 
 void ADieselandGameMode::Tick(float DeltaSeconds)
 {
-    
     //If time to start timer, start timer
     if(StartBossTimer == true)
     {
@@ -117,7 +124,7 @@ void ADieselandGameMode::Tick(float DeltaSeconds)
     }
     
     //If its time to spawn boss and we can spawn a boss
-    if (BossTimer <= 295.0f && CanSpawn == true)
+    if (BossTimer <= 180.0f && CanSpawn == true)
     {
         CanSpawn = false;
         //Select a random boss and boss zone
@@ -147,6 +154,7 @@ void ADieselandGameMode::StartGame_Implementation()
 	}
     //Start boss timer when game starts
     StartBossTimer = true;
+    CountdownSound->Play();
 }
 
 
