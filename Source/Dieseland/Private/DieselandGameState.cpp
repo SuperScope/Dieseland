@@ -16,7 +16,7 @@ ADieselandGameState::ADieselandGameState(const class FPostConstructInitializePro
 	WinningScore = 0;
 	KillGoal = 20;
 	WinningTeam = 0;
-	GameDuration = 600.0f;
+	GameDuration = 10.0f;
 	GameHasEnded = false;
 	GameHasStarted = false;
 	GameTimer = GameDuration;
@@ -93,7 +93,7 @@ void ADieselandGameState::CalculateScore()
 		{
 			for (int32 x = 0; x < Players.Num(); x++)
 			{
-				if (Players[x] != nullptr)
+				if (Players[x] != nullptr && Players[x]->PlayerState != nullptr)
 				{
 					int32 TempPlayerTeamNum = Cast<ADieselandPlayerState>(Players[x]->PlayerState)->TeamNumber;
 
