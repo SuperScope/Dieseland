@@ -25,8 +25,8 @@ AEngletonMachineGun::AEngletonMachineGun(const class FPostConstructInitializePro
 	ProjectileMovement->InitialSpeed = 1400.0f;
 	ProjCollision->SetCapsuleHalfHeight(150.0f);
 	ProjCollision->SetCapsuleRadius(150.0f);
-	//static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
-	//Particle->Template = ParticleSystemAsset.Object;
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
+	Particle->Template = ParticleSystemAsset.Object;
 	//Particle->SetIsReplicated(true);
 	
 	//temp meshscale

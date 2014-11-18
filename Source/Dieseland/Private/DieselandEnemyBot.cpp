@@ -7,6 +7,8 @@
 #include "DieselandPlayerController.h"
 #include "DieselandEnemyAI.h"
 #include "BaseWalkerProjectile.h"
+#include "DieselandGameState.h"
+#include "DieselandPlayerState.h"
 #include "UnrealNetwork.h"
 #include "EngletonCrazyLaser.h"
 #include "Scrap.h"
@@ -344,6 +346,34 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
 		if (this->Health <= 0 && Causer->ActorHasTag(FName(TEXT("Player"))))
 		{
 			FVector TempEnemyLoc = FVector(Causer->GetActorLocation().X, Causer->GetActorLocation().Y, Causer->GetActorLocation().Z);
+
+			if (this->IsQueen || this->IsKing)
+			{
+				UWorld* World = GetWorld();
+				if (World){
+					ADieselandGameState* GameState = World->GetGameState<ADieselandGameState>();
+
+
+					ADieselandCharacter* CauserController = Cast<ADieselandCharacter>(Causer);
+					int32 CauserTeamNum = Cast<ADieselandPlayerState>(CauserController->PlayerState)->GetTeamNum();
+					int32 SecondaryTempTeamNum;
+					ADieselandPlayerState* TempPlayerState; // = Cast<ADieselandPlayerState>(PlayerState);
+			
+
+					//	ADieselandPlayerController* PlayerController = Cast<ADieselandPlayerController>(Causer);
+					for (int x = 0; x < GameState->PlayerArray.Num(); x++)
+					{
+						TempPlayerState = Cast<ADieselandPlayerState>(GameState->PlayerArray[x]);
+						SecondaryTempTeamNum = TempPlayerState->GetTeamNum();
+						if (CauserTeamNum == SecondaryTempTeamNum)
+						{
+							//WATCH ME PLODE BABY
+							Cast<ADieselandCharacter>(Cast<ADieselandPlayerController>(TempPlayerState->GetOwner())->GetPawn())-> Scrap += 300;
+						}
+						 //PlayerController->PlayerState->
+					}
+				}
+			}
 
 			//Spawn Scrap pieces here
 			UWorld* const World = GetWorld();

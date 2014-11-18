@@ -44,9 +44,9 @@ AFoxCharacter::AFoxCharacter(const class FPostConstructInitializeProperties& PCI
 	this->CharacterMovement->MaxWalkSpeed = MoveSpeed;
 
 	//base cooldowns
-	BaseSkillOneCooldown = 1.0f; //23
-	BaseSkillTwoCooldown = 1.0f; //9
-	BaseSkillThreeCooldown = 1.0f; //13
+	BaseSkillOneCooldown = 23.0f; //23
+	BaseSkillTwoCooldown = 9.0f; //9
+	BaseSkillThreeCooldown = 13.0f; //13
 
 	//adjustments for cooldowns
 	SkillOneCooldown = BaseSkillOneCooldown / (1 + Intelligence / 100);
@@ -104,7 +104,7 @@ AFoxCharacter::AFoxCharacter(const class FPostConstructInitializeProperties& PCI
 void AFoxCharacter::SkillOne()
 {
 	ServerActivateParticle(SkillOneParticle);
-
+	isAimingOne = false;
 	UWorld* const World = GetWorld();
 	if (World)
 	{
@@ -137,6 +137,7 @@ void AFoxCharacter::SkillOne()
 void AFoxCharacter::SkillTwo()
 {
 	ServerActivateParticle(SkillTwoParticle);
+	isAimingTwo = false;
 
 	UWorld* const World = GetWorld();
 	if (World)
@@ -169,6 +170,7 @@ void AFoxCharacter::SkillTwo()
 void AFoxCharacter::SkillThree()
 {
 	ServerActivateParticle(SkillThreeParticle);
+	isAimingThree = false;
 
 	UWorld* const World = GetWorld();
 	if (World)
@@ -233,25 +235,57 @@ void AFoxCharacter::MeleeAttack()
 {
 	//fox doesn't use melee
 }
+//ultimate
 void AFoxCharacter::SkillOneAim()
 {
+	isAimingOne = true;
+	AimBar->SetWorldScale3D(FVector(16.0f, 0.01f, 1.0f));
 	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("Get Jinxed!")), FVector(0.0f, 1.0f, 0.0f));
 
 	AimBar->SetHiddenInGame(false);
 }
-
+//charm
 void AFoxCharacter::SkillTwoAim()
 {
+	isAimingTwo = true;
+	//AimBar->AddLocalRotation(FRotator(0, 90, 0));
+	AimBar->SetWorldScale3D(FVector(7.0f, 0.01f, 1.0f));
 	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("Get Jinxed!")), FVector(0.0f, 1.0f, 0.0f));
 
 	AimBar->SetHiddenInGame(false);
 }
-
+//smoke bomb
 void AFoxCharacter::SkillThreeAim()
 {
+	isAimingThree = true;
+	//AimBar->AddLocalRotation(FRotator(0, 90, 0));
+	AimBar->SetWorldScale3D(FVector(9.0f, 0.01f, 1.0f));
 	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("Get Jinxed!")), FVector(0.0f, 1.0f, 0.0f));
 
 	AimBar->SetHiddenInGame(false);
 }
 
 
+void AFoxCharacter::Tick(float DeltaSeconds)
+{
+
+	UpdateTimers(DeltaSeconds);
+	Super::Tick(DeltaSeconds);
+}
+
+void AFoxCharacter::UpdateTimers(float DeltaSeconds)
+{
+
+	if (isAimingOne)
+		AimBar->SetRelativeLocation(FVector(30.0f, 0.0f, 750.0f));
+
+	if (isAimingTwo)
+		AimBar->SetRelativeLocation(FVector(0.0f, 0.0f, 300.0f));
+
+	if (isAimingThree)
+		AimBar->SetRelativeLocation(FVector(0.0f, 0.0f, 450.0f));
+}
+/*
+AimBar->SetRelativeLocation(FVector(700.0f, 40.0f, -50.0f));
+AimBar->SetWorldRotation(AimRotation.GetNormalized());
+*/

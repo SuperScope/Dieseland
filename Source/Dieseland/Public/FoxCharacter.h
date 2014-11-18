@@ -23,7 +23,18 @@ class DIESELAND_API AFoxCharacter : public ADieselandCharacter
 	virtual void SkillTwoAim() override;
 	virtual void SkillThreeAim() override;
 
+	//here we update time
+	void UpdateTimers(float DeltaSeconds);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		bool isAimingOne;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		bool isAimingTwo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		bool isAimingThree;
+		
 	//audio assets
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
@@ -43,5 +54,7 @@ class DIESELAND_API AFoxCharacter : public ADieselandCharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
 		TSubobjectPtr <UAudioComponent> SmokeBombSound;
 
+protected:
+	virtual void Tick(float DeltaSeconds) override;
 	
 };

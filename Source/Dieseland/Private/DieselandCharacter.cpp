@@ -124,6 +124,8 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	AimBarMatStatic = AimBarMatRef.Object;
 	//for the aim sphere
 
+	//adjustments for foxs aiming mechanism
+
 
 	AimSphere = PCIP.CreateDefaultSubobject<UStaticMeshComponent >(this, TEXT("AimSphere"));
 	AimSphere->AttachParent = Mesh;
@@ -264,6 +266,11 @@ void ADieselandCharacter::ReceiveBeginPlay()
 	AimBar->SetWorldScale3D(FVector(4.0f, 1.0, 0.01));
 	AimBar->CastShadow = false;
 	AimBar->Materials.Add(AimBarMaterial);
+
+	if (IsFox)
+	{
+		AimBar->AddLocalRotation(FRotator(90, 0, 0));
+	}
 
 	MiniMapMaterial = UMaterialInstanceDynamic::Create(IconMatStatic, this);
 	MiniMapIcon->SetWorldScale3D(FVector(12.0f, 12.0, 0.01f));
