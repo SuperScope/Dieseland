@@ -174,8 +174,48 @@ ADieselandEnemyBot::ADieselandEnemyBot(const class FPostConstructInitializePrope
 }
 
 
+
+
 void ADieselandEnemyBot::ReceiveBeginPlay()
 {
+
+	//here we adjust the health of the bots at there spawn based on the character level in the game
+	UWorld* World = GetWorld();
+	float AverageCharacterLevel = 0;
+	if (World){
+		ADieselandGameState* GameState = World->GetGameState<ADieselandGameState>();
+		int32 TempCharacterLevel = 1;
+		ADieselandPlayerState* TempPlayerState; // = Cast<ADieselandPlayerState>(PlayerState);
+
+		for (int x = 0; x < GameState->PlayerArray.Num(); x++)
+		{
+				TempPlayerState = Cast<ADieselandPlayerState>(GameState->PlayerArray[x]);
+				TempCharacterLevel = TempPlayerState->GetCharacterLevel();
+				AverageCharacterLevel += TempCharacterLevel;
+		}
+		AverageCharacterLevel = (AverageCharacterLevel/GameState->PlayerArray.Num());
+	}
+	
+	MaxHealth = 175 + (AverageCharacterLevel * 10);
+	BaseAttackDamage = BasicAttackDamage + (AverageCharacterLevel + 3);
+	BasicAttackDamage = BaseAttackDamage;
+	
+	Health = MaxHealth;
+	if (IsKing || IsQueen)
+	{
+		MaxHealth = 1500 + (AverageCharacterLevel * 100);
+		Health = MaxHealth;
+		if (IsKing)
+		{
+			BaseAttackDamage = 150 + (AverageCharacterLevel * 15);
+			BasicAttackDamage = BaseAttackDamage;
+		}
+		if (IsQueen)
+		{
+			BaseAttackDamage = 40 + (AverageCharacterLevel * 4);
+			BasicAttackDamage = BaseAttackDamage;
+		}
+	}
 	HealthBarMaterial = UMaterialInstanceDynamic::Create(HealthBarMatStatic, this);
 	HealthBar->Elements[0].Material = HealthBarMaterial;
 	HealthBar->AddElement(HealthBarBackMatStatic, nullptr, false, 10.0f, 75.0f, nullptr);
@@ -345,7 +385,9 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
 		}
 		if (this->Health <= 0 && Causer->ActorHasTag(FName(TEXT("Player"))))
 		{
-			FVector TempEnemyLoc = FVector(Causer->GetActorLocation().X, Causer->GetActorLocation().Y, Causer->GetActorLocation().Z);
+			if (Causer != nullptr){
+				FVector TempEnemyLoc = FVector(Causer->GetActorLocation().X, Causer->GetActorLocation().Y, Causer->GetActorLocation().Z);
+			}
 
 			if (this->IsQueen || this->IsKing)
 			{
@@ -390,7 +432,9 @@ void ADieselandEnemyBot::EditHealth(int32 Amt, AActor* Causer)
                     RandomY = FMath::RandRange(-30, 30);
 					AActor* Scrap =	UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(this->GetActorLocation().X +RandomX, this->GetActorLocation().Y + RandomY, this->GetActorLocation().Z), FRotator(0.0f, 0.0f, 0.0f));
 					
-					Cast<AScrap>(Scrap)->ScrapValue = FMath::RandRange(30, 60);
+					if (Scrap != nullptr){
+						Cast<AScrap>(Scrap)->ScrapValue = FMath::RandRange(30, 60);
+					}
 
 
 					this->Destroy();

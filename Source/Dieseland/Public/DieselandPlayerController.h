@@ -108,6 +108,13 @@ public:
 	UFUNCTION(Category = UserInterface)
 	void OnShowScore();
 
+	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+		int32 RandomX;
+
+	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+		int32 RandomY;
+
+
 	// Cheat code to change characters
 	UFUNCTION(exec, BlueprintCallable, Category = Gameplay)
 	void ChangeCharacter(FString CharacterName);

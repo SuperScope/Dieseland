@@ -213,6 +213,7 @@ void ADieselandPlayerController::UpdateCooldownTimers_Implementation(float Delta
 				DieselandPawn->BasicAttackTimer = DieselandPawn->BasicAttackCooldown;
 				DieselandPawn->BasicAttackAmmo -= 1;
 				if (DieselandPawn->BasicAttackAmmo <= 0){
+					DieselandPawn->ReloadSound->Play();
 					DieselandPawn->BasicAttackReloadTimer = DieselandPawn->BasicAttackReloadSpeed;
 				}
 			}
@@ -232,7 +233,7 @@ void ADieselandPlayerController::UpdateCooldownTimers_Implementation(float Delta
 			}
 			if (DieselandPawn->StatusEffects.Contains(FString("Charmed")))
 			{
-				DieselandPawn->CharacterMovement->Velocity += DieselandPawn->VectorDirection * 300;
+				DieselandPawn->CharacterMovement->Velocity += DieselandPawn->VectorDirection * 2000;
 			}
 		}
 		if (DieselandPawn->SlowRemaining > 0.0f)
@@ -304,10 +305,6 @@ void ADieselandPlayerController::ReceiveBeginPlay()
 	}
 }
 
-bool ADieselandPlayerController::RespawnPawn_Validate()
-{
-	return true;
-}
 
 void ADieselandPlayerController::RespawnPawn_Implementation()
 {
@@ -315,8 +312,7 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 
 	if (DieselandPawn != nullptr)
 	{
-		if (Role == ROLE_Authority)
-		{
+	
 			FVector TempEnemyLoc = FVector(DieselandPawn->GetActorLocation().X, DieselandPawn->GetActorLocation().Y, DieselandPawn->GetActorLocation().Z);
 
 			FVector TempSpawnLocation = Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->PickSpawn()->GetActorLocation();
@@ -329,26 +325,33 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 			DieselandPawn->MoveSpeed = DieselandPawn->BaseMoveSpeed + (DieselandPawn->Dexterity * 3);
 
 			//Spawn Scrap pieces here
-			UWorld* const World = GetWorld();
+			/*UWorld* const World = GetWorld();
 			if (World && DieselandPawn->LatestDamageCauser != nullptr && DieselandPawn->LatestDamageCauser->ActorHasTag(FName(TEXT("Player"))))
 			{
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.Owner = this;
 				SpawnParams.Instigator = Instigator;
-				for (int32 x = 0; x < 5; x++)
+				for (int32 x = 0; x < 1; x++)
 				{
-					UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(TempEnemyLoc.X, TempEnemyLoc.Y, TempEnemyLoc.Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f));
-
+					AActor* Scrap = UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(DieselandPawn->GetActorLocation().X, DieselandPawn->GetActorLocation().Y, DieselandPawn->GetActorLocation().Z), FRotator(0.0f, 0.0f, 0.0f));
+					if (Scrap != nullptr){
+						Cast<AScrap>(Scrap)->ScrapValue = 250;
+					}
 					//Alternatively used to spawn c++ class
+
 					//AScrap* const Scrap = World->SpawnActor<AScrap>(AScrap::StaticClass(), FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + (70.0f * x)), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
 				}
-			}
+			} */
 			Cast<ADieselandPlayerState>(PlayerState)->SetDeaths(Cast<ADieselandPlayerState>(PlayerState)->GetDeaths() + 1);
-		}
 
 		
 	}
 }
+bool ADieselandPlayerController::RespawnPawn_Validate()
+{
+	return true;
+}
+
 
 void ADieselandPlayerController::ChangeCharacter(FString Character)
 {
@@ -1098,4 +1101,6 @@ void ADieselandPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimePro
 	DOREPLIFETIME(ADieselandPlayerController, PawnChosen);
 	DOREPLIFETIME(ADieselandPlayerController, NewPawn);
 	DOREPLIFETIME(ADieselandPlayerController, CostVal);
+	DOREPLIFETIME(ADieselandPlayerController, RandomY);
+	DOREPLIFETIME(ADieselandPlayerController, RandomX);
 }

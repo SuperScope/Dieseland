@@ -79,7 +79,7 @@ AFoxCharacter::AFoxCharacter(const class FPostConstructInitializeProperties& PCI
 	SmokeBombSound->AttachParent = RootComponent;
 	SmokeBombSound->bAutoActivate = false;
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> BasicAttackParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/MovingBulletTest_WIP.MovingBulletTest_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> BasicAttackParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/MovingBulletTest_WIP2.MovingBulletTest_WIP2'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_FoxPenetratorShot.Unreal_Particle_FoxPenetratorShot'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillTwoParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_FoxCharm_WIP3.Unreal_Particle_FoxCharm_WIP3'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillThreeParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
