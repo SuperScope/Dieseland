@@ -93,6 +93,9 @@ class DIESELAND_API AEngletonCharacter : public ADieselandCharacter
 		UParticleSystem* MachineGunTrailParticle;
 
 	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
+		UParticleSystem* MachineGunTrailParticle2;
+
+	UPROPERTY(Replicated, Category = Combat, BlueprintReadWrite, EditAnywhere)
 		UParticleSystem* CrazyLaserParticle;
 	
 

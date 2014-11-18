@@ -240,6 +240,10 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	LaughSound->AttachParent = RootComponent;
 	LaughSound->bAutoActivate = false;
 
+	ReloadSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Reload Sound"));
+	ReloadSound->AttachParent = RootComponent;
+	ReloadSound->bAutoActivate = false;
+
 	//Find the scrap blueprint's class
 	static ConstructorHelpers::FObjectFinder<UClass> ScrapBlueprint(TEXT("Class'/Game/Blueprints/Scrap_BP.Scrap_BP_C'"));
 	if (ScrapBlueprint.Object)
@@ -276,7 +280,7 @@ void ADieselandCharacter::ReceiveBeginPlay()
 	MiniMapIcon->SetWorldScale3D(FVector(12.0f, 12.0, 0.01f));
 	MiniMapIcon->SetWorldRotation(FRotator(0, 90.0f, 0));
 
-	MiniMapIcon->AddRelativeLocation(FVector(0.0f, 0.0f,1500.0f));
+	MiniMapIcon->AddRelativeLocation(FVector(0.0f, 0.0f,1000.0f));
 	MiniMapIcon->CastShadow = false;
 
 
@@ -530,6 +534,7 @@ void ADieselandCharacter::OnHasBeenKilled(AActor* Causer)
 		{
 			ADieselandPlayerState* TempPlayerState = Cast<ADieselandPlayerState>((Cast<ADieselandCharacter>(Causer)->PlayerState));
 			TempPlayerState->SetKillNum(TempPlayerState->Kills += 1);
+			Cast<ADieselandCharacter>(Causer)->Scrap += 250;
 			
 		}
 		Cast<ADieselandPlayerController>(Controller)->RespawnPawn();
@@ -831,6 +836,8 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, Health);
 	DOREPLIFETIME(ADieselandCharacter, MaxHealth);
 	DOREPLIFETIME(ADieselandCharacter, HealthRegeneration);
+
+	DOREPLIFETIME(ADieselandCharacter, CharacterLevel);
 
 	DOREPLIFETIME(ADieselandCharacter, Scrap);
 	DOREPLIFETIME(ADieselandCharacter, Kills);

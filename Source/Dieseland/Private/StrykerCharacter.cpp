@@ -163,6 +163,8 @@ void AStrykerCharacter::UpdateDurationTimers_Implementation(float DeltaSeconds)
 		this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Block);
 		this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Block);
 		this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Block);
+
+		SetActorRotation(FRotator(0,0,0));
 	}
 }
 
@@ -317,11 +319,15 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 
 			if (AssassinationTarget->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(AssassinationTarget)->GetTeamNumber() != this->GetTeamNumber())
 			{
-				Cast<ADieselandCharacter>(AssassinationTarget)->EditHealth(-1 * BasicAttackDamage, this);
+				if (AssassinationTarget != nullptr){
+					Cast<ADieselandCharacter>(AssassinationTarget)->EditHealth(-1 * BasicAttackDamage, this);
+				}
 			}
 			else if (AssassinationTarget->ActorHasTag(FName(TEXT("Enemy"))))
 			{
-				Cast<ADieselandEnemyBot>(AssassinationTarget)->EditHealth(-1 * BasicAttackDamage, this);
+				if (AssassinationTarget != nullptr){
+					Cast<ADieselandEnemyBot>(AssassinationTarget)->EditHealth(-1 * BasicAttackDamage, this);
+				}
 			}
 			
 			AssasinationDuration = 0;

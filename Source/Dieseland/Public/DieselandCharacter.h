@@ -203,6 +203,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
 	TSubobjectPtr <UAudioComponent> LaughSound;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+		TSubobjectPtr <UAudioComponent> ReloadSound;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
 	UMaterialInstanceDynamic* HealthBarMaterial;
 

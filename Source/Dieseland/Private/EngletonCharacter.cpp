@@ -89,12 +89,15 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> PulseParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_EngletonPulse2_WIP.Unreal_Particle_EngletonPulse2_WIP'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> MachineGunTrailParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet1.Unreal_Particle_Bullet1'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> CrazyLaserParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/CrazyLaser2_WIP.CrazyLaser2_WIP'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> MachineGunTrailParticleAsset2(TEXT("	ParticleSystem'/Game/Particles/Test/Unreal_Particle_Bullet12.Unreal_Particle_Bullet12'"));
+	
 	
 	this->CrazyLaserParticle = CrazyLaserParticleAsset.Object;
 	this->BombardmentParticle = BombardmentParticleAsset.Object;
 	this->MachineGunFireParticle = MachineGunFireParticleAsset.Object;
 	this->PulseParticle = PulseParticleAsset.Object;
 	this->MachineGunTrailParticle = MachineGunTrailParticleAsset.Object;
+	this->MachineGunTrailParticle2 = MachineGunTrailParticleAsset2.Object;
 
 	AimMesh2 = PCIP.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("AimMesh2"));
 	AimMesh2->AttachParent = (Mesh);
@@ -304,6 +307,7 @@ void AEngletonCharacter::SkillThree()
 void AEngletonCharacter::RangedAttack()
 {
 	MachineGunSound->Play();
+	ServerActivateParticle(MachineGunTrailParticle2);
 	ServerActivateParticle(MachineGunTrailParticle);
 	UWorld* const World = GetWorld();
 	if (World && Role == ROLE_Authority)
