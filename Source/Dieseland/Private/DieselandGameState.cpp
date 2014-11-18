@@ -117,7 +117,7 @@ void ADieselandGameState::CalculateScore()
 
 				if (WinningScore >= KillGoal && Role == ROLE_Authority)
 				{
-					Cast<ADieselandGameMode>(AuthorityGameMode)->EndGame();
+					//Cast<ADieselandGameMode>(AuthorityGameMode)->EndGame();
 				}
 			}
 			GEngine->AddOnScreenDebugMessage(i, 100.0f, FColor::Green, FString::FromInt(TeamScores[i]));
