@@ -132,7 +132,7 @@ void ADieselandPlayerState::SetCharacterName(const FString& NewName)
 
 	if (Role != ROLE_Authority)
 	{
-		ServerSetUsername(NewName);
+		ServerSetCharacterName(NewName);
 	}
 }
 

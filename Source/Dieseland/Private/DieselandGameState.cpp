@@ -14,9 +14,12 @@ ADieselandGameState::ADieselandGameState(const class FPostConstructInitializePro
 {
 	PrimaryActorTick.bCanEverTick = true;
 	WinningScore = 0;
-	KillGoal = 5;
+	KillGoal = 20;
 	WinningTeam = 0;
-	GameDuration = 60.0f;
+	//GameDuration = 600.0f;
+	GameDuration = 10.0f;
+	GameHasEnded = false;
+	GameHasStarted = false;
 	GameTimer = GameDuration;
 
 	TeamColors.Add(FVector(0.000905f, 1.0f, 0.0f));
@@ -32,16 +35,32 @@ ADieselandGameState::ADieselandGameState(const class FPostConstructInitializePro
 
 void ADieselandGameState::ReceiveBeginPlay()
 {
-	GetWorldTimerManager().SetTimer(this, &ADieselandGameState::CalculateScore, .2f, true);
+	if (Role == ROLE_Authority)
+	{
+		//GetWorldTimerManager().SetTimer(this, &ADieselandGameState::CalculateScore, .2f, true);
 
-	GetWorldTimerManager().SetTimer(this, &ADieselandGameState::GameTimerEnded, GameDuration, false);
+		//GetWorldTimerManager().SetTimer(this, &ADieselandGameState::GameTimerEnded, GameDuration, false);
+	}
+}
+
+void ADieselandGameState::StartTimer()
+{
+	if (Role == ROLE_Authority)
+	{
+		GetWorldTimerManager().SetTimer(this, &ADieselandGameState::GameTimerEnded, GameDuration, false);
+		GameHasStarted = true;
+	}
 }
 
 void ADieselandGameState::Tick(float DeltaSeconds)
 {
 	if (Role == ROLE_Authority)
 	{
-		GameTimer = GetWorldTimerManager().GetTimerRemaining(this, &ADieselandGameState::GameTimerEnded);
+		CalculateScore();
+		if (!GameHasEnded && GameHasStarted)
+		{
+			GameTimer = GetWorldTimerManager().GetTimerRemaining(this, &ADieselandGameState::GameTimerEnded);
+		}
 	}
 	Super::Tick(DeltaSeconds);
 }
@@ -111,7 +130,9 @@ void ADieselandGameState::GameTimerEnded()
 {
 	if (Role == ROLE_Authority)
 	{
-		Cast<ADieselandGameMode>(AuthorityGameMode)->EndGame();
+		//Cast<ADieselandGameMode>(AuthorityGameMode)->EndGame();
+		GameTimer = 0.0f;
+		GameHasEnded = true;
 	}
 }
 
@@ -127,5 +148,7 @@ void ADieselandGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandGameState, TeamColors);
 	DOREPLIFETIME(ADieselandGameState, GameDuration);
 	DOREPLIFETIME(ADieselandGameState, GameTimer);
+	DOREPLIFETIME(ADieselandGameState, GameHasEnded);
+	DOREPLIFETIME(ADieselandGameState, GameHasStarted);
 	DOREPLIFETIME(ADieselandGameState, Players);
 }
