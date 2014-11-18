@@ -256,7 +256,7 @@ void AMayhemCharacter::SkillThree()
 	if (Role == ROLE_Authority)
 	{
 		IronArmorHealthBuff = (float)MaxHealth * 0.25f + Strength * 0.75f;
-		IronArmorRegenBuff = (float)HealthRegeneration * 0.25f + Strength + 0.03f;
+		IronArmorRegenBuff = (float)HealthRegeneration * 0.1f + Strength + 0.02f;
 
 		IronArmorTimer = IronArmorDuration;
 

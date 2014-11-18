@@ -137,6 +137,10 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	bool IsPoisoned;
 
+	// Is this character currently poisoned.
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		bool IsFox;
+
 	// How long has this character been poisoned.
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float PoisonTimer;

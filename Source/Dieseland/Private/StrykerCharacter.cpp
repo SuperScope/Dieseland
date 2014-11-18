@@ -479,16 +479,16 @@ void AStrykerCharacter::MeleeAttack()
 		SlashSound->Stop();
 		if (Role == ROLE_Authority && CurActor != this)
 		{
-			if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
+			if ( CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
 			{
 				Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 
 			}
-			else if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("Enemy"))))
+			else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
 			{
 				Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 			}
-			else if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
+			else if (CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
 			{
 				Cast<AScrapBox>(CurActor)->DestroyCrate(this);
 			}
