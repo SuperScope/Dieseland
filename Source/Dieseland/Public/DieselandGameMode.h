@@ -48,7 +48,7 @@ class ADieselandGameMode : public AGameMode
     UPROPERTY(Category = Gameplay, BlueprintReadWrite, EditAnywhere)
     bool StartBossTimer;
 
-	UFUNCTION(Reliable, Server, WithValidation, BlueprintCallable, Category = Gameplay)
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void StartGame();
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)

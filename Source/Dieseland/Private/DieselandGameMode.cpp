@@ -137,13 +137,13 @@ void ADieselandGameMode::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
-void ADieselandGameMode::StartGame_Implementation()
+void ADieselandGameMode::StartGame()
 {
 	//Find world
 	UWorld* const World = GetWorld();
 
 	//If world exists spawn tiles and set location of tiles
-	if (World){
+	if (World && Role == ROLE_Authority && DeathTileArray.Num() <= 7){
 
 		for (int32 i = 0; i <= 6; i++)
 		{
@@ -155,12 +155,6 @@ void ADieselandGameMode::StartGame_Implementation()
     //Start boss timer when game starts
     StartBossTimer = true;
     CountdownSound->Play();
-}
-
-
-bool ADieselandGameMode::StartGame_Validate()
-{
-	return true;
 }
 
 APlayerStart* ADieselandGameMode::PickSpawn()

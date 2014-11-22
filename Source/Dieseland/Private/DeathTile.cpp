@@ -50,7 +50,7 @@ ADeathTile::ADeathTile(const class FPostConstructInitializeProperties& PCIP)
 
 	PrimaryActorTick.bCanEverTick = true;
 	
-	SetRemoteRoleForBackwardsCompat(ENetRole::ROLE_SimulatedProxy);
+	//SetRemoteRoleForBackwardsCompat(ENetRole::ROLE_SimulatedProxy);
 	bReplicates = true;
 	bReplicateMovement = true;
 	
