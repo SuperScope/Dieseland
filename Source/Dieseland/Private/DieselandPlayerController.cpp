@@ -22,7 +22,7 @@ ADieselandPlayerController::ADieselandPlayerController(const class FPostConstruc
 	//DefaultMouseCursor = EMouseCursor::Crosshairs;
 
 	static ConstructorHelpers::FObjectFinder<UClass> MayhemBPClass(TEXT("Class'/Game/Blueprints/Players/Mayhem_BP.Mayhem_BP_C'"));
-	static ConstructorHelpers::FObjectFinder<UClass> EngletonBPClass(TEXT("Class'/Game/Blueprints/Engleton.Engleton_C'"));
+	static ConstructorHelpers::FObjectFinder<UClass> EngletonBPClass(TEXT("Class'/Game/Blueprints/Players/Engleton.Engleton_C'"));
 	static ConstructorHelpers::FObjectFinder<UClass> StrykerBPClass(TEXT("Class'/Game/Blueprints/Players/Stryker_BP.Stryker_BP_C'"));
 	static ConstructorHelpers::FObjectFinder<UClass> FoxBPClass(TEXT("Class'/Game/Blueprints/Players/Fox_BP.Fox_BP_C'"));
 

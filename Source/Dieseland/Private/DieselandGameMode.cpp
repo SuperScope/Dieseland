@@ -18,7 +18,7 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
 	PlayerStateClass = ADieselandPlayerState::StaticClass();
 
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/BasicCharacter"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/Players/BasicCharacter"));
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
@@ -44,7 +44,7 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
 	static ConstructorHelpers::FObjectFinder<UClass> TileClass16(TEXT("Class'/Game/Level/DeathTiles/DeathTile_v16.DeathTile_v16_C'"));
 
 	static ConstructorHelpers::FObjectFinder<UClass> MayhemBPClass(TEXT("Class'/Game/Blueprints/Players/Mayhem_BP.Mayhem_BP_C'"));
-	static ConstructorHelpers::FObjectFinder<UClass> EngletonBPClass(TEXT("Class'/Game/Blueprints/Engleton.Engleton_C'"));
+	static ConstructorHelpers::FObjectFinder<UClass> EngletonBPClass(TEXT("Class'/Game/Blueprints/Players/Engleton.Engleton_C'"));
 	static ConstructorHelpers::FObjectFinder<UClass> StrykerBPClass(TEXT("Class'/Game/Blueprints/Players/Stryker_BP.Stryker_BP_C'"));
 	static ConstructorHelpers::FObjectFinder<UClass> FoxBPClass(TEXT("Class'/Game/Blueprints/Players/Fox_BP.Fox_BP_C'"));
     static ConstructorHelpers::FObjectFinder<USoundBase> CountdownSoundCue(TEXT("SoundBase'/Game/AudioDLC/Announcer/Sound_Announcer_Countdown_Cue.Sound_Announcer_Countdown_Cue'"));
