@@ -530,7 +530,7 @@ void ADieselandCharacter::OnHasBeenKilled(AActor* Causer)
 {
 	if (Role == ROLE_Authority)
 	{
-		if (Causer != nullptr && Causer->ActorHasTag(FName(TEXT("Player"))))
+		if (Causer != nullptr && Causer != nullptr && Causer->ActorHasTag(FName(TEXT("Player"))))
 		{
 			ADieselandPlayerState* TempPlayerState = Cast<ADieselandPlayerState>((Cast<ADieselandCharacter>(Causer)->PlayerState));
 			TempPlayerState->SetKillNum(TempPlayerState->Kills += 1);
