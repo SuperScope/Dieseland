@@ -153,8 +153,8 @@ void ADieselandGameMode::StartGame()
 		}
 	}
     //Start boss timer when game starts
-    StartBossTimer = true;
-    CountdownSound->Play();
+	StartBossTimer = true;
+    //CountdownSound->Play();
 }
 
 APlayerStart* ADieselandGameMode::PickSpawn()
