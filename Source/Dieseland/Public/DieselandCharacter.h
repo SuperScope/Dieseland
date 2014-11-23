@@ -309,6 +309,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	virtual void SkillThree();
 
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void PostSpawnRagdoll();
+
 	UFUNCTION(BlueprintNativeEvent, Category = Combat)
 	void OnBasicAttack();
 
@@ -325,8 +328,11 @@ public:
 	UFUNCTION()
 	void OnRep_AimRotation();
 
-	//UFUNCTION(BlueprintCallable,Category = Gameplay)
+	//UFUNCTION(BlueprintNativeEvent, Category = Gameplay)
 	void OnHasBeenKilled(AActor* Causer);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Gameplay)
+	void OnRagdollNeeded();
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	int32 GetTeamNumber();

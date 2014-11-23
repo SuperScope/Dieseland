@@ -73,9 +73,9 @@ void ADieselandPlayerController::PlayerTick(float DeltaTime)
 		if (DieselandPawn->Health <= 0)
 		{
 			//Prevents multiple respawns
-			DieselandPawn->Health = 1;
+			//DieselandPawn->Health = 1;
 
-			RespawnPawn();
+			//GetWorldTimerManager().SetTimer(this, &ADieselandPlayerController::RespawnPawn, 3.0f, false);
 			DieselandPawn->LingerTimer = 0;
 
 		}
@@ -316,13 +316,13 @@ void ADieselandPlayerController::RespawnPawn_Implementation()
 			FVector TempEnemyLoc = FVector(DieselandPawn->GetActorLocation().X, DieselandPawn->GetActorLocation().Y, DieselandPawn->GetActorLocation().Z);
 
 			FVector TempSpawnLocation = Cast<ADieselandGameMode>(GetWorld()->GetAuthGameMode())->PickSpawn()->GetActorLocation();
-			TempSpawnLocation = FVector(SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z + DieselandPawn->CapsuleComponent->GetScaledCapsuleHalfHeight());
+			TempSpawnLocation = FVector(TempSpawnLocation.X, TempSpawnLocation.Y, TempSpawnLocation.Z);
 
 			DieselandPawn->SetActorLocation(TempSpawnLocation);
 			DieselandPawn->Health = DieselandPawn->MaxHealth;
 			DieselandPawn->LingerTimer = 0;
 
-			DieselandPawn->MoveSpeed = DieselandPawn->BaseMoveSpeed + (DieselandPawn->Dexterity * 3);
+			DieselandPawn->CalculateStats();
 
 			//Spawn Scrap pieces here
 			/*UWorld* const World = GetWorld();

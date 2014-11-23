@@ -486,16 +486,21 @@ bool ADieselandCharacter::ResetCamera_Validate()
 //This function edits the health of the player
 void ADieselandCharacter::EditHealth(int32 Amt, AActor* Causer)
 {
-	if (this != nullptr)
+	if (this != nullptr && Health > 0)
 	{
 		Health += Amt;
 
-		if (Health <= 0)
+		if (Health <= 0 && !Cast<ADieselandPlayerController>(Controller)->PauseGameInput)
 		{
 			OnHasBeenKilled(Causer);
+
+			OnRagdollNeeded();
+			GetWorldTimerManager().SetTimer(this, &ADieselandCharacter::PostSpawnRagdoll, 3.0f, false);
+			this->SetActorHiddenInGame(true);
+			Cast<ADieselandPlayerController>(Controller)->PauseGameInput = true;
 		}
 
-		if (Causer->ActorHasTag(FName(TEXT("Player"))) || Causer->ActorHasTag(FName(TEXT("KillFloor"))))
+		if (Causer->ActorHasTag(FName(TEXT("Player"))) /*|| Causer->ActorHasTag(FName(TEXT("KillFloor")))*/)
 		{
 			LatestDamageCauser = Causer;
 		}
@@ -504,15 +509,6 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Causer)
 		{
 			ServerEditHealth(Amt, Causer);
 		}
-
-		/*else if (Target->ActorHasTag(FName(TEXT("Enemy"))))
-	{
-		ServerDamageEnemy(Amt, Target);
-	}
-	else if (Target->ActorHasTag(FName(TEXT("ScrapBox"))))
-	{
-		Cast<AScrapBox>(Target)->DestroyCrate(this);
-		}*/
 	}
 }
 
@@ -537,9 +533,19 @@ void ADieselandCharacter::OnHasBeenKilled(AActor* Causer)
 			Cast<ADieselandCharacter>(Causer)->Scrap += 250;
 			
 		}
-		Cast<ADieselandPlayerController>(Controller)->RespawnPawn();
+		//Cast<ADieselandPlayerController>(Controller)->RespawnPawn();
 	}
 	
+}
+
+void ADieselandCharacter::PostSpawnRagdoll()
+{
+	if (Role == ROLE_Authority)
+	{
+		Cast<ADieselandPlayerController>(Controller)->RespawnPawn();
+		this->SetActorHiddenInGame(false);
+		Cast<ADieselandPlayerController>(Controller)->PauseGameInput = false;
+	}
 }
 
 //function for adjusting speed and health, currently using this for strykers posions, I put the function here so it is extendable to other characters in case

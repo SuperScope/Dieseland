@@ -219,7 +219,7 @@ void AMayhemCharacter::SkillOne()
 					EnemyActor->CharacterMovement->MaxWalkSpeed = 0.0f;
 					EnemyActor->CharacterMovement->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
 
-					Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
+					Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * BasicAttackDamage, this);
 				}
 				else if (Role == ROLE_Authority && CurActor->ActorHasTag(FName(TEXT("ScrapBox"))))
 				{

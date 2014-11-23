@@ -38,7 +38,7 @@ void ABaseTrap::ReceiveActorBeginOverlap(AActor* OtherActor)
                 Cast<ADieselandCharacter>(OtherActor)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandCharacter>(OtherActor)->MoveSpeed * 0.30f;
             }
 			// TODO: Replace with better damage handling
-			Cast<ADieselandCharacter>(OtherActor)->Health -= TrapDamage;
+			Cast<ADieselandCharacter>(OtherActor)->EditHealth(-1 * TrapDamage, this);
 
 		}
 		/*if (OtherActor->ActorHasTag(FName(TEXT("Enemy"))))
