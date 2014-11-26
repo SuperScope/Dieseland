@@ -132,6 +132,10 @@ public:
 	// Does this character use melee for it's basic attack
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	bool IsMelee;
+    
+    // Stop character select music
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Audio)
+	bool StopMusic;
 
 	// Is this character currently poisoned.
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -205,6 +209,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
 		TSubobjectPtr <UAudioComponent> ReloadSound;
+   
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component")
+    TSubobjectPtr <UAudioComponent> CharSelectMusic;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
 	UMaterialInstanceDynamic* HealthBarMaterial;

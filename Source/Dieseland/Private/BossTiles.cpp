@@ -42,7 +42,7 @@ void ABossTiles::Tick(float DeltaSeconds)
     if(Role == ROLE_Authority)
     {
         //If boss timer hits 0 and we can spawn a boss
-        if(GameMode->BossTimer <= 180.0f && CanSpawn == true)
+        if(GameMode->BossTimer <= 0.0f && CanSpawn == true)
         {
             //Set ZoneTag based on RandomSpawnIndex
             if(GameMode->RandomSpawnIndex == 0)
