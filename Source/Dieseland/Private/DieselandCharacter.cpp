@@ -848,6 +848,11 @@ bool ADieselandCharacter::ServerActivateAOEParticle_Validate(UParticleSystem* Pa
 	return true;
 }
 
+void ADieselandCharacter::MulticastMusicOff_Implementation()
+{
+    CharSelectMusic->Stop();
+}
+
 void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

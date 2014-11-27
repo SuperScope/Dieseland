@@ -412,6 +412,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Networking)
 	void UpdateTeamColor();
+    
+    UFUNCTION(NetMulticast, Unreliable, BlueprintCallable, Category = Audio)
+	void MulticastMusicOff();
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;
