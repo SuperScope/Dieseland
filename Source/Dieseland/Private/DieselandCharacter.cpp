@@ -59,7 +59,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	BaseHealth = 100;
 
 	// Scrap value
-	Scrap = 0;
+	Scrap = 10000;
 	Kills = 0;
 
 	// Base Move Speed

@@ -97,6 +97,7 @@ void ADieselandPlayerController::UpdateCooldownTimers_Implementation(float Delta
 		//health regeneration
 		if (HealthRegenTimer >= 1){
 			if (DieselandPawn->Health < DieselandPawn->MaxHealth){
+				DieselandPawn->Scrap += 1;
 				DieselandPawn->Health += DieselandPawn->HealthRegeneration;
 				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
 			}
@@ -233,7 +234,7 @@ void ADieselandPlayerController::UpdateCooldownTimers_Implementation(float Delta
 			}
 			if (DieselandPawn->StatusEffects.Contains(FString("Charmed")))
 			{
-				DieselandPawn->CharacterMovement->Velocity += DieselandPawn->VectorDirection * 2000;
+				DieselandPawn->CharacterMovement->Velocity += DieselandPawn->VectorDirection * 800;
 			}
 		}
 		if (DieselandPawn->SlowRemaining > 0.0f)

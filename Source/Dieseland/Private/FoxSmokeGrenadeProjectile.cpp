@@ -4,13 +4,15 @@
 #include "DieselandPlayerController.h"
 #include "FoxSmokeGrenadeProjectile.h"
 #include "FoxSmokeGrenade.h"
+#include "UnrealNetwork.h"
+#include "ScrapBox.h"
 #include "DieselandCharacter.h"
 
 
 AFoxSmokeGrenadeProjectile::AFoxSmokeGrenadeProjectile(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
-	InitialLifeSpan = 1.0f;
+	
 	//the penetration round is meant to be large and move very quickly
 	ProjectileMovement->InitialSpeed = 1400.0f;
 	ProjCollision->SetCapsuleHalfHeight(150.0f);
@@ -25,7 +27,7 @@ AFoxSmokeGrenadeProjectile::AFoxSmokeGrenadeProjectile(const class FPostConstruc
 	Particle->Template = ParticleSystemAsset.Object;
 	this->Particle->SetVisibility(false);
 
-
+	GrenadeLifeTime = 0;
 	//temp meshscale
 	FVector MeshScale;
 	MeshScale = FVector(1.0f, 1.0f, 1.0f);
@@ -47,7 +49,15 @@ void AFoxSmokeGrenadeProjectile::ReceiveBeginPlay()
 	//GrenadeMeshMaterial = UMaterialInstanceDynamic::Create(GrenadeMeshMatStatic, this);
 	//GrenadeMesh->Materials.Add(GrenadeMeshMaterial);
 	GrenadeMesh->SetVisibility(true);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen messageasdsadsadsa!"));
 }
+
+void AFoxSmokeGrenadeProjectile::Tick(float DeltaSeconds)
+{
+	UpdateTimers(DeltaSeconds);
+	Super::Tick(DeltaSeconds);
+}
+
 void AFoxSmokeGrenadeProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 {
 	UWorld* const World = GetWorld();
@@ -70,6 +80,41 @@ void AFoxSmokeGrenadeProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 				Grenade->ServerActivateProjectile();
 				this->Destroy();
 			}
+			else if (OtherActor->ActorHasTag(TEXT("ScrapBox")))
+			{
+				Cast<AScrapBox>(OtherActor)->DestroyCrate(this);
+				AFoxSmokeGrenade* const Grenade = World->SpawnActor<AFoxSmokeGrenade>(AFoxSmokeGrenade::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
+				Grenade->ServerActivateProjectile();
+			}
 		}
 	}
+}
+
+void AFoxSmokeGrenadeProjectile::UpdateTimers(float DeltaSeconds)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
+	GrenadeLifeTime += DeltaSeconds;
+	if (GrenadeLifeTime >= 1.0f)
+	{
+		UWorld* const World = GetWorld();
+		if (World)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = Instigator;
+
+
+			AFoxSmokeGrenade* const Grenade = World->SpawnActor<AFoxSmokeGrenade>(AFoxSmokeGrenade::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnParams);
+			Grenade->ServerActivateProjectile();
+			this->Destroy();
+		}
+	}
+}
+
+
+
+void AFoxSmokeGrenadeProjectile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
 }

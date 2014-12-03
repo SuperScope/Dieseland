@@ -57,6 +57,9 @@ class DIESELAND_API AStrykerCharacter : public ADieselandCharacter
 		AActor* AssassinationTarget;
 
 
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		int32 TempKills;
+
 	//combat functions
 	UFUNCTION(Reliable, NetMulticast, WithValidation)
 		void SearchForAssassinationTarget();
