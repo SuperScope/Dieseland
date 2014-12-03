@@ -27,6 +27,7 @@ AFoxSmokeGrenadeProjectile::AFoxSmokeGrenadeProjectile(const class FPostConstruc
 	Particle->Template = ParticleSystemAsset.Object;
 	this->Particle->SetVisibility(false);
 
+	InitialLifeSpan = 2.0f;
 	GrenadeLifeTime = 0;
 	//temp meshscale
 	FVector MeshScale;
@@ -49,7 +50,6 @@ void AFoxSmokeGrenadeProjectile::ReceiveBeginPlay()
 	//GrenadeMeshMaterial = UMaterialInstanceDynamic::Create(GrenadeMeshMatStatic, this);
 	//GrenadeMesh->Materials.Add(GrenadeMeshMaterial);
 	GrenadeMesh->SetVisibility(true);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen messageasdsadsadsa!"));
 }
 
 void AFoxSmokeGrenadeProjectile::Tick(float DeltaSeconds)
@@ -92,7 +92,7 @@ void AFoxSmokeGrenadeProjectile::ReceiveActorBeginOverlap(AActor* OtherActor)
 
 void AFoxSmokeGrenadeProjectile::UpdateTimers(float DeltaSeconds)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("This is an on screen message!"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("This is an on screen message!"));
 	GrenadeLifeTime += DeltaSeconds;
 	if (GrenadeLifeTime >= 1.0f)
 	{

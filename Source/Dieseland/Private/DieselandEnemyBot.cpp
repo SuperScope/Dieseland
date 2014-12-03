@@ -207,12 +207,12 @@ void ADieselandEnemyBot::ReceiveBeginPlay()
 		Health = MaxHealth;
 		if (IsKing)
 		{
-			BaseAttackDamage = 125 + (AverageCharacterLevel * 10);
+			BaseAttackDamage = 100 + (AverageCharacterLevel * 8);
 			BasicAttackDamage = BaseAttackDamage;
 		}
 		if (IsQueen)
 		{
-			BaseAttackDamage = 30 + (AverageCharacterLevel * 3);
+			BaseAttackDamage = 20 + (AverageCharacterLevel * 2);
 			BasicAttackDamage = BaseAttackDamage;
 		}
 	}

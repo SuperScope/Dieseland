@@ -59,7 +59,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	BaseHealth = 100;
 
 	// Scrap value
-	Scrap = 10000;
+	Scrap = 0;
 	Kills = 0;
 
 	// Base Move Speed
@@ -499,15 +499,16 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Causer)
 			this->SetActorHiddenInGame(true);
 			Cast<ADieselandPlayerController>(Controller)->PauseGameInput = true;
 		}
+		if (Causer != nullptr){
+			if (Causer->ActorHasTag(FName(TEXT("Player"))) /*|| Causer->ActorHasTag(FName(TEXT("KillFloor")))*/)
+			{
+				LatestDamageCauser = Causer;
+			}
 
-		if (Causer->ActorHasTag(FName(TEXT("Player"))) /*|| Causer->ActorHasTag(FName(TEXT("KillFloor")))*/)
-		{
-			LatestDamageCauser = Causer;
-		}
-
-		if (Role < ROLE_Authority)
-		{
-			ServerEditHealth(Amt, Causer);
+			if (Role < ROLE_Authority)
+			{
+				ServerEditHealth(Amt, Causer);
+			}
 		}
 	}
 }
