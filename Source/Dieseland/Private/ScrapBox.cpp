@@ -16,10 +16,12 @@ AScrapBox::AScrapBox(const class FPostConstructInitializeProperties& PCIP)
 	: Super(PCIP)
 {
 	static ConstructorHelpers::FObjectFinder<UDestructibleMesh> DestructibleMesh(TEXT("DestructibleMesh'/Game/PropsDLC/Mesh_Environment_Crate_WIP_DM.Mesh_Environment_Crate_WIP_DM'"));
-
+	SetRemoteRoleForBackwardsCompat(ENetRole::ROLE_SimulatedProxy);
 	Mesh = PCIP.CreateDefaultSubobject<UDestructibleComponent>(this, TEXT("Mesh"));
 	Mesh->SetDestructibleMesh(DestructibleMesh.Object);
+	//Mesh->AttachTo(RootComponent);
 	RootComponent = Mesh;
+	//Mesh->SetIsReplicated(true);
 	//Mesh->SetCollisionProfileName(FName(TEXT("BlockAll")));
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'"));
@@ -28,6 +30,7 @@ AScrapBox::AScrapBox(const class FPostConstructInitializeProperties& PCIP)
 	Particle->AttachTo(Mesh);
 	Particle->bAutoActivate = false;
 	Particle->SetHiddenInGame(false);
+	Particle->SetIsReplicated(true);
 
 	static ConstructorHelpers::FObjectFinder<UClass> ScrapBlueprint(TEXT("Class'/Game/Blueprints/Scrap_BP.Scrap_BP_C'"));
 	if (ScrapBlueprint.Object)
@@ -38,22 +41,25 @@ AScrapBox::AScrapBox(const class FPostConstructInitializeProperties& PCIP)
 	ScrapAmt = 1;
 
 	Tags.Add(FName(TEXT("ScrapBox")));
-	
 	bReplicates = true;
+	bReplicateMovement = true;
 }
 
 void AScrapBox::DestroyCrate_Implementation(AActor* Causer)
 {
-	Mesh->ApplyDamage(100.0, GetActorLocation(), FVector(0.0f, 0.0f, 0.0f), 1000.0f);
 	//Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 	//Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 
+	Mesh->ApplyDamage(100.0, GetActorLocation(), FVector(0.0f, 0.0f, 0.0f), 1000.0f);
 //	this->InitialLifeSpan = 2.0f;
 //	this->SetLifeSpan(2.0f);
+	if (this != nullptr){
+		this->SetLifeSpan(0.5f);
+	}
 
 	if (Role == ROLE_Authority)
 	{
-		this->SetLifeSpan(2.0f);
+		
 		//Spawn Scrap pieces here
 		UWorld* const World = GetWorld();
 		if (World)
