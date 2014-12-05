@@ -243,6 +243,14 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	ReloadSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Reload Sound"));
 	ReloadSound->AttachParent = RootComponent;
 	ReloadSound->bAutoActivate = false;
+    
+    static ConstructorHelpers::FObjectFinder<USoundBase> CharSelectBase(TEXT("SoundBase'/Game/AudioDLC/Interface/Sound_Menu_BackgroundSongwithAmbience_WIP.Sound_Menu_BackgroundSongwithAmbience_WIP'"));
+    CharSelectMusic = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("CharSelectMusic"));
+	CharSelectMusic->AttachParent = RootComponent;
+	CharSelectMusic->bAutoActivate = false;
+    CharSelectMusic->SetSound(CharSelectBase.Object);
+    StopMusic= false;
+    
 
 	//Find the scrap blueprint's class
 	static ConstructorHelpers::FObjectFinder<UClass> ScrapBlueprint(TEXT("Class'/Game/Blueprints/Scrap_BP.Scrap_BP_C'"));
@@ -264,6 +272,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 void ADieselandCharacter::ReceiveBeginPlay()
 {
+    CharSelectMusic->Play();
 	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
 
 	//AimBar->SetWorldLocation(FVector(0, 0, -50));
@@ -311,6 +320,11 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 		return;
 	}
 
+    if(StopMusic == true)
+    {
+        StopMusic = false;
+        CharSelectMusic->Stop();
+    }
 
 	if (Health <= 0)
 	{
@@ -499,15 +513,16 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Causer)
 			this->SetActorHiddenInGame(true);
 			Cast<ADieselandPlayerController>(Controller)->PauseGameInput = true;
 		}
+		if (Causer != nullptr){
+			if (Causer->ActorHasTag(FName(TEXT("Player"))) /*|| Causer->ActorHasTag(FName(TEXT("KillFloor")))*/)
+			{
+				LatestDamageCauser = Causer;
+			}
 
-		if (Causer->ActorHasTag(FName(TEXT("Player"))) /*|| Causer->ActorHasTag(FName(TEXT("KillFloor")))*/)
-		{
-			LatestDamageCauser = Causer;
-		}
-
-		if (Role < ROLE_Authority)
-		{
-			ServerEditHealth(Amt, Causer);
+			if (Role < ROLE_Authority)
+			{
+				ServerEditHealth(Amt, Causer);
+			}
 		}
 	}
 }
@@ -834,6 +849,11 @@ bool ADieselandCharacter::ServerActivateAOEParticle_Validate(UParticleSystem* Pa
 	return true;
 }
 
+void ADieselandCharacter::MulticastMusicOff_Implementation()
+{
+    CharSelectMusic->Stop();
+}
+
 void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -850,8 +870,9 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
 	DOREPLIFETIME(ADieselandCharacter, AimMesh);
 	DOREPLIFETIME(ADieselandCharacter, AimRotation);
-
+    
 	DOREPLIFETIME(ADieselandCharacter, IsMelee);
+    DOREPLIFETIME(ADieselandCharacter, StopMusic);
 
 	DOREPLIFETIME(ADieselandCharacter, MoveSpeed);
 

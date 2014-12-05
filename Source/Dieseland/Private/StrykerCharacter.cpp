@@ -175,6 +175,7 @@ bool AStrykerCharacter::UpdateDurationTimers_Validate(float DeltaSeconds)
 
 void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 {
+	
 	if (this->Health <= 0){
 		AssasinationHitCounter = 6;
 		return;
@@ -206,6 +207,7 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 				this->CharacterMovement->Velocity += FVector(0, 0, 0);
 				if (CurActor->ActorHasTag(FName(TEXT("Player"))) && Cast<ADieselandCharacter>(CurActor)->GetTeamNumber() != this->GetTeamNumber())
 				{
+					TempKills = this->Kills;
 					//this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 					//this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
 					this->CapsuleComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
@@ -250,6 +252,11 @@ void AStrykerCharacter::SearchForAssassinationTarget_Implementation()
 		{
 			ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(AssassinationTarget);
 			if (DieselandPawn->Health <= 0){
+				AssasinationHitCounter = 6;
+				return;
+			}
+			if (Kills > TempKills)
+			{
 				AssasinationHitCounter = 6;
 				return;
 			}
@@ -393,7 +400,7 @@ void AStrykerCharacter::SkillOne()
 			this->CharacterMovement->Velocity += FVector(Direction.X * 12500, Direction.Y * 12500, 0);
 			IsAttemptingAssassinate = true;
 		//this->SetActorRotation(CharacterRotation);
-		this->CharacterMovement->Velocity += FVector(Direction.X * 20000, Direction.Y * 20000,0);
+		this->CharacterMovement->Velocity += FVector(Direction.X * 25000, Direction.Y * 25000,0);
 		
 		OnSkillOne();
 	}
@@ -456,7 +463,7 @@ void AStrykerCharacter::SkillThree()
 		//this->SetActorRotation(CharacterRotation);
 		FVector Direction = CharacterRotation.Vector();
 		//this->StatusEffects.Add(FString("Stunned"));
-		this->CharacterMovement->Velocity += FVector(Direction.X * 60000, Direction.Y * 60000, 0);
+		this->CharacterMovement->Velocity += FVector(Direction.X * 80000, Direction.Y * 80000, 0);
 		OnSkillThree();
 	}
 }
@@ -513,6 +520,7 @@ void AStrykerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > &
 	DOREPLIFETIME(AStrykerCharacter, AssasinationAttemptDuration);
 	DOREPLIFETIME(AStrykerCharacter, AssasinationDuration);
 	DOREPLIFETIME(AStrykerCharacter, AssasinationDuration2);
+	DOREPLIFETIME(AStrykerCharacter, TempKills);
 
 }
 
@@ -521,7 +529,7 @@ void AStrykerCharacter::SkillOneAim()
 {
 	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
 	//AimBar->SetWorldLocation(FVector(0, 0, -50));
-	AimBar->SetWorldScale3D(FVector(8.0f, 1.0, 0.01f));
+	AimBar->SetWorldScale3D(FVector(7.0f, 1.0, 0.01f));
 	AimBar->CastShadow = false;
 	AimBar->Materials.Add(AimBarMaterial);
 	Cast<UMaterialInstanceDynamic>(AimBar->Materials[0])->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.01f, 0.75f, 0.01f));

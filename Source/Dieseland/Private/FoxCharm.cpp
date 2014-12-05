@@ -59,6 +59,10 @@ void AFoxCharm::ReceiveActorBeginOverlap(AActor* OtherActor)
 			Cast<ADieselandEnemyBot>(OtherActor)->StatusEffects.Add(FString("Charmed"));
 
 		}
+		else if (OtherActor->ActorHasTag(TEXT("ScrapBox")))
+		{
+			Cast<AScrapBox>(OtherActor)->DestroyCrate(this);
+		}
 	}
 }
 

@@ -48,7 +48,7 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	//here I set melee to false so that Engleton only uses ranged attacks
 	IsMelee = false;
 	//here I set pulse range
-	PulseRange = 450;
+	PulseRange = 600;
 	//here I set the range of Engleton's Bombardment
 	BombardmentRange = 600;
 	//Set our hitcount for bombardment
@@ -77,6 +77,7 @@ AEngletonCharacter::AEngletonCharacter(const class FPostConstructInitializePrope
 	PulseCollision->AttachSocketName = FName(TEXT("AimSocket"));
 	PulseCollision->SetCapsuleHalfHeight(PulseRange / 2.0f);
 	PulseCollision->SetCapsuleRadius(PulseRange/ 2.0f);
+	PulseCollision->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
 	PulseCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	AOECollision->SetSphereRadius(10.0f);
@@ -267,8 +268,8 @@ void AEngletonCharacter::SkillThree()
 			if (MoveCharacterY <= 0){
 				MoveCharacterY = -1;
 			}
-			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 6000 + (Intelligence * 20.0f), -MoveCharacterY * 6000 + (Intelligence * 20.0f), 0);
-			DieselandPawn->CharacterMovement->JumpZVelocity = 400 + (Intelligence * 10);
+			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 6000 + (Intelligence * 25.0f), -MoveCharacterY * 6000 + (Intelligence * 25.0f), 0);
+			DieselandPawn->CharacterMovement->JumpZVelocity = 400 + (Intelligence * 3);
 			DieselandPawn->CharacterMovement->DoJump(false);
 			OnSkillThree();
 		}
@@ -295,8 +296,8 @@ void AEngletonCharacter::SkillThree()
 			if (MoveCharacterY <= 0){
 				MoveCharacterY = -1;
 			}
-			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 1500, -MoveCharacterY * 1500, 0);
-			DieselandPawn->CharacterMovement->JumpZVelocity = 550 + (Intelligence * 5);
+			DieselandPawn->CharacterMovement->Velocity += FVector(-MoveCharacterX * 10000 + (Intelligence * 40), -MoveCharacterY * 10000 + (Intelligence * 40), 0);
+			DieselandPawn->CharacterMovement->JumpZVelocity = 400 + (Intelligence * 3);
 			DieselandPawn->CharacterMovement->DoJump(false);
 			OnSkillThree();
 		}
@@ -449,7 +450,7 @@ void AEngletonCharacter::SkillThreeAim()
 	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
 	//AimBar->SetWorldLocation(FVector(0, 0, -50));
 	AimSphere->SetRelativeLocation(FVector(0, 0, 60));
-	AimSphere->SetWorldScale3D(FVector(6.0f, 6.0f, 0.1));
+	AimSphere->SetWorldScale3D(FVector(8.0f, 8.0f, 0.1));
 	AimSphere->CastShadow = false;
 	AimSphere->Materials.Add(AimBarMaterial);
 	Cast<UMaterialInstanceDynamic>(AimSphere->Materials[0])->SetVectorParameterValue(FName(TEXT("TeamColor")), FVector(0.01, 0.01f, 0.75f));
