@@ -239,8 +239,8 @@ void AMayhemCharacter::SkillTwo()
 		ServerActivateAOEParticle(SkillTwoParticle);
 		RageSound->Play();
 		RageVoiceOver->Play();
-		RageMoveSpeedBuff = (CharacterMovement->MaxWalkSpeed * .3f) + (Strength * .06f);
-		RageAttkSpeedBuff = (BasicAttackCooldown * .1f) + (Strength * .03f);
+		RageMoveSpeedBuff = (CharacterMovement->MaxWalkSpeed * .3f) + (Strength * .05f);
+		RageAttkSpeedBuff = (BasicAttackCooldown * .1f) + (Strength * .02f);
 
 		BasicAttackCooldown -= RageAttkSpeedBuff;
 		CharacterMovement->MaxWalkSpeed += RageMoveSpeedBuff;
@@ -255,8 +255,8 @@ void AMayhemCharacter::SkillThree()
 {
 	if (Role == ROLE_Authority)
 	{
-		IronArmorHealthBuff = (float)MaxHealth * 0.25f + Strength * 0.75f;
-		IronArmorRegenBuff = (float)HealthRegeneration * 0.1f + Strength + 0.02f;
+		IronArmorHealthBuff = (float)MaxHealth * 0.25f + Strength * 0.5f;
+		IronArmorRegenBuff = (float)HealthRegeneration * 0.08f + Strength + 0.01f;
 
 		IronArmorTimer = IronArmorDuration;
 
