@@ -61,7 +61,7 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 	// Scrap value
 	Scrap = 0;
 	Kills = 0;
-
+	TempKilled = 0;
 	// Base Move Speed
 	BaseMoveSpeed = 400;
 	this->CharacterMovement->MaxWalkSpeed = BaseMoveSpeed;
@@ -345,6 +345,16 @@ void ADieselandCharacter::Tick(float DeltaSeconds)
 		}
 	}
 
+	//reset kills
+	if (Kills > TempKilled)
+	{
+		KillTimer = 5.0f;
+		Kills = TempKilled;
+	}
+	if (KillTimer >= 0)
+	{
+		KillTimer -= DeltaSeconds;
+	}
 	Super::Tick(DeltaSeconds);
 
 	//for when a character is poisoned
@@ -546,8 +556,12 @@ void ADieselandCharacter::OnHasBeenKilled(AActor* Causer)
 		if (Causer != nullptr && Causer != nullptr && Causer->ActorHasTag(FName(TEXT("Player"))))
 		{
 			ADieselandPlayerState* TempPlayerState = Cast<ADieselandPlayerState>((Cast<ADieselandCharacter>(Causer)->PlayerState));
-			TempPlayerState->SetKillNum(TempPlayerState->Kills += 1);
-			Cast<ADieselandCharacter>(Causer)->Scrap += 250;
+			if (Cast<ADieselandCharacter>(Causer)->KillTimer <= 0){
+				Cast<ADieselandCharacter>(Causer)->KillTimer = 5.0f;
+				TempPlayerState->SetKillNum(TempPlayerState->Kills += 1);
+				Cast<ADieselandCharacter>(Causer)->Scrap += 250;
+
+			}
 			
 		}
 		//Cast<ADieselandPlayerController>(Controller)->RespawnPawn();
@@ -869,6 +883,7 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
 	DOREPLIFETIME(ADieselandCharacter, Scrap);
 	DOREPLIFETIME(ADieselandCharacter, Kills);
+	DOREPLIFETIME(ADieselandCharacter, TempKilled);
 
 	DOREPLIFETIME(ADieselandCharacter, AimMesh);
 	DOREPLIFETIME(ADieselandCharacter, AimRotation);
@@ -895,6 +910,7 @@ void ADieselandCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	DOREPLIFETIME(ADieselandCharacter, SkillOneCooldown);
 	DOREPLIFETIME(ADieselandCharacter, SkillTwoCooldown);
 	DOREPLIFETIME(ADieselandCharacter, SkillThreeCooldown);
+	DOREPLIFETIME(ADieselandCharacter, KillTimer);
 	DOREPLIFETIME(ADieselandCharacter, TauntTimer);
 	DOREPLIFETIME(ADieselandCharacter, LaughTimer);
 	DOREPLIFETIME(ADieselandCharacter, CommentTimer);

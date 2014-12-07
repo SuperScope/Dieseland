@@ -69,6 +69,9 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Kills;
 
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int32 TempKilled;
+
 	// Public health value of this character
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int32 Health;
@@ -176,6 +179,10 @@ public:
 	// The Cooldown for skill 3
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float SkillThreeCooldown;
+
+	// The Cooldown for skill 3
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Combat)
+	float KillTimer;
 
 
 	// The Base Cooldown for skill 1

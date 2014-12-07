@@ -14,9 +14,9 @@ ADieselandGameState::ADieselandGameState(const class FPostConstructInitializePro
 {
 	PrimaryActorTick.bCanEverTick = true;
 	WinningScore = 0;
-	KillGoal = 5;
+	KillGoal = 25;
 	WinningTeam = 0;
-	GameDuration = 1000.0f;
+	GameDuration = 1500.0f;
 	GameHasEnded = false;
 	GameHasStarted = false;
 	GameTimer = GameDuration;
