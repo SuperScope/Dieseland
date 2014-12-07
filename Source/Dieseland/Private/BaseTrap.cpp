@@ -29,6 +29,8 @@ void ABaseTrap::ReceiveActorBeginOverlap(AActor* OtherActor)
 	Super::ReceiveActorBeginOverlap(OtherActor);
 	if (Role == ROLE_Authority)
 	{
+        if (OtherActor != nullptr)
+        {
 		if (OtherActor->ActorHasTag(TEXT("Player")))
 		{
             if(this->ActorHasTag(TEXT("Oil")))
@@ -52,6 +54,7 @@ void ABaseTrap::ReceiveActorBeginOverlap(AActor* OtherActor)
 			}
 		}*/
 	}
+    }
 
 }
 
@@ -60,6 +63,8 @@ void ABaseTrap::ReceiveActorEndOverlap(AActor* OtherActor)
 	Super::ReceiveActorEndOverlap(OtherActor);
 	if (Role == ROLE_Authority)
 	{
+        if(OtherActor != nullptr)
+        {
 		if (OtherActor->ActorHasTag(TEXT("Player")))
 		{
 			Cast<ADieselandCharacter>(OtherActor)->LingerTimer = LingerCoolDown;
@@ -71,7 +76,8 @@ void ABaseTrap::ReceiveActorEndOverlap(AActor* OtherActor)
 			Cast<ADieselandEnemyBot>(OtherActor)->LingerDamage = LingerDamage;
 			Cast<ADieselandEnemyBot>(OtherActor)->CharacterMovement->MaxWalkSpeed = Cast<ADieselandEnemyBot>(OtherActor)->CharacterMovement->MaxWalkSpeed * TrapSlow;
 		}*/
-	}
+        }
+    }
 
 }
 
