@@ -500,28 +500,30 @@ bool ADieselandCharacter::ResetCamera_Validate()
 //This function edits the health of the player
 void ADieselandCharacter::EditHealth(int32 Amt, AActor* Causer)
 {
-	if (this != nullptr && Health > 0)
-	{
-		Health += Amt;
-
-		if (Health <= 0 && !Cast<ADieselandPlayerController>(Controller)->PauseGameInput)
+	if (Causer != nullptr){
+		if (this != nullptr && Health > 0)
 		{
-			OnHasBeenKilled(Causer);
+			Health += Amt;
 
-			OnRagdollNeeded();
-			GetWorldTimerManager().SetTimer(this, &ADieselandCharacter::PostSpawnRagdoll, 3.0f, false);
-			this->SetActorHiddenInGame(true);
-			Cast<ADieselandPlayerController>(Controller)->PauseGameInput = true;
-		}
-		if (Causer != nullptr){
-			if (Causer->ActorHasTag(FName(TEXT("Player"))) /*|| Causer->ActorHasTag(FName(TEXT("KillFloor")))*/)
+			if (Health <= 0 && !Cast<ADieselandPlayerController>(Controller)->PauseGameInput)
 			{
-				LatestDamageCauser = Causer;
+				OnHasBeenKilled(Causer);
+
+				OnRagdollNeeded();
+				GetWorldTimerManager().SetTimer(this, &ADieselandCharacter::PostSpawnRagdoll, 3.0f, false);
+				this->SetActorHiddenInGame(true);
+				Cast<ADieselandPlayerController>(Controller)->PauseGameInput = true;
 			}
+			if (Causer != nullptr){
+				if (Causer->ActorHasTag(FName(TEXT("Player"))) /*|| Causer->ActorHasTag(FName(TEXT("KillFloor")))*/)
+				{
+					LatestDamageCauser = Causer;
+				}
 
-			if (Role < ROLE_Authority)
-			{
-				ServerEditHealth(Amt, Causer);
+				if (Role < ROLE_Authority)
+				{
+					ServerEditHealth(Amt, Causer);
+				}
 			}
 		}
 	}
