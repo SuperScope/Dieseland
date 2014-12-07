@@ -181,11 +181,11 @@ void AEngletonCharacter::SkillOne()
 				{
 					//because this damage is applied every half and a second and not every second, the damage is halved. 
 					//I apply the damage every half a second so that damage is more realisticly applied from the ability
-					Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * (30 + (Intelligence * 1.5f)), this);
+					Cast<ADieselandCharacter>(CurActor)->EditHealth(-1 * (35 + (Intelligence * 1.5f)), this);
 				}
 				else if (CurActor->ActorHasTag(FName(TEXT("Enemy"))))
 				{
-					Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * (30 + (Intelligence * 1.5f)), this);
+					Cast<ADieselandEnemyBot>(CurActor)->EditHealth(-1 * (35 + (Intelligence * 1.5f)), this);
 				}
 			}
 		}
@@ -215,7 +215,7 @@ void AEngletonCharacter::SkillTwo()
 		AEngletonCrazyLaser* const Projectile = World->SpawnActor<AEngletonCrazyLaser>(AEngletonCrazyLaser::StaticClass(), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), ProjectileRotation, SpawnParams);
 		if (Projectile)
 		{
-			Projectile->ProjectileDamage = 100 + (Intelligence * 3);
+			Projectile->ProjectileDamage = 100 + (Intelligence * 5);
 			// Start the particle effect
 			//Projectile->ServerActivateProjectile();
 
@@ -397,7 +397,7 @@ void AEngletonCharacter::UpdateTimers(float DeltaSeconds)
 	if (PulseActivated)
 	{
 		if (PulseTimer == 0){
-			this->CharacterMovement->MaxWalkSpeed = MoveSpeed * (1.3 + (Intelligence / 100));
+			this->CharacterMovement->MaxWalkSpeed = MoveSpeed * (1.4 + (Intelligence / 100));
 		}
 		PulseTimer += DeltaSeconds;
 		if (PulseTimer >= 4){

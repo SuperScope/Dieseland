@@ -21,7 +21,7 @@ AFoxCharacter::AFoxCharacter(const class FPostConstructInitializeProperties& PCI
 	//here I set her base values
 	BaseMoveSpeed = 390;
 	BaseHealth = 390;
-	BaseDamage = 51;
+	BaseDamage = 54;
 	BaseCooldownSpeed = 2;
 	//here I set her base stats
 	Strength = 12;
