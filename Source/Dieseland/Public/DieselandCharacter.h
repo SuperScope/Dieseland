@@ -79,6 +79,8 @@ public:
 	// Value 0.0f - 1.0f used for health bar display
 	float HealthPercentage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	bool IsRespawning;
 
 	// Public health value of this character
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = Gameplay)
