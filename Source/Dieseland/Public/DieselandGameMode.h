@@ -19,6 +19,10 @@ class ADieselandGameMode : public AGameMode
 	//Array for the Spawn Locations
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
 	TArray<APlayerStart*> SpawnArray;
+
+	//Array for the starting Spawn Locations
+	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
+	TArray<APlayerStart*> StartSpawnArray;
     
     //Array for the Boss Spawn Locations
 	UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
@@ -65,6 +69,9 @@ class ADieselandGameMode : public AGameMode
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Gameplay)
 	void OnGameEnded();
+
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+	void FindSpawns();
 
 	UClass* MayhemClass;
 	UClass* EngletonClass;

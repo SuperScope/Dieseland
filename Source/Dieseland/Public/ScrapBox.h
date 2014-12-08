@@ -29,6 +29,9 @@ class DIESELAND_API AScrapBox : public AActor
     UPROPERTY(Replicated, Category = Gameplay, BlueprintReadWrite, EditAnywhere)
     int32 RandomY;
 
+	UFUNCTION(Reliable, NetMulticast, BlueprintCallable, Category = Gameplay)
+	void MultiDestroyCrate(AActor* Causer);
+
 	UFUNCTION(Reliable, Server, WithValidation, BlueprintCallable, Category = Gameplay)
 	void DestroyCrate(AActor* Causer);
 

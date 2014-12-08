@@ -97,13 +97,32 @@ ADieselandGameMode::ADieselandGameMode(const class FPostConstructInitializePrope
 void ADieselandGameMode::ReceiveBeginPlay()
 {
 	//StartGame();
+	/*TActorIterator< APlayerStart > ActorItr =
+		TActorIterator< APlayerStart >(GetWorld());
+
+	while (ActorItr)
+	{
+		SpawnArray.Add(*ActorItr);
+		if (ActorItr->PlayerStartTag == FName(TEXT("Start")))
+		{
+			StartSpawnArray.Add(*ActorItr);
+		}
+		++ActorItr;
+	}*/
+}
+
+void ADieselandGameMode::FindSpawns()
+{
 	TActorIterator< APlayerStart > ActorItr =
 		TActorIterator< APlayerStart >(GetWorld());
 
 	while (ActorItr)
 	{
 		SpawnArray.Add(*ActorItr);
-
+		if (ActorItr->PlayerStartTag == FName("Start"))
+		{
+			StartSpawnArray.Add(*ActorItr);
+		}
 		++ActorItr;
 	}
 }
@@ -197,6 +216,11 @@ bool ADieselandGameMode::EndGame_Validate()
 
 APawn* ADieselandGameMode::SpawnDefaultPawnFor(AController* NewPlayer, AActor* StartSpot)
 {
+	if (StartSpawnArray.Num() < 1)
+	{
+		FindSpawns();
+	}
+	StartSpot = StartSpawnArray[0];
 	//NewPlayer->PlayerState->PlayerId
 	// don't allow pawn to be spawned with any pitch or roll
 	FRotator StartRotation(ForceInit);
@@ -212,6 +236,7 @@ APawn* ADieselandGameMode::SpawnDefaultPawnFor(AController* NewPlayer, AActor* S
 	if (ResultPawn != NULL)
 	{
 		PlayersSpawned++;
+		StartSpawnArray.RemoveAt(0);
 	}
 	return ResultPawn;
 
@@ -224,6 +249,8 @@ void ADieselandGameMode::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	// Replicate to everyone
     DOREPLIFETIME(ADieselandGameMode, BossTimer);
     DOREPLIFETIME(ADieselandGameMode, CanSpawn);
+	DOREPLIFETIME(ADieselandGameMode, SpawnArray);
+	DOREPLIFETIME(ADieselandGameMode, StartSpawnArray);
     DOREPLIFETIME(ADieselandGameMode, RandomBossIndex);
     DOREPLIFETIME(ADieselandGameMode, RandomSpawnIndex);
 	DOREPLIFETIME(ADieselandGameMode, DeathTileClassArray);

@@ -21,7 +21,7 @@ AScrapBox::AScrapBox(const class FPostConstructInitializeProperties& PCIP)
 	Mesh->SetDestructibleMesh(DestructibleMesh.Object);
 	//Mesh->AttachTo(RootComponent);
 	RootComponent = Mesh;
-	//Mesh->SetIsReplicated(true);
+	Mesh->SetIsReplicated(true);
 	//Mesh->SetCollisionProfileName(FName(TEXT("BlockAll")));
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemAsset(TEXT("ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'"));
@@ -45,32 +45,32 @@ AScrapBox::AScrapBox(const class FPostConstructInitializeProperties& PCIP)
 	bReplicateMovement = true;
 }
 
-void AScrapBox::DestroyCrate_Implementation(AActor* Causer)
+void AScrapBox::MultiDestroyCrate_Implementation(AActor* Causer)
 {
 	//Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 	//Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 
 	Mesh->ApplyDamage(100.0, GetActorLocation(), FVector(0.0f, 0.0f, 0.0f), 1000.0f);
-//	this->InitialLifeSpan = 2.0f;
-//	this->SetLifeSpan(2.0f);
+	//	this->InitialLifeSpan = 2.0f;
+	//	this->SetLifeSpan(2.0f);
 	if (this != nullptr){
 		this->SetLifeSpan(0.5f);
 	}
-
+	
 	if (Role == ROLE_Authority)
 	{
-		
+
 		//Spawn Scrap pieces here
 		UWorld* const World = GetWorld();
 		if (World)
 		{
 			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = Cast<ADieselandCharacter>(Causer); 
+			SpawnParams.Owner = Cast<ADieselandCharacter>(Causer);
 			SpawnParams.Instigator = Instigator;
 			for (int32 x = 0; x < ScrapAmt; x++)
 			{
-                RandomX = FMath::RandRange(-30, 30);
-                RandomY = FMath::RandRange(-30, 30);
+				RandomX = FMath::RandRange(-30, 30);
+				RandomY = FMath::RandRange(-30, 30);
 				AActor* Scrap = UDieselandStaticLibrary::SpawnBlueprint<AActor>(World, ScrapClass, FVector(GetActorLocation().X + RandomX, GetActorLocation().Y + RandomY, GetActorLocation().Z), FRotator(0.0f, 0.0f, 0.0f));
 				if (Scrap != nullptr)
 				{
@@ -81,6 +81,11 @@ void AScrapBox::DestroyCrate_Implementation(AActor* Causer)
 			}
 		}
 	}
+}
+
+void AScrapBox::DestroyCrate_Implementation(AActor* Causer)
+{
+	MultiDestroyCrate(Causer);
 }
 
 bool AScrapBox::DestroyCrate_Validate(AActor* Causer)
