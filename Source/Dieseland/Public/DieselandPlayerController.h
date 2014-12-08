@@ -185,6 +185,10 @@ protected:
 	UClass* StrykerClass;
 	UClass* FoxClass;
 
+	bool IsUsingMouse;
+	FVector MouseLocation;
+	FVector PrevMouseLocation;
+
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
@@ -197,6 +201,10 @@ protected:
 	void OnMoveRight(float Val);
 	void OnFaceNorth(float Val);
 	void OnFaceEast(float Val);
+	void MouseAxis(float Val);
+	void OnMouseMove(FVector TargetLocation);
+
+	void ResetMouseInput();
 	
 };
 

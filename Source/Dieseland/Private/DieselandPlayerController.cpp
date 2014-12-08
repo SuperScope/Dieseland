@@ -53,7 +53,7 @@ void ADieselandPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 
 	UpdateCooldownTimers(DeltaTime);
-	
+
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 	if (DieselandPawn != nullptr){
 
@@ -67,7 +67,7 @@ void ADieselandPlayerController::PlayerTick(float DeltaTime)
 		GEngine->AddOnScreenDebugMessage(20, 10.0f, FColor::Red, FString("Kills: ") + FString::FromInt(DieselandPawn->Kills));
 
 		if (DieselandPawn->BasicAttackReloadTimer > 0.0f){
-			GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor::Yellow, FString("Basic Attack Reload: ") + FString::SanitizeFloat(DieselandPawn->BasicAttackReloadTimer));
+		GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor::Yellow, FString("Basic Attack Reload: ") + FString::SanitizeFloat(DieselandPawn->BasicAttackReloadTimer));
 		}*/
 
 		if (DieselandPawn->Health <= 0)
@@ -79,6 +79,18 @@ void ADieselandPlayerController::PlayerTick(float DeltaTime)
 			DieselandPawn->LingerTimer = 0;
 
 		}
+	}
+	if (GetPawn() != nullptr && IsUsingMouse)
+	{
+		FHitResult Result;
+		GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, Result);
+
+		MouseLocation = FVector(Result.Location.X, Result.Location.Y, GetPawn()->GetActorLocation().Z);
+	}
+	if (PrevMouseLocation != MouseLocation)
+	{
+		PrevMouseLocation = MouseLocation;
+		OnMouseMove(MouseLocation);
 	}
 }
 
@@ -270,6 +282,9 @@ void ADieselandPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("Attack", IE_Pressed, this, &ADieselandPlayerController::OnAttackPress);
 	InputComponent->BindAction("Attack", IE_Released, this, &ADieselandPlayerController::OnAttackRelease);
+
+	InputComponent->BindAxis("MouseX", this, &ADieselandPlayerController::MouseAxis);
+	InputComponent->BindAxis("MouseY", this, &ADieselandPlayerController::MouseAxis);
 
 	InputComponent->BindAction("Aim_1", IE_Pressed, this, &ADieselandPlayerController::AimOne);
 	InputComponent->BindAction("Skill_1", IE_Released, this, &ADieselandPlayerController::AimOneRelease);
@@ -534,11 +549,60 @@ void ADieselandPlayerController::OnMoveRight(float Val)
 	}
 }
 
+void ADieselandPlayerController::MouseAxis(float Val)
+{
+	
+	if (FMath::Abs(Val) > 0.8f)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(this, &ADieselandPlayerController::ResetMouseInput);
+
+		this->bEnableMouseOverEvents = true;
+		this->bShowMouseCursor = true;
+
+		IsUsingMouse = true;
+	}
+	else
+	{
+		ResetMouseInput();
+	}
+}
+
+void ADieselandPlayerController::OnMouseMove(FVector TargetLocation)
+{
+	
+
+	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
+
+	if (GetPawn() != nullptr && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
+
+		// Convert the joystick axis to a rotator
+		FacingRotation = FRotationMatrix::MakeFromX(DieselandPawn->GetActorLocation() - MouseLocation).Rotator();
+
+		// If the rotation value is different from previous, change the rotation
+		if (DieselandPawn->AimRotation != FacingRotation){
+			// Edit the pawn's spine rotation
+			DieselandPawn->AimRotation = FacingRotation;
+			// If this is the client, send the the rotator to the server
+			if (Role < ROLE_Authority){
+				ServerOnAim(FacingRotation);
+			}
+		}
+	}
+	
+}
+
+void ADieselandPlayerController::ResetMouseInput()
+{
+	IsUsingMouse = false;
+	this->bEnableMouseOverEvents = false;
+	this->bShowMouseCursor = false;
+}
+
 void ADieselandPlayerController::OnFaceNorth(float Val)
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 	
-	if (GetPawn() != nullptr && Val != 0.0f && DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
+	if (GetPawn() != nullptr && Val != 0.0f && DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput && !IsUsingMouse){
 
 		// Convert the joystick axis to a rotator
 		FVector TempAxisVector = FVector(Val, (GetInputAxisValue("LookEast") * 1.0f), 0.0f);
@@ -559,7 +623,7 @@ void ADieselandPlayerController::OnFaceEast(float Val)
 {
 	ADieselandCharacter* DieselandPawn = Cast<ADieselandCharacter>(GetPawn());
 
-	if (GetPawn() != nullptr && Val != 0.0f && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput){
+	if (GetPawn() != nullptr && Val != 0.0f && !DieselandPawn->StatusEffects.Contains(FString("Stunned")) && !PauseGameInput && !IsUsingMouse){
 		
 		// Convert the joystick axis to a rotator
 		FVector TempAxisVector = FVector(GetInputAxisValue("LookNorth"), Val * 1.0f, 0.0f);
