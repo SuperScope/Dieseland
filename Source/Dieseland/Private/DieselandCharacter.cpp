@@ -519,14 +519,18 @@ void ADieselandCharacter::EditHealth(int32 Amt, AActor* Causer)
 		{
 			Health += Amt;
 
-			if (Health <= 0 && !Cast<ADieselandPlayerController>(Controller)->PauseGameInput)
+			if (Health <= 0 && !IsRespawning)
 			{
 				OnHasBeenKilled(Causer);
 
 				OnRagdollNeeded();
 				GetWorldTimerManager().SetTimer(this, &ADieselandCharacter::PostSpawnRagdoll, 3.0f, false);
 				this->SetActorHiddenInGame(true);
-				Cast<ADieselandPlayerController>(Controller)->PauseGameInput = true;
+				if (Cast<ADieselandPlayerController>(Controller) != nullptr)
+				{
+					Cast<ADieselandPlayerController>(Controller)->PauseGameInput = true;
+				}
+				IsRespawning = true;
 			}
 			if (Causer != nullptr){
 				if (Causer->ActorHasTag(FName(TEXT("Player"))) /*|| Causer->ActorHasTag(FName(TEXT("KillFloor")))*/)
@@ -580,6 +584,7 @@ void ADieselandCharacter::PostSpawnRagdoll()
 		Cast<ADieselandPlayerController>(Controller)->RespawnPawn();
 		this->SetActorHiddenInGame(false);
 		Cast<ADieselandPlayerController>(Controller)->PauseGameInput = false;
+		IsRespawning = false;
 	}
 }
 

@@ -234,7 +234,7 @@ void ADieselandPlayerController::UpdateCooldownTimers_Implementation(float Delta
 			}
 			if (DieselandPawn->StatusEffects.Contains(FString("Charmed")))
 			{
-				DieselandPawn->CharacterMovement->Velocity += DieselandPawn->VectorDirection * 800;
+				DieselandPawn->CharacterMovement->Velocity += DieselandPawn->VectorDirection * 400;
 			}
 		}
 		if (DieselandPawn->SlowRemaining > 0.0f)
