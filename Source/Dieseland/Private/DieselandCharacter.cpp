@@ -272,7 +272,11 @@ ADieselandCharacter::ADieselandCharacter(const class FPostConstructInitializePro
 
 void ADieselandCharacter::ReceiveBeginPlay()
 {
-    CharSelectMusic->Play();
+    if(Role == ROLE_Authority)
+    {
+        CharSelectMusic->Play();
+    }
+    
 	AimBarMaterial = UMaterialInstanceDynamic::Create(AimBarMatStatic, this);
 
 	//AimBar->SetWorldLocation(FVector(0, 0, -50));
