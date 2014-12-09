@@ -852,13 +852,16 @@ void ADieselandCharacter::OnRep_AimRotation()
 }
 
 
-void ADieselandCharacter::ServerActivateParticle_Implementation(UParticleSystem* Particle, bool ShouldDetach)
+void ADieselandCharacter::ServerActivateParticle_Implementation(UParticleSystem* Particle, bool ShouldDetach, bool UseParentRotation)
 {
 	//ParticleSystem->SetTemplate(Particle);
 	//ParticleSystem->ActivateSystem();
-	if (ShouldDetach){
+	if (ShouldDetach && !UseParentRotation){
 		UGameplayStatics::SpawnEmitterAtLocation(this, Particle, Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), Mesh->GetSocketRotation(FName(TEXT("AimSocket"))));
-		//UGameplayStatics::SpawnEmitterAttached(Particle, this->Mesh, FName(TEXT("AimSocket")), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), Mesh->GetSocketRotation(FName(TEXT("AimSocket"))), EAttachLocation::KeepWorldPosition);
+	}
+	else if (ShouldDetach && UseParentRotation)
+	{
+		UGameplayStatics::SpawnEmitterAttached(Particle, this->Mesh, FName(TEXT("NAME_None")), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), Mesh->GetSocketRotation(FName(TEXT("AimSocket"))), EAttachLocation::KeepWorldPosition);
 	}
 	else
 	{
@@ -868,7 +871,7 @@ void ADieselandCharacter::ServerActivateParticle_Implementation(UParticleSystem*
 	
 }
 
-bool ADieselandCharacter::ServerActivateParticle_Validate(UParticleSystem* Particle, bool ShouldDetach)
+bool ADieselandCharacter::ServerActivateParticle_Validate(UParticleSystem* Particle, bool ShouldDetach, bool UseParentRotation)
 {
 	return true;
 }

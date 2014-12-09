@@ -387,7 +387,7 @@ public:
 	TSubobjectPtr<class UParticleSystemComponent> AOEParticleSystem;
 
 	UFUNCTION(Reliable, NetMulticast, WithValidation)
-	void ServerActivateParticle(UParticleSystem* Particle, bool ShouldDetach = false);
+	void ServerActivateParticle(UParticleSystem* Particle, bool ShouldDetach = false, bool UseParentRotation = false);
 
 	UFUNCTION(Reliable, NetMulticast, WithValidation)
 	void ServerActivateAOEParticle(UParticleSystem* Particle);
