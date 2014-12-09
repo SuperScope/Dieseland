@@ -58,9 +58,12 @@ AMayhemCharacter::AMayhemCharacter(const class FPostConstructInitializePropertie
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> MayhemSkillOneParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_MayhemSkullCrusher_WIP.Unreal_Particle_MayhemSkullCrusher_WIP'"));
 	SkillOneParticle = MayhemSkillOneParticleAsset.Object;
-
+	
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> RageParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_MayhemRage_WIP.Unreal_Particle_MayhemRage_WIP'"));
 	SkillTwoParticle = RageParticleAsset.Object;
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> SkillThreeParticleAsset(TEXT("ParticleSystem'/Game/Particles/Test/Unreal_Particle_IronArmor.Unreal_Particle_IronArmor'"));
+	SkillThreeParticle = SkillThreeParticleAsset.Object;
 
 	IronArmorSound = PCIP.CreateDefaultSubobject<UAudioComponent>(this, TEXT("Iron Armor Sound"));
 	IronArmorSound->AttachParent = RootComponent;
@@ -255,6 +258,7 @@ void AMayhemCharacter::SkillThree()
 {
 	if (Role == ROLE_Authority)
 	{
+		ServerActivateAOEParticle(SkillThreeParticle);
 		IronArmorHealthBuff = (float)MaxHealth * 0.25f + Strength * 0.5f;
 		IronArmorRegenBuff = (float)HealthRegeneration * 0.08f + Strength + 0.01f;
 
