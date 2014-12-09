@@ -219,8 +219,15 @@ APawn* ADieselandGameMode::SpawnDefaultPawnFor(AController* NewPlayer, AActor* S
 	if (StartSpawnArray.Num() < 1)
 	{
 		FindSpawns();
+		if (StartSpawnArray.Num() < 1)
+		{
+			StartSpot = StartSpawnArray[0];
+		}
 	}
-	StartSpot = StartSpawnArray[0];
+	else if (StartSpawnArray.Num() >= 1)
+	{
+		StartSpot = StartSpawnArray[0];
+	}
 	//NewPlayer->PlayerState->PlayerId
 	// don't allow pawn to be spawned with any pitch or roll
 	FRotator StartRotation(ForceInit);
@@ -236,7 +243,11 @@ APawn* ADieselandGameMode::SpawnDefaultPawnFor(AController* NewPlayer, AActor* S
 	if (ResultPawn != NULL)
 	{
 		PlayersSpawned++;
-		StartSpawnArray.RemoveAt(0);
+		
+		if (StartSpawnArray.Num() >= 1)
+		{
+			StartSpawnArray.RemoveAt(0);
+		}
 	}
 	return ResultPawn;
 
