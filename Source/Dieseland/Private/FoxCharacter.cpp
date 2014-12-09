@@ -103,7 +103,7 @@ AFoxCharacter::AFoxCharacter(const class FPostConstructInitializeProperties& PCI
 // To do fox penetration round
 void AFoxCharacter::SkillOne()
 {
-	ServerActivateParticle(SkillOneParticle);
+	ServerActivateParticle(SkillOneParticle, true);
 	isAimingOne = false;
 	UWorld* const World = GetWorld();
 	if (World)
@@ -136,7 +136,7 @@ void AFoxCharacter::SkillOne()
 //To do fox charm
 void AFoxCharacter::SkillTwo()
 {
-	ServerActivateParticle(SkillTwoParticle);
+	ServerActivateParticle(SkillTwoParticle, true);
 	isAimingTwo = false;
 
 	UWorld* const World = GetWorld();
@@ -169,7 +169,7 @@ void AFoxCharacter::SkillTwo()
 //To do fox smoke bomb
 void AFoxCharacter::SkillThree()
 {
-	ServerActivateParticle(SkillThreeParticle);
+	ServerActivateParticle(SkillThreeParticle, true);
 	isAimingThree = false;
 
 	UWorld* const World = GetWorld();
@@ -201,7 +201,7 @@ void AFoxCharacter::SkillThree()
 
 void AFoxCharacter::RangedAttack()
 {
-	ServerActivateParticle(BasicAttackParticle);
+	ServerActivateParticle(BasicAttackParticle, true);
 
 	UWorld* const World = GetWorld();
 	if (World)

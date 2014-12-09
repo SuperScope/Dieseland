@@ -197,7 +197,7 @@ void AEngletonCharacter::SkillOne()
 void AEngletonCharacter::SkillTwo()
 {
 	CrazyLaserSound->Play();
-	ServerActivateParticle(CrazyLaserParticle);
+	ServerActivateParticle(CrazyLaserParticle, true);
 
 	UWorld* const World = GetWorld();
 	if (World && Role == ROLE_Authority)
@@ -308,8 +308,8 @@ void AEngletonCharacter::SkillThree()
 void AEngletonCharacter::RangedAttack()
 {
 	MachineGunSound->Play();
-	ServerActivateParticle(MachineGunTrailParticle2);
-	ServerActivateParticle(MachineGunTrailParticle);
+	ServerActivateParticle(MachineGunTrailParticle2, true);
+	ServerActivateParticle(MachineGunTrailParticle, true);
 	UWorld* const World = GetWorld();
 	if (World && Role == ROLE_Authority)
 	{

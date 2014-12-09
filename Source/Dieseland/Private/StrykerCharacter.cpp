@@ -382,7 +382,7 @@ void AStrykerCharacter::SkillOne()
 {
 	if (Role == ROLE_Authority)
 	{
-	ServerActivateAOEParticle(SkillOneParticle);
+	ServerActivateParticle(SkillOneParticle);
 
 	//here I ensure the player can't cast this ability when in air as it will cause a bug...
 	if (this->CharacterMovement->Velocity.Z > 0 || this->CharacterMovement->Velocity.Z < 0){
@@ -413,7 +413,7 @@ void AStrykerCharacter::SkillOne()
 void AStrykerCharacter::SkillTwo()
 {
 	PoisonSound->Play();
-	ServerActivateParticle(SkillTwoParticle);
+	ServerActivateParticle(SkillTwoParticle, true);
 
 
 	UWorld* const World = GetWorld();

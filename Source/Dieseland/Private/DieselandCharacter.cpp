@@ -852,13 +852,22 @@ void ADieselandCharacter::OnRep_AimRotation()
 }
 
 
-void ADieselandCharacter::ServerActivateParticle_Implementation(UParticleSystem* Particle)
+void ADieselandCharacter::ServerActivateParticle_Implementation(UParticleSystem* Particle, bool ShouldDetach)
 {
-	ParticleSystem->SetTemplate(Particle);
-	ParticleSystem->ActivateSystem();
+	//ParticleSystem->SetTemplate(Particle);
+	//ParticleSystem->ActivateSystem();
+	if (ShouldDetach){
+		UGameplayStatics::SpawnEmitterAttached(Particle, this->Mesh, FName(TEXT("NAME_None")), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), Mesh->GetSocketRotation(FName(TEXT("AimSocket"))), EAttachLocation::KeepWorldPosition);
+	}
+	else
+	{
+		ParticleSystem->SetTemplate(Particle);
+		ParticleSystem->ActivateSystem();
+	}
+	
 }
 
-bool ADieselandCharacter::ServerActivateParticle_Validate(UParticleSystem* Particle)
+bool ADieselandCharacter::ServerActivateParticle_Validate(UParticleSystem* Particle, bool ShouldDetach)
 {
 	return true;
 }
