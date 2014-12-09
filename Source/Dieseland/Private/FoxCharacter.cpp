@@ -169,7 +169,7 @@ void AFoxCharacter::SkillTwo()
 //To do fox smoke bomb
 void AFoxCharacter::SkillThree()
 {
-	ServerActivateParticle(SkillThreeParticle, true);
+	//ServerActivateParticle(SkillThreeParticle, true);
 	isAimingThree = false;
 
 	UWorld* const World = GetWorld();
