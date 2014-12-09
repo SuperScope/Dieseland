@@ -857,7 +857,8 @@ void ADieselandCharacter::ServerActivateParticle_Implementation(UParticleSystem*
 	//ParticleSystem->SetTemplate(Particle);
 	//ParticleSystem->ActivateSystem();
 	if (ShouldDetach){
-		UGameplayStatics::SpawnEmitterAttached(Particle, this->Mesh, FName(TEXT("AimSocket")), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), Mesh->GetSocketRotation(FName(TEXT("AimSocket"))), EAttachLocation::KeepWorldPosition);
+		UGameplayStatics::SpawnEmitterAtLocation(this, Particle, Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), Mesh->GetSocketRotation(FName(TEXT("AimSocket"))));
+		//UGameplayStatics::SpawnEmitterAttached(Particle, this->Mesh, FName(TEXT("AimSocket")), Mesh->GetSocketLocation(FName(TEXT("AimSocket"))), Mesh->GetSocketRotation(FName(TEXT("AimSocket"))), EAttachLocation::KeepWorldPosition);
 	}
 	else
 	{
